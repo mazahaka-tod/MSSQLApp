@@ -122,6 +122,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
             return new SelectList(items, "Value", "Text");
         }
 
+        // Частичное представление
         public ActionResult AddEmployee(int index)
         {
             ViewBag.Index = index;
@@ -182,6 +183,13 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             businessTripService.DeleteAll();
             return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            businessTripService.Dispose();
+            employeeService.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

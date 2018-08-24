@@ -7,12 +7,10 @@ namespace DiplomMSSQLApp.DAL.Repositories
 {
     public class EFPostRepository : EFGenericRepository<Post>
     {
-        //DbContext _context;
         private DbSet<Post> _dbSet;
 
         public EFPostRepository(DbContext context) : base(context)
         {
-            //_context = context;
             _dbSet = context.Set<Post>();
         }
 

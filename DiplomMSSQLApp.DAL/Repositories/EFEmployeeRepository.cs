@@ -8,19 +8,16 @@ namespace DiplomMSSQLApp.DAL.Repositories
 {
     public class EFEmployeeRepository : EFGenericRepository<Employee>
     {
-        //DbContext _context;
         private DbSet<Employee> _dbSet;
 
         public EFEmployeeRepository(DbContext context) : base(context)
         {
-            //_context = context;
             _dbSet = context.Set<Employee>();
         }
 
         public override IEnumerable<Employee> Get(Func<Employee, bool> predicate)
         {
-            return _dbSet.Include(e => e.Department).Include(e => e.Post)
-                .Where(predicate).ToList();
+            return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(predicate).ToList();
         }
 
         public override Employee FindById(int id)
@@ -30,15 +27,15 @@ namespace DiplomMSSQLApp.DAL.Repositories
 
         public override IEnumerable<Employee> Get(int val)
         {
-            var emps = _dbSet.AsQueryable().Where(e => e.Salary >= val)
-                .Include(e => e.Department).Include(e => e.Post)
-                .AsNoTracking();
-            return emps.ToList();
+            return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary >= val).ToList();
         }
 
         public override IEnumerable<Employee> Get(bool f)
         {
-            return _dbSet.Where(e => e.Salary != 50000).ToList();
+            if (f)
+                return _dbSet.Where(e => e.Salary > 50000).ToList();
+            else
+                return _dbSet.Where(e => e.Salary <= 50000).ToList();
         }
 
         public override Employee GetFirst()

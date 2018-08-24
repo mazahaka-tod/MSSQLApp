@@ -149,5 +149,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
             departmentService.DeleteAll();
             return RedirectToAction("Index");
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            employeeService.Dispose();
+            departmentService.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }

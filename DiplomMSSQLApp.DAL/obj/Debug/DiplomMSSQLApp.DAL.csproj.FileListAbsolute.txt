@@ -32,3 +32,15 @@ C:\Users\Al\git\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.csproj.
 C:\Users\Al\git\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.csproj.CopyComplete
 C:\Users\Al\git\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.dll
 C:\Users\Al\git\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.pdb
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\bin\Debug\DiplomMSSQLApp.DAL.dll.config
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\bin\Debug\DiplomMSSQLApp.DAL.dll
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\bin\Debug\DiplomMSSQLApp.DAL.pdb
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\bin\Debug\EntityFramework.dll
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\bin\Debug\EntityFramework.xml
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.csprojAssemblyReference.cache
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.csproj.CoreCompileInputs.cache
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.csproj.CopyComplete
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.dll
+C:\Users\Al\Desktop\github\MSSQLApp\DiplomMSSQLApp.DAL\obj\Debug\DiplomMSSQLApp.DAL.pdb
