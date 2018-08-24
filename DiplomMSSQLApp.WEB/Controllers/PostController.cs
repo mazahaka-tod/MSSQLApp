@@ -156,7 +156,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 MinSalary = p.MinSalary,
                 MaxSalary = p.MaxSalary
             });
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default))
+            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
             {
                 foreach (var item in posts)
                 {

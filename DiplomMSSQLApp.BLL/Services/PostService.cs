@@ -120,8 +120,8 @@ namespace DiplomMSSQLApp.BLL.Services
             Database.Save();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default))
+            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
+            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
             {
                 sw.WriteLine("Количество должностей: " + num + "; Время: " + elapsedTime);
             }
@@ -140,8 +140,8 @@ namespace DiplomMSSQLApp.BLL.Services
             }
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default))
+            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
+            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
             {
                 sw.WriteLine("Общее количество должностей: " + cnt + "; Условие выборки: MaxSalary == 60000; Индекс: нет; Количество найденных должностей: " + result.Count() + "; Количество выборок: " + num + "; Время: " + elapsedTime);
             }
@@ -174,8 +174,8 @@ namespace DiplomMSSQLApp.BLL.Services
             //stopWatch.Stop();
             //TimeSpan ts = stopWatch.Elapsed;
             ts = new TimeSpan(ts.Ticks / num);
-            string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default))
+            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
+            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
             {
                 sw.WriteLine("Количество замен: " + matchedCount + "; Количество должностей: " + num + "; Время: " + elapsedTime);
             }
@@ -191,8 +191,8 @@ namespace DiplomMSSQLApp.BLL.Services
             Database.Save();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default))
+            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
+            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
             {
                 sw.WriteLine("Количество найденных записей: " + posts.Count() + "; Количество должностей: " + num + "; Время: " + elapsedTime);
             }
