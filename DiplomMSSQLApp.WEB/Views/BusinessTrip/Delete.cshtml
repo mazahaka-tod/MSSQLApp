@@ -1,0 +1,79 @@
+﻿@model DiplomMSSQLApp.WEB.Models.BusinessTripViewModel
+
+@{
+    ViewBag.Title = "Удаление командировки";
+}
+
+<h2>Удаление командировки</h2>
+
+<h3>Вы уверены, что хотите удалить командировку?</h3>
+<div>
+
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateStart)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateStart)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateEnd)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateEnd)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Destination)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Destination)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Purpose)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Purpose)
+        </dd>
+
+        @for (int i = 0; i < Model.Employees.Count; i++)
+        {
+            <dt>
+                @Html.Label("Employee", "Сотрудник №" + (i + 1).ToString())
+            </dt>
+
+            <dd>
+                @Model.Employees.ElementAt(i).LastName
+                @Model.Employees.ElementAt(i).FirstName
+            </dd>
+        }
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Удалить" class="btn btn-default" />
+        </div>
+    }
+</div>
+<br />
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

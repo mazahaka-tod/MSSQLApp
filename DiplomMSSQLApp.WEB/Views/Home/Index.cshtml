@@ -1,0 +1,408 @@
+﻿@using DiplomMSSQLApp.WEB.Helpers
+@model DiplomMSSQLApp.WEB.Models.EmployeeListViewModel
+
+@{
+    ViewBag.Title = "Список сотрудников";
+}
+
+<h2>Список сотрудников</h2>
+
+<p>
+    <details>
+        <summary>Поиск по фильтру</summary>
+        @using (Html.BeginForm("Index", "Home"))
+        {
+            <table>
+                <tr>
+                    <td>
+                        <dl class="dl-horizontal">
+                            <dt>
+                                @Html.Label("LastName", "Фамилия")
+                            </dt>
+                            <dd>
+                                <span id="lastname">
+                                    @Html.TextBox("LastName", null, new { @class = "form-control" })
+                                </span>
+                                @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "LastName" }, new AjaxOptions { UpdateTargetId = "lastname", InsertionMode = InsertionMode.InsertAfter })
+                                <br />
+                                @Html.CheckBox("Or", new { style = "margin-bottom: 12px" })
+                                @Html.Label("Or", "Минимум одно соответствие")
+                            </dd>
+
+                            <dt>
+                                @Html.Label("Email", "Email")
+                            </dt>
+                            <dd>
+                                @Html.TextBox("Email", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                            </dd>
+
+                            <dt>
+                                @Html.Label("Phone", "Телефон")
+                            </dt>
+                            <dd>
+                                @Html.CheckBox("PhoneNumber", new { style = "margin-bottom: 12px" })
+                                @Html.Label("PhoneNumber", "Есть")
+                            </dd>
+
+                            <dt>
+                                @Html.Label("HireDate", "Дата найма на работу:")
+                            </dt>
+                            <dd>
+                                @Html.TextBox("HireDate", null, new { @class = "form-control", style = "margin-bottom: 12px", placeholder = "yyyy-mm-dd" })
+                            </dd>
+
+                            <dt>
+                                @Html.Label("MinSalary", "Зарплата от ")
+                            </dt>
+                            <dd>
+                                @Html.TextBox("MinSalary", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                            </dd>
+
+                            <dt>
+                                @Html.Label("MaxSalary", " до ")
+                            </dt>
+                            <dd>
+                                @Html.TextBox("MaxSalary", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                            </dd>
+
+                            <dt>
+                                @Html.Label("Bonus", "Премия")
+                            </dt>
+                            <dd>
+                                <span id="bonus">@Html.TextBox("Bonus", null, new { @class = "form-control" })</span>
+                                @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "Bonus" }, new AjaxOptions { UpdateTargetId = "bonus", InsertionMode = InsertionMode.InsertAfter })
+                                <br />
+                                @Html.CheckBox("BonusExists", new { style = "margin-bottom: 12px" })
+                                @Html.Label("BonusExists", "Есть")
+                            </dd>
+
+                            <dt>
+                                @Html.Label("Post", "Должность")
+                            </dt>
+                            <dd>
+                                @Html.TextBox("Post", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                            </dd>
+
+                            <dt>
+                                @Html.Label("DepartmentName", "Название отдела")
+                            </dt>
+                            <dd>
+                                @Html.TextBox("DepartmentName", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>
+                        <dl class="dl-horizontal">
+                            <dt>
+                                @Html.Label("Sort", "Сортировка")
+                            </dt>
+                            <dd>
+                                @Html.DropDownList("Sort", new SelectList(new[] { new { label = "По фамилии сотрудника", value = "SurName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownList("Asc", new SelectList(new[] { new { label = "По возрастанию", value = "1" }, new { label = "По убыванию", value = "-1" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                            </dd>
+
+                            <dt>
+                                @Html.Label("Columns", "Показывать столбцы")
+                            </dt>
+                            <dd>
+                                <input type="checkbox" id="Columns0" name="Columns" value="0" checked>
+                                @Html.Label("Columns", "Фамилия сотрудника")
+                                <br />
+                                <input type="checkbox" id="Columns1" name="Columns" value="1" checked>
+                                @Html.Label("Columns", "Имя сотрудника")
+                                <br />
+                                <input type="checkbox" id="Columns2" name="Columns" value="2" checked>
+                                @Html.Label("Columns", "Email")
+                                <br />
+                                <input type="checkbox" id="Columns3" name="Columns" value="3" checked>
+                                @Html.Label("Columns", "Телефон")
+                                <br />
+                                <input type="checkbox" id="Columns4" name="Columns" value="4" checked>
+                                @Html.Label("Columns", "Дата приема на работу")
+                                <br />
+                                <input type="checkbox" id="Columns5" name="Columns" value="5" checked>
+                                @Html.Label("Columns", "Зарплата")
+                                <br />
+                                <input type="checkbox" id="Columns6" name="Columns" value="6" checked>
+                                @Html.Label("Columns", "Премия")
+                                <br />
+                                <input type="checkbox" id="Columns7" name="Columns" value="7" checked>
+                                @Html.Label("Columns", "Должность")
+                                <br />
+                                <input type="checkbox" id="Columns8" name="Columns" value="8" checked>
+                                @Html.Label("Columns", "Название отдела")
+                            </dd>
+
+                            <dt>
+                                @Html.Label("Not", "Не соответствующие фильтру")
+                            </dt>
+                            <dd>
+                                @Html.CheckBox("Not", new { style = "margin-bottom: 12px" })
+                                @Html.Label("Not", "Да")
+                            </dd>
+
+                            <dt>
+                            </dt>
+                            <dd>
+                                <input type="submit" value="Поиск" class="btn btn-default" />
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+            </table>
+        }
+    </details>
+</p>
+
+<p>
+    @Html.ActionLink("Добавить сотрудника", "Create", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Удалить всех сотрудников", "AllDelete", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
+</p>
+
+<p>
+    @using (Html.BeginForm("TestCreate", "Home"))
+    {
+        <div>
+            @Html.Label("Num", "Тест добавления сотрудников")
+        </div>
+        <input type="number" value=10 name="num" /><br />
+        <input type="submit" value="Добавить" />
+    }
+</p>
+<p>
+    @using (Html.BeginForm("TestRead", "Home"))
+    {
+        <div>
+            @Html.Label("Num", "Тест выборки сотрудников")
+        </div>
+        <input type="number" value=10 name="num" /><br />
+        @Html.Label("Val", "Salary >= ")
+        <input type="number" value=55000 name="val" /><br />
+        <input type="submit" value="Поиск" />
+    }
+</p>
+<p>
+    @using (Html.BeginForm("TestUpdate", "Home"))
+    {
+        <div>
+            @Html.Label("Num", "Тест обновления сотрудников")
+        </div>
+        <input type="number" value=10 name="num" /><br />
+        <input type="submit" value="Обновить" />
+    }
+</p>
+<p>
+    @using (Html.BeginForm("TestDelete", "Home"))
+    {
+        <div>
+            @Html.Label("Num", "Тест удаления сотрудников")
+        </div>
+        <input type="number" value=10 name="num" /><br />
+        <input type="submit" value="Удалить" />
+    }
+</p>
+
+@if (Model.Employees.Count() > 0)
+{
+    <table class="table table-striped table-hover">
+        <tr>
+            @if (Model.Filter.Columns.Contains("0"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).LastName)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("1"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).FirstName)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("2"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Email)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("3"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).PhoneNumber)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("4"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).HireDate)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("5"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Salary)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("6"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Bonus)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("7"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Post.Title)
+                </th>
+            }
+            @if (Model.Filter.Columns.Contains("8"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Department.DepartmentName)
+                </th>
+            }
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.Employees)
+        {
+            <tr>
+                @if (Model.Filter.Columns.Contains("0"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("1"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("2"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("3"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("4"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HireDate)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("5"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Salary)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("6"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Bonus)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("7"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Post.Title)
+                    </td>
+                }
+                @if (Model.Filter.Columns.Contains("8"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Department.DepartmentName)
+                    </td>
+                }
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </table>
+}
+
+<p>
+    @Html.Label("Count", "Количество сотрудников: " + Model.PageInfo.RealPages)
+</p>
+
+<div class="btn-group">
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { str = Html.Raw(Json.Encode(Model.Filter)), page = x }))
+</div>
+
+@section scripts {
+    @Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
+    <script>
+        // Устанавлеваем checkbox, textbox и dropdownlist на форме поиска
+        $(document).ready(function() {
+            @{ string f = Model.Filter.Columns.Contains("0") ? "true" : "false"; }
+            $('#Columns0').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("1") ? "true" : "false"; }
+            $('#Columns1').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("2") ? "true" : "false"; }
+            $('#Columns2').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("3") ? "true" : "false"; }
+            $('#Columns3').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("4") ? "true" : "false"; }
+            $('#Columns4').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("5") ? "true" : "false"; }
+            $('#Columns5').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("6") ? "true" : "false"; }
+            $('#Columns6').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("7") ? "true" : "false"; }
+            $('#Columns7').prop('checked', @f);
+            @{ f = Model.Filter.Columns.Contains("8") ? "true" : "false"; }
+            $('#Columns8').prop('checked', @f);
+
+            $('#Or').prop('checked', @Model.Filter.Or.ToString().ToLower());
+            $('#PhoneNumber').prop('checked', @Model.Filter.PhoneNumber.ToString().ToLower());
+            $('#BonusExists').prop('checked', @Model.Filter.BonusExists.ToString().ToLower());
+            $('#Not').prop('checked', @Model.Filter.Not.ToString().ToLower());
+
+        @if (Model.Filter.LastName != null)
+            {
+                @:$('#LastName').prop('value', "@Model.Filter.LastName[0]");
+            }
+            @if (Model.Filter.Email != null)
+            {
+                @:$('#Email').prop('value', "@Model.Filter.Email");
+            }
+            @if (Model.Filter.HireDate != null)
+            {
+                @:$('#HireDate').prop('value', "@Model.Filter.HireDate");
+            }
+            @if (Model.Filter.MinSalary != null)
+            {
+                @:$('#MinSalary').prop('value', "@Model.Filter.MinSalary");
+            }
+            @if (Model.Filter.MaxSalary != null)
+            {
+                @:$('#MaxSalary').prop('value', "@Model.Filter.MaxSalary");
+            }
+            @if (Model.Filter.Bonus != null)
+            {
+                @:$('#Bonus').prop('value', "@Model.Filter.Bonus[0]");
+            }
+            @if (Model.Filter.Post != null)
+            {
+                @:$('#Post').prop('value', "@Model.Filter.Post");
+            }
+            @if (Model.Filter.DepartmentName != null)
+            {
+                @:$('#DepartmentName').prop('value', "@Model.Filter.DepartmentName");
+            }
+
+            $('select#Sort option[value="@Model.Filter.Sort"]').prop('selected', true);
+            $('select#Asc option[value="@Model.Filter.Asc"]').prop('selected', true);
+        });
+    </script>
+}
