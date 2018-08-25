@@ -4,7 +4,7 @@ using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services
 {
@@ -18,12 +18,12 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Добавление нового отдела (с валидацией)
-        public override void Create(DepartmentDTO item)
+        public override async Task CreateAsync(DepartmentDTO item)
         {
             ValidationDepartment(item);
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>());
             Database.Departments.Create(Mapper.Map<DepartmentDTO, Department>(item));
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Получение списка всех отделов
@@ -36,28 +36,28 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Удаление отдела
-        public override void Delete(int id)
+        public override async Task DeleteAsync(int id)
         {
             Department item = Database.Departments.FindById(id);
             if (item == null) return;
             Database.Departments.Remove(item);
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Удаление всех отделов
-        public override void DeleteAll()
+        public override async Task DeleteAllAsync()
         {
             Database.Departments.RemoveAll();
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Обновление информации об отделе
-        public override void Edit(DepartmentDTO item)
+        public override async Task EditAsync(DepartmentDTO item)
         {
             ValidationDepartment(item);
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>());
             Database.Departments.Update(Mapper.Map<DepartmentDTO, Department>(item));
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         public override void Dispose()
@@ -88,6 +88,26 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             if (item.DepartmentName == null)
                 throw new ValidationException("Требуется ввести название отдела", "DepartmentName");
+        }
+
+        public override Task TestCreateAsync(int num, string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void TestRead(int num, string path, int val)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Task TestUpdateAsync(int num, string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Task TestDeleteAsync(int num, string path)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

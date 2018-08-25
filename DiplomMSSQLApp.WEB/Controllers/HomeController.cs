@@ -7,6 +7,7 @@ using DiplomMSSQLApp.WEB.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers
@@ -59,14 +60,14 @@ namespace DiplomMSSQLApp.WEB.Controllers
             ViewBag.Departments = new SelectList(departmentService.GetAll().ToList(), "Id", "DepartmentName");
             return View();
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Create(EmployeeViewModel e)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
+        public async Task<ActionResult> CreateAsync(EmployeeViewModel e)
         {
             try
             {
                 Mapper.Initialize(cfg => cfg.CreateMap<EmployeeViewModel, EmployeeDTO>());
                 var eDto = Mapper.Map<EmployeeViewModel, EmployeeDTO>(e);
-                employeeService.Create(eDto);
+                await employeeService.CreateAsync(eDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -100,17 +101,15 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 return Content(ex.Message);
             }
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Edit(EmployeeViewModel e)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(EmployeeViewModel e)
         {
             try
             {
                 // Обновляем данные сотрудника
                 Mapper.Initialize(cfg => cfg.CreateMap<EmployeeViewModel, EmployeeDTO>());
                 EmployeeDTO eDto = Mapper.Map<EmployeeViewModel, EmployeeDTO>(e);
-                employeeService.Edit(eDto);
-                // Проверяем смену начальника отдела
-                //(departmentService as DepartmentService).ChangeManager(eDto);
+                await employeeService.EditAsync(eDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -164,9 +163,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
             }
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<ActionResult> DeleteConfirmedAsync(int id)
         {
-            employeeService.Delete(id);
+            await employeeService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -192,9 +191,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление всех сотрудников
-        public ActionResult AllDelete()
+        [ActionName("DeleteAll")]
+        public async Task<ActionResult> DeleteAllAsync()
         {
-            employeeService.DeleteAll();
+            await employeeService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 
@@ -228,10 +228,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Тест добавления сотрудников
-        public ActionResult TestCreate(int num)
+        [ActionName("TestCreate")]
+        public async Task<ActionResult> TestCreateAsync(int num)
         {
             string path = Server.MapPath("~/Results/Employee/Create.txt");
-            employeeService.TestCreate(num, path);
+            await employeeService.TestCreateAsync(num, path);
             return RedirectToAction("Index");
         }
 
@@ -244,18 +245,20 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Тест обновления сотрудников
-        public ActionResult TestUpdate(int num)
+        [ActionName("TestUpdate")]
+        public async Task<ActionResult> TestUpdateAsync(int num)
         {
             string path = Server.MapPath("~/Results/Employee/Update.txt");
-            employeeService.TestUpdate(num, path);
+            await employeeService.TestUpdateAsync(num, path);
             return RedirectToAction("Index");
         }
 
         // Тест удаления сотрудников
-        public ActionResult TestDelete(int num)
+        [ActionName("TestDelete")]
+        public async Task<ActionResult> TestDeleteAsync(int num)
         {
             string path = Server.MapPath("~/Results/Employee/Delete.txt");
-            employeeService.TestDelete(num, path);
+            await employeeService.TestDeleteAsync(num, path);
             return RedirectToAction("Index");
         }
 

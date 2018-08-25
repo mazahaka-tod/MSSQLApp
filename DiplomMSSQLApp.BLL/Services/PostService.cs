@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services
 {
@@ -21,12 +22,12 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Добавление новой должности (с валидацией)
-        public override void Create(PostDTO item)
+        public override async Task CreateAsync(PostDTO item)
         {
             ValidationPost(item);
             Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, Post>());
             Database.Posts.Create(Mapper.Map<PostDTO, Post>(item));
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Получение списка всех должностей
@@ -39,28 +40,28 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Удаление должности
-        public override void Delete(int id)
+        public override async Task DeleteAsync(int id)
         {
             Post item = Database.Posts.FindById(id);
             if (item == null) return;
             Database.Posts.Remove(item);
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Удаление всех должностей
-        public override void DeleteAll()
+        public override async Task DeleteAllAsync()
         {
             Database.Posts.RemoveAll();
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Обновление информации о должности
-        public override void Edit(PostDTO item)
+        public override async Task EditAsync(PostDTO item)
         {
             ValidationPost(item);
             Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, Post>());
             Database.Posts.Update(Mapper.Map<PostDTO, Post>(item));
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         public override void Dispose()
@@ -96,7 +97,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест добавления должностей
-        public override void TestCreate(int num, string path)
+        public override async Task TestCreateAsync(int num, string path)
         {
             List<Post> posts = new List<Post>();
             string[] titles = { "Accountant", "Actuary", "Biologist", "Chemist", "Ecologist", "Economist",
@@ -117,7 +118,7 @@ namespace DiplomMSSQLApp.BLL.Services
             }
             Database.Posts.Create(posts);
             stopWatch.Start();
-            Database.Save();
+            await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
@@ -148,7 +149,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест обновления должностей
-        public override void TestUpdate(int num, string path)
+        public override async Task TestUpdateAsync(int num, string path)
         {
             long matchedCount = 0;
             TimeSpan ts = new TimeSpan();
@@ -165,7 +166,7 @@ namespace DiplomMSSQLApp.BLL.Services
 
                     stopWatch.Start();
                     Database.Posts.Update(post);
-                    Database.Save();
+                    await Database.SaveAsync();
                     stopWatch.Stop();
                     ts = ts.Add(stopWatch.Elapsed);
                     ++matchedCount;
@@ -182,13 +183,13 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест удаления должностей
-        public override void TestDelete(int num, string path)
+        public override async Task TestDeleteAsync(int num, string path)
         {
             Stopwatch stopWatch = new Stopwatch();
-            IEnumerable<Post> posts = Database.Posts.Get(false);
+            IEnumerable<Post> posts = Database.Posts.Get();
             Database.Posts.RemoveSeries(posts.Take(num));
             stopWatch.Start();
-            Database.Save();
+            await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";

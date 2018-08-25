@@ -2,6 +2,7 @@
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.DAL.Repositories
 {
@@ -58,9 +59,9 @@ namespace DiplomMSSQLApp.DAL.Repositories
             }
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
         private bool disposed = false;

@@ -1,5 +1,6 @@
 ﻿using DiplomMSSQLApp.BLL.BusinessModels;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Interfaces
 {
@@ -7,18 +8,18 @@ namespace DiplomMSSQLApp.BLL.Interfaces
     {
         PageInfo PageInfo { get; set; }
 
-        void Create(TEntity item);
-        void Delete(int id);
-        void DeleteAll();
+        Task CreateAsync(TEntity item);
+        Task DeleteAsync(int id);
+        Task DeleteAllAsync();
         void Dispose();
-        void Edit(TEntity item);
+        Task EditAsync(TEntity item);
         TEntity FindById(int? id);
         IEnumerable<TEntity> Get(EmployeeFilter f, string path, ref int cnt);
         IEnumerable<TEntity> GetAll();
         IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page, int cnt);
-        void TestCreate(int num, string path);
+        Task TestCreateAsync(int num, string path);
         void TestRead(int num, string path, int val);
-        void TestUpdate(int num, string path);
-        void TestDelete(int num, string path);
+        Task TestUpdateAsync(int num, string path);
+        Task TestDeleteAsync(int num, string path);
     }
 }

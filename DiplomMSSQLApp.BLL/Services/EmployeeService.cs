@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services
 {
@@ -24,12 +25,12 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Добавление нового сотрудника (с валидацией)
-        public override void Create(EmployeeDTO item)
+        public override async Task CreateAsync(EmployeeDTO item)
         {
             ValidationEmployee(item);
             Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
             Database.Employees.Create(Mapper.Map<EmployeeDTO, Employee>(item));
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Получение списка всех сотрудников
@@ -233,28 +234,28 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Удаление сотрудника
-        public override void Delete(int id)
+        public override async Task DeleteAsync(int id)
         {
             Employee item = Database.Employees.FindById(id);
             if (item == null) return;
             Database.Employees.Remove(item);
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Удаление всех сотрудников
-        public override void DeleteAll()
+        public override async Task DeleteAllAsync()
         {
             Database.Employees.RemoveAll();
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Обновление информации о сотруднике
-        public override void Edit(EmployeeDTO item)
+        public override async Task EditAsync(EmployeeDTO item)
         {
             ValidationEmployee(item);
             Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
             Database.Employees.Update(Mapper.Map<EmployeeDTO, Employee>(item));
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         public override void Dispose()
@@ -280,7 +281,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Обновление информации о сотрудниках (при редактировании информации об отделе)
-        public void UpdateEmployees(string old, DepartmentDTO dDto)
+        public async Task UpdateEmployeesAsync(string old, DepartmentDTO dDto)
         {
             // Если при обновлении изменился начальник отдела, то нужно внести изменения в таблицу сотрудников:
             // 1. У сотрудника, который был начальником, установить должность в null
@@ -293,7 +294,7 @@ namespace DiplomMSSQLApp.BLL.Services
                 {
                     oldManager.PostId = null;
                     Database.Employees.Update(oldManager);
-                    Database.Save();
+                    await Database.SaveAsync();
                 }
                 // 2.
                 Post postManager = Database.Posts.Get(p => p.Title == "Manager").FirstOrDefault();
@@ -303,7 +304,7 @@ namespace DiplomMSSQLApp.BLL.Services
                 newManager.PostId = postManager.Id;
                 newManager.DepartmentId = d.Id;
                 Database.Employees.Update(newManager);
-                Database.Save();
+                await Database.SaveAsync();
             }
         }
 
@@ -345,7 +346,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест добавления сотрудников
-        public override void TestCreate(int num, string path)
+        public override async Task TestCreateAsync(int num, string path)
         {
             List<Employee> emps = new List<Employee>();
             string[] lastNames = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller",
@@ -370,7 +371,7 @@ namespace DiplomMSSQLApp.BLL.Services
             }
             Database.Employees.Create(emps);
             stopWatch.Start();
-            Database.Save();
+            await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
@@ -411,7 +412,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест обновления сотрудников
-        public override void TestUpdate(int num, string path)
+        public override async Task TestUpdateAsync(int num, string path)
         {
             long matchedCount = 0;
             TimeSpan ts = new TimeSpan();
@@ -433,7 +434,7 @@ namespace DiplomMSSQLApp.BLL.Services
 
                     stopWatch.Start();
                     Database.Employees.Update(emp);
-                    Database.Save();
+                    await Database.SaveAsync();
                     stopWatch.Stop();
                     ts = ts.Add(stopWatch.Elapsed);
                     ++matchedCount;
@@ -452,13 +453,13 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест удаления сотрудников
-        public override void TestDelete(int num, string path)
+        public override async Task TestDeleteAsync(int num, string path)
         {
             Stopwatch stopWatch = new Stopwatch();
-            IEnumerable<Employee> emps = Database.Employees.Get(false);
+            IEnumerable<Employee> emps = Database.Employees.Get();
             Database.Employees.RemoveSeries(emps.Take(num));
             stopWatch.Start();
-            Database.Save();
+            await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DiplomMSSQLApp.BLL.BusinessModels;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services
 {
@@ -9,18 +10,18 @@ namespace DiplomMSSQLApp.BLL.Services
     {
         public PageInfo PageInfo { get; set; }
 
-        public virtual void Create(T item) { }
-        public abstract void Delete(int id);
-        public abstract void DeleteAll();
+        public abstract Task CreateAsync(T item);
+        public abstract Task DeleteAsync(int id);
+        public abstract Task DeleteAllAsync();
         public abstract void Dispose();
-        public virtual void Edit(T item) { }
+        public abstract Task EditAsync(T item);
         public abstract T FindById(int? id);
         public virtual IEnumerable<T> Get(EmployeeFilter f, string path, ref int cnt) { return null; }
         public abstract IEnumerable<T> GetAll();
-        public virtual void TestCreate(int num, string path) { }
-        public virtual void TestRead(int num, string path, int val) { }
-        public virtual void TestUpdate(int num, string path) { }
-        public virtual void TestDelete(int num, string path) { }
+        public abstract Task TestCreateAsync(int num, string path);
+        public abstract void TestRead(int num, string path, int val);
+        public abstract Task TestUpdateAsync(int num, string path);
+        public abstract Task TestDeleteAsync(int num, string path);
 
         public IEnumerable<T> GetPage(IEnumerable<T> col, int page, int cnt)
         {

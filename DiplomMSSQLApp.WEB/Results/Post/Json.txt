@@ -1,10 +1,1 @@
-﻿{"Title":"Programmer","MinSalary":10000,"MaxSalary":90000}
-{"Title":"Actuary","MinSalary":20000,"MaxSalary":60000}
-{"Title":"Biologist","MinSalary":40800,"MaxSalary":80800}
-{"Title":"Chemist","MinSalary":21600,"MaxSalary":61600}
-{"Title":"Ecologist","MinSalary":42800,"MaxSalary":82800}
-{"Title":"Economist","MinSalary":23600,"MaxSalary":63600}
-{"Title":"Geophysicist","MinSalary":44400,"MaxSalary":84400}
-{"Title":"Investigator","MinSalary":25200,"MaxSalary":65200}
-{"Title":"Meteorologist","MinSalary":46400,"MaxSalary":86400}
-{"Title":"Microbiologist","MinSalary":27200,"MaxSalary":67200}
+﻿

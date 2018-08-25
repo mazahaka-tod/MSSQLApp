@@ -6,6 +6,7 @@ using DiplomMSSQLApp.WEB.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers
@@ -43,14 +44,14 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             return View();
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Create(PostViewModel p)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
+        public async Task<ActionResult> CreateAsync(PostViewModel p)
         {
             try
             {
                 Mapper.Initialize(cfg => cfg.CreateMap<PostViewModel, PostDTO>());
                 PostDTO pDto = Mapper.Map<PostViewModel, PostDTO>(p);
-                postService.Create(pDto);
+                await postService.CreateAsync(pDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -76,15 +77,15 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 return Content(ex.Message);
             }
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Edit(PostViewModel p)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(PostViewModel p)
         {
             try
             {
                 // Обновляем данные отдела
                 Mapper.Initialize(cfg => cfg.CreateMap<PostViewModel, PostDTO>());
                 PostDTO pDto = Mapper.Map<PostViewModel, PostDTO>(p);
-                postService.Edit(pDto);
+                await postService.EditAsync(pDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -113,9 +114,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
             }
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<ActionResult> DeleteConfirmedAsync(int id)
         {
-            postService.Delete(id);
+            await postService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -139,9 +140,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление всех должностей
-        public ActionResult AllDelete()
+        [ActionName("DeleteAll")]
+        public async Task<ActionResult> DeleteAllAsync()
         {
-            postService.DeleteAll();
+            await postService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 
@@ -152,9 +154,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
             IEnumerable<PostDTO> pDto = postService.GetAll();
             var posts = pDto.Select(p => new
             {
-                Title = p.Title,
-                MinSalary = p.MinSalary,
-                MaxSalary = p.MaxSalary
+                p.Title,
+                p.MinSalary,
+                p.MaxSalary
             });
             using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
             {
@@ -167,10 +169,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Тест добавления сотрудников
-        public ActionResult TestCreate(int num)
+        [ActionName("TestCreate")]
+        public async Task<ActionResult> TestCreateAsync(int num)
         {
             string path = Server.MapPath("~/Results/Post/Create.txt");
-            postService.TestCreate(num, path);
+            await postService.TestCreateAsync(num, path);
             return RedirectToAction("Index");
         }
 
@@ -183,18 +186,20 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Тест обновления сотрудников
-        public ActionResult TestUpdate(int num)
+        [ActionName("TestUpdate")]
+        public async Task<ActionResult> TestUpdateAsync(int num)
         {
             string path = Server.MapPath("~/Results/Post/Update.txt");
-            postService.TestUpdate(num, path);
+            await postService.TestUpdateAsync(num, path);
             return RedirectToAction("Index");
         }
 
         // Тест удаления сотрудников
-        public ActionResult TestDelete(int num)
+        [ActionName("TestDelete")]
+        public async Task<ActionResult> TestDeleteAsync(int num)
         {
             string path = Server.MapPath("~/Results/Post/Delete.txt");
-            postService.TestDelete(num, path);
+            await postService.TestDeleteAsync(num, path);
             return RedirectToAction("Index");
         }
 

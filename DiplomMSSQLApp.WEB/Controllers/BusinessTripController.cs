@@ -6,6 +6,7 @@ using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers
@@ -44,8 +45,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
             ViewBag.Employees = GetSelectList();
             return View();
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Create(BusinessTripViewModel bt, int[] ids)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
+        public async Task<ActionResult> CreateAsync(BusinessTripViewModel bt, int[] ids)
         {
             try
             {
@@ -56,7 +57,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
                     cfg.CreateMap<DepartmentViewModel, DepartmentDTO>();
                 });
                 BusinessTripDTO bDto = Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
-                (businessTripService as BusinessTripService).Create(bDto, ids);
+                await (businessTripService as BusinessTripService).CreateAsync(bDto, ids);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -88,8 +89,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 return Content(ex.Message);
             }
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Edit(BusinessTripViewModel bt, int[] ids)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(BusinessTripViewModel bt, int[] ids)
         {
             try
             {
@@ -100,7 +101,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
                     cfg.CreateMap<DepartmentViewModel, DepartmentDTO>();
                 });
                 BusinessTripDTO bDto = Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
-                (businessTripService as BusinessTripService).Edit(bDto, ids);
+                await (businessTripService as BusinessTripService).EditAsync(bDto, ids);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -151,9 +152,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
             }
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<ActionResult> DeleteConfirmedAsync(int id)
         {
-            businessTripService.Delete(id);
+            await businessTripService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -179,9 +180,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление всех командировок
-        public ActionResult AllDelete()
+        [ActionName("DeleteAll")]
+        public async Task<ActionResult> DeleteAllAsync()
         {
-            businessTripService.DeleteAll();
+            await businessTripService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 

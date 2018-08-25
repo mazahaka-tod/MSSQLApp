@@ -6,6 +6,7 @@ using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers
@@ -41,14 +42,14 @@ namespace DiplomMSSQLApp.WEB.Controllers
             ViewBag.Employees = new SelectList(employeeService.GetAll().ToList(), "LastName", "LastName");
             return View();
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Create(DepartmentViewModel d)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
+        public async Task<ActionResult> CreateAsync(DepartmentViewModel d)
         {
             try
             {
                 Mapper.Initialize(cfg => cfg.CreateMap<DepartmentViewModel, DepartmentDTO>());
                 DepartmentDTO dDto = Mapper.Map<DepartmentViewModel, DepartmentDTO>(d);
-                departmentService.Create(dDto);
+                await departmentService.CreateAsync(dDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -76,17 +77,17 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 return Content(ex.Message);
             }
         }
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Edit(DepartmentViewModel d, string old)
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(DepartmentViewModel d, string old)
         {
             try
             {
                 // Обновляем данные отдела
                 Mapper.Initialize(cfg => cfg.CreateMap<DepartmentViewModel, DepartmentDTO>());
                 DepartmentDTO dDto = Mapper.Map<DepartmentViewModel, DepartmentDTO>(d);
-                departmentService.Edit(dDto);
+                await departmentService.EditAsync(dDto);
                 // Обновляем данные сотрудников
-                (employeeService as EmployeeService).UpdateEmployees(old, dDto);
+                //await (employeeService as EmployeeService).UpdateEmployeesAsync(old, dDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -117,9 +118,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
             }
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<ActionResult> DeleteConfirmedAsync(int id)
         {
-            departmentService.Delete(id);
+            await departmentService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -144,9 +145,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление всех отделов
-        public ActionResult AllDelete()
+        [ActionName("DeleteAll")]
+        public async Task<ActionResult> DeleteAllAsync()
         {
-            departmentService.DeleteAll();
+            await departmentService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 

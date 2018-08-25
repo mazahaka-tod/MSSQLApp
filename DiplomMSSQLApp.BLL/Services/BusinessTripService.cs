@@ -5,6 +5,7 @@ using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services
 {
@@ -18,21 +19,23 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Добавление новой командировки (с валидацией)
-        public void Create(BusinessTripDTO item, int[] ids)
+        public async Task CreateAsync(BusinessTripDTO item, int[] ids)
         {
             ValidationBusinessTrip(item);
-            BusinessTrip newbt = new BusinessTrip();
-            newbt.Name = item.Name;
-            newbt.DateStart = item.DateStart;
-            newbt.DateEnd = item.DateEnd;
-            newbt.Destination = item.Destination;
-            newbt.Purpose = item.Purpose;
+            BusinessTrip newbt = new BusinessTrip
+            {
+                Name = item.Name,
+                DateStart = item.DateStart,
+                DateEnd = item.DateEnd,
+                Destination = item.Destination,
+                Purpose = item.Purpose
+            };
             foreach (var id in ids.Distinct())
             {
                 newbt.Employees.Add(Database.Employees.FindById(id));
             }
             Database.BusinessTrips.Create(newbt);
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Получение списка всех командировок
@@ -48,23 +51,23 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Удаление командировки
-        public override void Delete(int id)
+        public override async Task DeleteAsync(int id)
         {
             BusinessTrip item = Database.BusinessTrips.FindById(id);
             if (item == null) return;
             Database.BusinessTrips.Remove(item);
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Удаление всех командировок
-        public override void DeleteAll()
+        public override async Task DeleteAllAsync()
         {
             Database.BusinessTrips.RemoveAll();
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         // Обновление информации о командировке
-        public void Edit(BusinessTripDTO item, int[] ids)
+        public async Task EditAsync(BusinessTripDTO item, int[] ids)
         {
             ValidationBusinessTrip(item);
             BusinessTrip newbt = Database.BusinessTrips.FindById(item.Id);
@@ -79,18 +82,13 @@ namespace DiplomMSSQLApp.BLL.Services
                 newbt.Employees.Add(Database.Employees.FindById(id));
             }
             Database.BusinessTrips.Update(newbt);
-            Database.Save();
+            await Database.SaveAsync();
         }
 
         public override void Dispose()
         {
             Database.Dispose();
         }
-
-        //public override IEnumerable<BusinessTripDTO> Get(EmployeeFilter f)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         // Получение командировки по id
         public override BusinessTripDTO FindById(int? id)
@@ -122,6 +120,36 @@ namespace DiplomMSSQLApp.BLL.Services
                 throw new ValidationException("Дата окончания командировки не должна быть до даты начала", "DateEnd");
             if (item.Destination == null)
                 throw new ValidationException("Требуется ввести место назначения", "Destination");
+        }
+
+        public override Task CreateAsync(BusinessTripDTO item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Task EditAsync(BusinessTripDTO item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Task TestCreateAsync(int num, string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void TestRead(int num, string path, int val)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Task TestUpdateAsync(int num, string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Task TestDeleteAsync(int num, string path)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

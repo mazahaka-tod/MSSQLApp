@@ -1,5 +1,6 @@
 ﻿using DiplomMSSQLApp.DAL.Entities;
 using System;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.DAL.Interfaces
 {
@@ -9,6 +10,6 @@ namespace DiplomMSSQLApp.DAL.Interfaces
         IGenericRepository<Department> Departments { get; }
         IGenericRepository<Employee> Employees { get; }
         IGenericRepository<Post> Posts { get; }
-        void Save();
+        Task SaveAsync();
     }
 }
