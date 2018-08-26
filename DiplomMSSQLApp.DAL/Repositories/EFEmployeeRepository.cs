@@ -15,32 +15,32 @@ namespace DiplomMSSQLApp.DAL.Repositories
             _dbSet = context.Set<Employee>();
         }
 
-        public override IEnumerable<Employee> Get(Func<Employee, bool> predicate)
-        {
-            return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(predicate).ToList();
-        }
-
         public override Employee FindById(int id)
         {
             return _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefault(e => e.Id == id);
         }
 
-        public override IEnumerable<Employee> Get(int val)
+        public override IEnumerable<Employee> Get(int salary)
         {
-            return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary >= val).ToList();
+            return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary >= salary).ToList();
         }
 
-        public override IEnumerable<Employee> Get(bool f)
+        public override IEnumerable<Employee> Get(bool flag)
         {
-            if (f)
-                return _dbSet.Where(e => e.Salary > 50000).ToList();
+            if (flag)
+                return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary > 50000).ToList();
             else
-                return _dbSet.Where(e => e.Salary <= 50000).ToList();
+                return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary <= 50000).ToList();
+        }
+
+        public override IEnumerable<Employee> Get(Func<Employee, bool> predicate)
+        {
+            return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(predicate).ToList();
         }
 
         public override Employee GetFirst()
         {
-            return _dbSet.FirstOrDefault(e => e.Salary < 100000);
+            return _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefault(e => e.Salary < 50000);
         }
     }
 }

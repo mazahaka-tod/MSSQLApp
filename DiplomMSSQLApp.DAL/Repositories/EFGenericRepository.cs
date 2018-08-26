@@ -17,61 +17,76 @@ namespace DiplomMSSQLApp.DAL.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-        public IEnumerable<TEntity> Get()
-        {
-            return _dbSet.ToList();
-        }
-
-        public virtual IEnumerable<TEntity> Get(Func<TEntity, bool> predicate)
-        {
-            return _dbSet.Where(predicate).ToList();
-        }
-        public virtual TEntity FindById(int id)
-        {
-            return _dbSet.Find(id);
-        }
-
+        // Добавление элемента
         public void Create(TEntity item)
         {
             _dbSet.Add(item);
         }
-
+        // Добавление последовательности элементов
         public void Create(IEnumerable<TEntity> items)
         {
             _dbSet.AddRange(items);
         }
-
-        public void Update(TEntity item)
+        // Поиск по id
+        public virtual TEntity FindById(int id)
         {
-            _context.Entry(item).State = EntityState.Modified;
+            return _dbSet.Find(id);
         }
+        // Получение всех элементов
+        public IEnumerable<TEntity> Get()
+        {
+            return _dbSet.ToList();
+        }
+        //// Получение элементов по условию
+        //public virtual IEnumerable<TEntity> Get(int salary)
+        //{
+        //    return _dbSet.ToList();
+        //}
+        //// Получение элементов по условию
+        //public virtual IEnumerable<TEntity> Get(bool flag)
+        //{
+        //    return _dbSet.ToList();
+        //}
+        // Получение элементов, удовлетворяющих предикату
+        public virtual IEnumerable<TEntity> Get(Func<TEntity, bool> predicate)
+        {
+            return _dbSet.Where(predicate).ToList();
+        }
+        // Получение первого элемента
+        public virtual TEntity GetFirst()
+        {
+            return _dbSet.FirstOrDefault();
+        }
+        // Удаление элемента
         public void Remove(TEntity item)
         {
             _dbSet.Remove(item);
         }
+        // Удаление последовательности элементов
+        public void RemoveSeries(IEnumerable<TEntity> items)
+        {
+            _dbSet.RemoveRange(items);
+        }
+        // Удаление всех элементов
         public void RemoveAll()
         {
             _dbSet.RemoveRange(Get());
         }
-
-        public virtual IEnumerable<TEntity> Get(int val)
+        // Обновление элемента
+        public void Update(TEntity item)
         {
-            return _dbSet.ToList();
+            _context.Entry(item).State = EntityState.Modified;
         }
 
-        public virtual IEnumerable<TEntity> Get(bool f)
+        // Нереализованные методы
+        public virtual IEnumerable<TEntity> Get(int salary)
         {
-            return _dbSet.ToList();
+            throw new NotImplementedException();
         }
 
-        public virtual TEntity GetFirst()
+        public virtual IEnumerable<TEntity> Get(bool flag)
         {
-            return _dbSet.SingleOrDefault();
-        }
-
-        public void RemoveSeries(IEnumerable<TEntity> items)
-        {
-            _dbSet.RemoveRange(items);
+            throw new NotImplementedException();
         }
     }
 }

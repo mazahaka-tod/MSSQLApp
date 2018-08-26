@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
@@ -30,24 +31,13 @@ namespace DiplomMSSQLApp.BLL.Services
                 Destination = item.Destination,
                 Purpose = item.Purpose
             };
+            // Добавляем сотрудников, отправленных в командировку
             foreach (var id in ids.Distinct())
             {
                 newbt.Employees.Add(Database.Employees.FindById(id));
             }
             Database.BusinessTrips.Create(newbt);
             await Database.SaveAsync();
-        }
-
-        // Получение списка всех командировок
-        public override IEnumerable<BusinessTripDTO> GetAll()
-        {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
-                cfg.CreateMap<Employee, EmployeeDTO>()
-                    .ForMember(p => p.Post, opt => opt.Ignore())
-                    .ForMember(d => d.Department, opt => opt.Ignore());
-            });
-            return Mapper.Map<IEnumerable<BusinessTrip>, List<BusinessTripDTO>>(Database.BusinessTrips.Get());
         }
 
         // Удаление командировки
@@ -66,6 +56,11 @@ namespace DiplomMSSQLApp.BLL.Services
             await Database.SaveAsync();
         }
 
+        public override void Dispose()
+        {
+            Database.Dispose();
+        }
+
         // Обновление информации о командировке
         public async Task EditAsync(BusinessTripDTO item, int[] ids)
         {
@@ -77,17 +72,13 @@ namespace DiplomMSSQLApp.BLL.Services
             newbt.Destination = item.Destination;
             newbt.Purpose = item.Purpose;
             newbt.Employees.Clear();
+            // Добавляем сотрудников, отправленных в командировку
             foreach (var id in ids.Distinct())
             {
                 newbt.Employees.Add(Database.Employees.FindById(id));
             }
             Database.BusinessTrips.Update(newbt);
             await Database.SaveAsync();
-        }
-
-        public override void Dispose()
-        {
-            Database.Dispose();
         }
 
         // Получение командировки по id
@@ -107,6 +98,18 @@ namespace DiplomMSSQLApp.BLL.Services
             return Mapper.Map<BusinessTrip, BusinessTripDTO>(bt);
         }
 
+        // Получение списка всех командировок
+        public override IEnumerable<BusinessTripDTO> GetAll()
+        {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
+                cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(p => p.Post, opt => opt.Ignore())
+                    .ForMember(d => d.Department, opt => opt.Ignore());
+            });
+            return Mapper.Map<IEnumerable<BusinessTrip>, List<BusinessTripDTO>>(Database.BusinessTrips.Get());
+        }
+
         // Валидация модели
         private void ValidationBusinessTrip(BusinessTripDTO item)
         {
@@ -122,12 +125,18 @@ namespace DiplomMSSQLApp.BLL.Services
                 throw new ValidationException("Требуется ввести место назначения", "Destination");
         }
 
+        // Нереализованные методы
         public override Task CreateAsync(BusinessTripDTO item)
         {
             throw new System.NotImplementedException();
         }
 
         public override Task EditAsync(BusinessTripDTO item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override IEnumerable<BusinessTripDTO> Get(EmployeeFilter f, string path, ref int cnt)
         {
             throw new System.NotImplementedException();
         }

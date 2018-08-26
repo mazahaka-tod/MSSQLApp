@@ -14,22 +14,22 @@ namespace DiplomMSSQLApp.DAL.Repositories
             _dbSet = context.Set<Post>();
         }
 
-        public override IEnumerable<Post> Get(int val)
+        public override IEnumerable<Post> Get(int salary)
         {
-            return _dbSet.AsQueryable().Where(p => p.MaxSalary >= val).AsNoTracking().ToList();
+            return _dbSet.Where(p => p.MaxSalary >= salary).ToList();
         }
 
-        public override IEnumerable<Post> Get(bool f)
+        public override IEnumerable<Post> Get(bool flag)
         {
-            if (f)
-                return _dbSet.AsQueryable().Where(p => p.MaxSalary == 60000).AsNoTracking().ToList();
+            if (flag)
+                return _dbSet.Where(p => p.MaxSalary > 50000).ToList();
             else
-                return _dbSet.Where(p => p.MaxSalary != 75000).ToList();
+                return _dbSet.Where(p => p.MaxSalary <= 50000).ToList();
         }
 
         public override Post GetFirst()
         {
-            return _dbSet.FirstOrDefault(p => p.MaxSalary != 75000);
+            return _dbSet.FirstOrDefault(p => p.MaxSalary < 50000);
         }
     }
 }

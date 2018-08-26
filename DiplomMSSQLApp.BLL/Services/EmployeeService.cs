@@ -33,13 +33,51 @@ namespace DiplomMSSQLApp.BLL.Services
             await Database.SaveAsync();
         }
 
-        // Получение списка всех сотрудников
-        public override IEnumerable<EmployeeDTO> GetAll()
+        // Удаление сотрудника
+        public override async Task DeleteAsync(int id)
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Employee, EmployeeDTO>()
-                .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-            );
-            return Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(Database.Employees.Get());
+            Employee item = Database.Employees.FindById(id);
+            if (item == null) return;
+            Database.Employees.Remove(item);
+            await Database.SaveAsync();
+        }
+
+        // Удаление всех сотрудников
+        public override async Task DeleteAllAsync()
+        {
+            Database.Employees.RemoveAll();
+            await Database.SaveAsync();
+        }
+
+        public override void Dispose()
+        {
+            Database.Dispose();
+        }
+
+        // Обновление информации о сотруднике
+        public override async Task EditAsync(EmployeeDTO item)
+        {
+            ValidationEmployee(item);
+            Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
+            Database.Employees.Update(Mapper.Map<EmployeeDTO, Employee>(item));
+            await Database.SaveAsync();
+        }
+
+        // Получение сотрудника по id
+        public override EmployeeDTO FindById(int? id)
+        {
+            if (id == null)
+                throw new ValidationException("Не установлено id сотрудника", "");
+            Employee e = Database.Employees.FindById(id.Value);
+            if (e == null)
+                throw new ValidationException("Сотрудник не найден", "");
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<Employee, EmployeeDTO>();
+                cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
+                cfg.CreateMap<Post, PostDTO>();
+                cfg.CreateMap<Department, DepartmentDTO>();
+            });
+            return Mapper.Map<Employee, EmployeeDTO>(e);
         }
 
         // Получение списка сотрудников по фильтру
@@ -47,7 +85,8 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             bool bl = true;
             string message = "";
-            Func<Employee, bool> predicate = e => {
+            bool predicate(Employee e)
+            {
                 bool flag = true;
                 // Фильтр по фамилии
                 if (f.LastName != null && !string.IsNullOrEmpty(f.LastName[0]))
@@ -86,8 +125,7 @@ namespace DiplomMSSQLApp.BLL.Services
                 if (!string.IsNullOrWhiteSpace(f.HireDate))
                 {
                     if (bl) message += "Дата приема на работу = " + f.HireDate + "; ";
-                    DateTime date;
-                    if (DateTime.TryParse(f.HireDate, out date))
+                    if (DateTime.TryParse(f.HireDate, out DateTime date))
                     {
                         flag = e.HireDate == date ? true : false;
                         //filters.Add(builder.Eq("HireDate", new DateTime(date.Year, date.Month, date.Day)));
@@ -97,7 +135,7 @@ namespace DiplomMSSQLApp.BLL.Services
                 if (f.MinSalary.HasValue)
                 {
                     //if (bl)
-                        message += "Зарплата >= " + f.MinSalary + "; ";
+                    message += "Зарплата >= " + f.MinSalary + "; ";
                     flag = e.Salary >= f.MinSalary ? true : false;
                 }
                 if (f.MaxSalary.HasValue)
@@ -135,10 +173,10 @@ namespace DiplomMSSQLApp.BLL.Services
                 }
                 if (bl) bl = false;
                 return flag;
-            };
+            }
             // Параметры для сортировки
-            string sort = f.Sort == null ? "LastName" : f.Sort;
-            string asc = f.Asc == null ? "1" : f.Asc;
+            string sort = f.Sort ?? "LastName";
+            string asc = f.Asc ?? "1";
             IEnumerable<Employee> col;
             if (asc.Equals("1"))
                 switch (sort)
@@ -222,10 +260,7 @@ namespace DiplomMSSQLApp.BLL.Services
             {
                 cfg.CreateMap<BusinessTrip, BusinessTripDTO>()
                     .ForMember(bt => bt.Employees, opt => opt.Ignore());
-                cfg.CreateMap<Employee, EmployeeDTO>()
-                    //.ForMember(e => e.Department, opt => opt.Ignore())
-                    //.ForMember(e => e.Post, opt => opt.Ignore())
-                    ;
+                cfg.CreateMap<Employee, EmployeeDTO>();
                 cfg.CreateMap<Department, DepartmentDTO>();
                 cfg.CreateMap<Post, PostDTO>();
             });
@@ -233,51 +268,13 @@ namespace DiplomMSSQLApp.BLL.Services
             return collection;
         }
 
-        // Удаление сотрудника
-        public override async Task DeleteAsync(int id)
-        {
-            Employee item = Database.Employees.FindById(id);
-            if (item == null) return;
-            Database.Employees.Remove(item);
-            await Database.SaveAsync();
-        }
 
-        // Удаление всех сотрудников
-        public override async Task DeleteAllAsync()
+        // Получение списка всех сотрудников
+        public override IEnumerable<EmployeeDTO> GetAll()
         {
-            Database.Employees.RemoveAll();
-            await Database.SaveAsync();
-        }
-
-        // Обновление информации о сотруднике
-        public override async Task EditAsync(EmployeeDTO item)
-        {
-            ValidationEmployee(item);
-            Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
-            Database.Employees.Update(Mapper.Map<EmployeeDTO, Employee>(item));
-            await Database.SaveAsync();
-        }
-
-        public override void Dispose()
-        {
-            Database.Dispose();
-        }
-
-        // Получение сотрудника по id
-        public override EmployeeDTO FindById(int? id)
-        {
-            if (id == null)
-                throw new ValidationException("Не установлено id сотрудника", "");
-            Employee e = Database.Employees.FindById(id.Value);
-            if (e == null)
-                throw new ValidationException("Сотрудник не найден", "");
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<Employee, EmployeeDTO>();
-                cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
-                cfg.CreateMap<Post, PostDTO>();
-                cfg.CreateMap<Department, DepartmentDTO>();
-            });
-            return Mapper.Map<Employee, EmployeeDTO>(e);
+            Mapper.Initialize(cfg => cfg.CreateMap<Employee, EmployeeDTO>()
+                .ForMember(e => e.BusinessTrips, opt => opt.Ignore()));
+            return Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(Database.Employees.Get());
         }
 
         // Обновление информации о сотрудниках (при редактировании информации об отделе)
@@ -340,7 +337,7 @@ namespace DiplomMSSQLApp.BLL.Services
             Department department = Database.Departments.FindById(item.DepartmentId.HasValue ? item.DepartmentId.Value : 0);
             if (department == null)
                 throw new ValidationException("Отдел не найден", "");
-            Post post = Database.Posts.FindById(item.PostId.HasValue ? item.PostId.Value : 0);
+            Post post = Database.Posts.FindById(item.PostId ?? 0);
             if (post == null)
                 throw new ValidationException("Должность не найдена", "");
         }

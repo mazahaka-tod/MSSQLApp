@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
@@ -30,15 +31,6 @@ namespace DiplomMSSQLApp.BLL.Services
             await Database.SaveAsync();
         }
 
-        // Получение списка всех должностей
-        public override IEnumerable<PostDTO> GetAll()
-        {
-            Mapper.Initialize(cfg => cfg.CreateMap<Post, PostDTO>()
-                .ForMember(p => p.Employees, opt => opt.Ignore())
-            );
-            return Mapper.Map<IEnumerable<Post>, List<PostDTO>>(Database.Posts.Get());
-        }
-
         // Удаление должности
         public override async Task DeleteAsync(int id)
         {
@@ -55,6 +47,11 @@ namespace DiplomMSSQLApp.BLL.Services
             await Database.SaveAsync();
         }
 
+        public override void Dispose()
+        {
+            Database.Dispose();
+        }
+
         // Обновление информации о должности
         public override async Task EditAsync(PostDTO item)
         {
@@ -62,11 +59,6 @@ namespace DiplomMSSQLApp.BLL.Services
             Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, Post>());
             Database.Posts.Update(Mapper.Map<PostDTO, Post>(item));
             await Database.SaveAsync();
-        }
-
-        public override void Dispose()
-        {
-            Database.Dispose();
         }
 
         // Получение должности по id
@@ -85,6 +77,15 @@ namespace DiplomMSSQLApp.BLL.Services
                     .ForMember(dp => dp.Post, opt => opt.Ignore());
             });
             return Mapper.Map<Post, PostDTO>(p);
+        }
+
+        // Получение списка всех должностей
+        public override IEnumerable<PostDTO> GetAll()
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<Post, PostDTO>()
+                .ForMember(p => p.Employees, opt => opt.Ignore())
+            );
+            return Mapper.Map<IEnumerable<Post>, List<PostDTO>>(Database.Posts.Get());
         }
 
         // Валидация модели
@@ -197,6 +198,12 @@ namespace DiplomMSSQLApp.BLL.Services
             {
                 sw.WriteLine("Количество найденных записей: " + posts.Count() + "; Количество должностей: " + num + "; Время: " + elapsedTime);
             }
+        }
+
+        // Нереализованные методы
+        public override IEnumerable<PostDTO> Get(EmployeeFilter f, string path, ref int cnt)
+        {
+            throw new NotImplementedException();
         }
     }
 }

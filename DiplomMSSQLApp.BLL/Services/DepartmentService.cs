@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
@@ -26,15 +27,6 @@ namespace DiplomMSSQLApp.BLL.Services
             await Database.SaveAsync();
         }
 
-        // Получение списка всех отделов
-        public override IEnumerable<DepartmentDTO> GetAll()
-        {
-            Mapper.Initialize(cfg => cfg.CreateMap<Department, DepartmentDTO>()
-                .ForMember(d => d.Employees, opt => opt.Ignore())
-            );
-            return Mapper.Map<IEnumerable<Department>, List<DepartmentDTO>>(Database.Departments.Get());
-        }
-
         // Удаление отдела
         public override async Task DeleteAsync(int id)
         {
@@ -51,6 +43,11 @@ namespace DiplomMSSQLApp.BLL.Services
             await Database.SaveAsync();
         }
 
+        public override void Dispose()
+        {
+            Database.Dispose();
+        }
+
         // Обновление информации об отделе
         public override async Task EditAsync(DepartmentDTO item)
         {
@@ -58,11 +55,6 @@ namespace DiplomMSSQLApp.BLL.Services
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>());
             Database.Departments.Update(Mapper.Map<DepartmentDTO, Department>(item));
             await Database.SaveAsync();
-        }
-
-        public override void Dispose()
-        {
-            Database.Dispose();
         }
 
         // Получение отдела по id
@@ -83,11 +75,26 @@ namespace DiplomMSSQLApp.BLL.Services
             return Mapper.Map<Department, DepartmentDTO>(d);
         }
 
+        // Получение списка всех отделов
+        public override IEnumerable<DepartmentDTO> GetAll()
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<Department, DepartmentDTO>()
+                .ForMember(d => d.Employees, opt => opt.Ignore())
+            );
+            return Mapper.Map<IEnumerable<Department>, List<DepartmentDTO>>(Database.Departments.Get());
+        }
+
         // Валидация модели
         private void ValidationDepartment(DepartmentDTO item)
         {
             if (item.DepartmentName == null)
                 throw new ValidationException("Требуется ввести название отдела", "DepartmentName");
+        }
+
+        // Нереализованные методы
+        public override IEnumerable<DepartmentDTO> Get(EmployeeFilter f, string path, ref int cnt)
+        {
+            throw new System.NotImplementedException();
         }
 
         public override Task TestCreateAsync(int num, string path)
