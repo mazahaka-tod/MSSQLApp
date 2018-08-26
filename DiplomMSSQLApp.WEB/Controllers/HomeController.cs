@@ -191,7 +191,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление всех сотрудников
-        [ActionName("DeleteAll")]
+        public ActionResult DeleteAll()
+        {
+            return View();
+        }
+        [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllAsync()
         {
             await employeeService.DeleteAllAsync();
