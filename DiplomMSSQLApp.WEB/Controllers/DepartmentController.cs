@@ -61,11 +61,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Обновление информации об отделе
-        public ActionResult Edit(int? id)
+        [ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(int? id)
         {
             try
             {
-                DepartmentDTO dDto = departmentService.FindById(id);
+                DepartmentDTO dDto = await departmentService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
                     .ForMember(dp => dp.Employees, opt => opt.Ignore()));
                 DepartmentViewModel d = Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
@@ -99,11 +100,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление отдела
-        public ActionResult Delete(int? id)
+        [ActionName("Delete")]
+        public async Task<ActionResult> DeleteAsync(int? id)
         {
             try
             {
-                DepartmentDTO dDto = departmentService.FindById(id);
+                DepartmentDTO dDto = await departmentService.FindByIdAsync(id);
                 Mapper.Initialize(cfg =>
                 {
                     cfg.CreateMap<DepartmentDTO, DepartmentViewModel>();
@@ -125,11 +127,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Подробная информация об отделе
-        public ActionResult Details(int? id)
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id)
         {
             try
             {
-                DepartmentDTO dDto = departmentService.FindById(id);
+                DepartmentDTO dDto = await departmentService.FindByIdAsync(id);
                 Mapper.Initialize(cfg =>
                 {
                     cfg.CreateMap<DepartmentDTO, DepartmentViewModel>();

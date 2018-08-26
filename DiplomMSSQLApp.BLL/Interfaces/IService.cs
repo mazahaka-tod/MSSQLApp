@@ -13,7 +13,7 @@ namespace DiplomMSSQLApp.BLL.Interfaces
         Task DeleteAllAsync();
         void Dispose();
         Task EditAsync(TEntity item);
-        TEntity FindById(int? id);
+        Task<TEntity> FindByIdAsync(int? id);
         IEnumerable<TEntity> Get(EmployeeFilter f, string path, ref int cnt);
         IEnumerable<TEntity> GetAll();
         IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page, int cnt);

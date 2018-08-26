@@ -80,11 +80,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Обновление информации о сотруднике
-        public ActionResult Edit(int? id)
+        [ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(int? id)
         {
             try
             {
-                EmployeeDTO eDto = employeeService.FindById(id);
+                EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
                         .ForMember(d => d.BusinessTrips, opt => opt.Ignore());
@@ -143,11 +144,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление сотрудника
-        public ActionResult Delete(int? id)
+        [ActionName("Delete")]
+        public async Task<ActionResult> DeleteAsync(int? id)
         {
             try
             {
-                EmployeeDTO eDto = employeeService.FindById(id);
+                EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
@@ -170,11 +172,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Подробная информация о сотруднике
-        public ActionResult Details(int? id)
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id)
         {
             try
             {
-                EmployeeDTO eDto = employeeService.FindById(id);
+                EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
@@ -210,14 +213,14 @@ namespace DiplomMSSQLApp.WEB.Controllers
             var employees = eDto.Select(e => new
             {
                 SurName = e.LastName,
-                FirstName = e.FirstName,
-                Email = e.Email,
-                PhoneNumber = e.PhoneNumber,
+                e.FirstName,
+                e.Email,
+                e.PhoneNumber,
                 Addresses = "Addresses",
                 //"[{ \"Name\" : \"home\", \"City\" : \"Moskow\", \"Street\" : \"Kutuzovsky Avenue 57\", \"Zip\" : \"643976\" }]",
                 HireDate = "HireDate",
-                Salary = e.Salary,
-                Bonus = e.Bonus,
+                e.Salary,
+                e.Bonus,
                 Post = "",
                 DepartmentName = ""
             });

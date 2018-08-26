@@ -27,7 +27,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Добавление нового сотрудника (с валидацией)
         public override async Task CreateAsync(EmployeeDTO item)
         {
-            ValidationEmployee(item);
+            await ValidationEmployeeAsync(item);
             Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
             Database.Employees.Create(Mapper.Map<EmployeeDTO, Employee>(item));
             await Database.SaveAsync();
@@ -36,7 +36,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление сотрудника
         public override async Task DeleteAsync(int id)
         {
-            Employee item = Database.Employees.FindById(id);
+            Employee item = await Database.Employees.FindByIdAsync(id);
             if (item == null) return;
             Database.Employees.Remove(item);
             await Database.SaveAsync();
@@ -57,18 +57,18 @@ namespace DiplomMSSQLApp.BLL.Services
         // Обновление информации о сотруднике
         public override async Task EditAsync(EmployeeDTO item)
         {
-            ValidationEmployee(item);
+            await ValidationEmployeeAsync(item);
             Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
             Database.Employees.Update(Mapper.Map<EmployeeDTO, Employee>(item));
             await Database.SaveAsync();
         }
 
         // Получение сотрудника по id
-        public override EmployeeDTO FindById(int? id)
+        public override async Task<EmployeeDTO> FindByIdAsync(int? id)
         {
             if (id == null)
                 throw new ValidationException("Не установлено id сотрудника", "");
-            Employee e = Database.Employees.FindById(id.Value);
+            Employee e = await Database.Employees.FindByIdAsync(id.Value);
             if (e == null)
                 throw new ValidationException("Сотрудник не найден", "");
             Mapper.Initialize(cfg => {
@@ -306,7 +306,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Валидация модели
-        private void ValidationEmployee(EmployeeDTO item)
+        private async Task ValidationEmployeeAsync(EmployeeDTO item)
         {
             if (item.LastName == null)
                 throw new ValidationException("Требуется ввести фамилию", "LastName");
@@ -334,10 +334,10 @@ namespace DiplomMSSQLApp.BLL.Services
                     throw new ValidationException("Зарплата должна быть меньше " + item.Post.MaxSalary, "Salary");
             }
 
-            Department department = Database.Departments.FindById(item.DepartmentId.HasValue ? item.DepartmentId.Value : 0);
+            Department department = await Database.Departments.FindByIdAsync(item.DepartmentId.HasValue ? item.DepartmentId.Value : 0);
             if (department == null)
                 throw new ValidationException("Отдел не найден", "");
-            Post post = Database.Posts.FindById(item.PostId ?? 0);
+            Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
             if (post == null)
                 throw new ValidationException("Должность не найдена", "");
         }

@@ -69,11 +69,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Обновление информации о командировке
-        public ActionResult Edit(int? id)
+        [ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(int? id)
         {
             try
             {
-                BusinessTripDTO bDto = businessTripService.FindById(id);
+                BusinessTripDTO bDto = await businessTripService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
@@ -132,11 +133,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление командировки
-        public ActionResult Delete(int? id)
+        [ActionName("Delete")]
+        public async Task<ActionResult> DeleteAsync(int? id)
         {
             try
             {
-                BusinessTripDTO bDto = businessTripService.FindById(id);
+                BusinessTripDTO bDto = await businessTripService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
@@ -159,11 +161,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Подробная информация о командировке
-        public ActionResult Details(int? id)
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id)
         {
             try
             {
-                BusinessTripDTO bDto = businessTripService.FindById(id);
+                BusinessTripDTO bDto = await businessTripService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()

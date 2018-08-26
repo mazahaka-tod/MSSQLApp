@@ -62,11 +62,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Обновление информации о должности
-        public ActionResult Edit(int? id)
+        [ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(int? id)
         {
             try
             {
-                PostDTO pDto = postService.FindById(id);
+                PostDTO pDto = await postService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(pt => pt.Employees, opt => opt.Ignore()));
                 PostViewModel p = Mapper.Map<PostDTO, PostViewModel>(pDto);
@@ -96,11 +97,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Удаление должности
-        public ActionResult Delete(int? id)
+        [ActionName("Delete")]
+        public async Task<ActionResult> DeleteAsync(int? id)
         {
             try
             {
-                PostDTO pDto = postService.FindById(id);
+                PostDTO pDto = await postService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<PostDTO, PostViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
@@ -121,11 +123,12 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Подробная информация о должности
-        public ActionResult Details(int? id)
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id)
         {
             try
             {
-                PostDTO pDto = postService.FindById(id);
+                PostDTO pDto = await postService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<PostDTO, PostViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();

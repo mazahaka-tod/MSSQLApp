@@ -34,7 +34,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление должности
         public override async Task DeleteAsync(int id)
         {
-            Post item = Database.Posts.FindById(id);
+            Post item = await Database.Posts.FindByIdAsync(id);
             if (item == null) return;
             Database.Posts.Remove(item);
             await Database.SaveAsync();
@@ -62,11 +62,11 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Получение должности по id
-        public override PostDTO FindById(int? id)
+        public override async Task<PostDTO> FindByIdAsync(int? id)
         {
             if (id == null)
                 throw new ValidationException("Не установлено id должности", "");
-            Post p = Database.Posts.FindById(id.Value);
+            Post p = await Database.Posts.FindByIdAsync(id.Value);
             if (p == null)
                 throw new ValidationException("Должность не найден", "");
             Mapper.Initialize(cfg => {

@@ -30,7 +30,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление отдела
         public override async Task DeleteAsync(int id)
         {
-            Department item = Database.Departments.FindById(id);
+            Department item = await Database.Departments.FindByIdAsync(id);
             if (item == null) return;
             Database.Departments.Remove(item);
             await Database.SaveAsync();
@@ -58,11 +58,11 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Получение отдела по id
-        public override DepartmentDTO FindById(int? id)
+        public override async Task<DepartmentDTO> FindByIdAsync(int? id)
         {
             if (id == null)
                 throw new ValidationException("Не установлено id отдела", "");
-            Department d = Database.Departments.FindById(id.Value);
+            Department d = await Database.Departments.FindByIdAsync(id.Value);
             if (d == null)
                 throw new ValidationException("Отдел не найден", "");
             Mapper.Initialize(cfg => {

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.DAL.Repositories
 {
@@ -15,9 +16,9 @@ namespace DiplomMSSQLApp.DAL.Repositories
             _dbSet = context.Set<Employee>();
         }
 
-        public override Employee FindById(int id)
+        public override async Task<Employee> FindByIdAsync(int id)
         {
-            return _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefault(e => e.Id == id);
+            return await _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public override IEnumerable<Employee> Get(int salary)

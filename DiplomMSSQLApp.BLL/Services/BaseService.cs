@@ -15,7 +15,7 @@ namespace DiplomMSSQLApp.BLL.Services
         public abstract Task DeleteAllAsync();
         public abstract void Dispose();
         public abstract Task EditAsync(T item);
-        public abstract T FindById(int? id);
+        public abstract Task<T> FindByIdAsync(int? id);
         public abstract IEnumerable<T> Get(EmployeeFilter f, string path, ref int cnt);
         public abstract IEnumerable<T> GetAll();
         public abstract Task TestCreateAsync(int num, string path);

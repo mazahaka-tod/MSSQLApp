@@ -1,1 +1,1 @@
-﻿
+﻿{"Title":"qwe","MinSalary":25000,"MaxSalary":40000}

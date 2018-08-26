@@ -34,7 +34,7 @@ namespace DiplomMSSQLApp.BLL.Services
             // Добавляем сотрудников, отправленных в командировку
             foreach (var id in ids.Distinct())
             {
-                newbt.Employees.Add(Database.Employees.FindById(id));
+                newbt.Employees.Add(await Database.Employees.FindByIdAsync(id));
             }
             Database.BusinessTrips.Create(newbt);
             await Database.SaveAsync();
@@ -43,7 +43,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление командировки
         public override async Task DeleteAsync(int id)
         {
-            BusinessTrip item = Database.BusinessTrips.FindById(id);
+            BusinessTrip item = await Database.BusinessTrips.FindByIdAsync(id);
             if (item == null) return;
             Database.BusinessTrips.Remove(item);
             await Database.SaveAsync();
@@ -65,7 +65,7 @@ namespace DiplomMSSQLApp.BLL.Services
         public async Task EditAsync(BusinessTripDTO item, int[] ids)
         {
             ValidationBusinessTrip(item);
-            BusinessTrip newbt = Database.BusinessTrips.FindById(item.Id);
+            BusinessTrip newbt = await Database.BusinessTrips.FindByIdAsync(item.Id);
             newbt.Name = item.Name;
             newbt.DateStart = item.DateStart;
             newbt.DateEnd = item.DateEnd;
@@ -75,18 +75,18 @@ namespace DiplomMSSQLApp.BLL.Services
             // Добавляем сотрудников, отправленных в командировку
             foreach (var id in ids.Distinct())
             {
-                newbt.Employees.Add(Database.Employees.FindById(id));
+                newbt.Employees.Add(await Database.Employees.FindByIdAsync(id));
             }
             Database.BusinessTrips.Update(newbt);
             await Database.SaveAsync();
         }
 
         // Получение командировки по id
-        public override BusinessTripDTO FindById(int? id)
+        public override async Task<BusinessTripDTO> FindByIdAsync(int? id)
         {
             if (id == null)
                 throw new ValidationException("Не установлено id командировки", "");
-            BusinessTrip bt = Database.BusinessTrips.FindById(id.Value);
+            BusinessTrip bt = await Database.BusinessTrips.FindByIdAsync(id.Value);
             if (bt == null)
                 throw new ValidationException("Командировка не найдена", "");
             Mapper.Initialize(cfg => {

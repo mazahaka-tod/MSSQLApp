@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.DAL.Repositories
 {
@@ -28,25 +29,15 @@ namespace DiplomMSSQLApp.DAL.Repositories
             _dbSet.AddRange(items);
         }
         // Поиск по id
-        public virtual TEntity FindById(int id)
+        public virtual async Task<TEntity> FindByIdAsync(int id)
         {
-            return _dbSet.Find(id);
+            return await _dbSet.FindAsync(id);
         }
         // Получение всех элементов
         public IEnumerable<TEntity> Get()
         {
             return _dbSet.ToList();
         }
-        //// Получение элементов по условию
-        //public virtual IEnumerable<TEntity> Get(int salary)
-        //{
-        //    return _dbSet.ToList();
-        //}
-        //// Получение элементов по условию
-        //public virtual IEnumerable<TEntity> Get(bool flag)
-        //{
-        //    return _dbSet.ToList();
-        //}
         // Получение элементов, удовлетворяющих предикату
         public virtual IEnumerable<TEntity> Get(Func<TEntity, bool> predicate)
         {
