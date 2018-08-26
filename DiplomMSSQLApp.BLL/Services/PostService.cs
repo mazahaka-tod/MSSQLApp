@@ -43,7 +43,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление всех должностей
         public override async Task DeleteAllAsync()
         {
-            Database.Posts.RemoveAll();
+            await Database.Posts.RemoveAllAsync();
             await Database.SaveAsync();
         }
 
@@ -80,12 +80,11 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Получение списка всех должностей
-        public override IEnumerable<PostDTO> GetAll()
+        public override async Task<IEnumerable<PostDTO>> GetAllAsync()
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Post, PostDTO>()
-                .ForMember(p => p.Employees, opt => opt.Ignore())
-            );
-            return Mapper.Map<IEnumerable<Post>, List<PostDTO>>(Database.Posts.Get());
+                .ForMember(p => p.Employees, opt => opt.Ignore()));
+            return Mapper.Map<IEnumerable<Post>, List<PostDTO>>(await Database.Posts.GetAsync());
         }
 
         // Валидация модели
@@ -130,22 +129,22 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест выборки должностей
-        public override void TestRead(int num, string path, int val)
+        public override async Task TestReadAsync(int num, string path, int salary)
         {
-            var cnt = Database.Posts.Get().Count();
+            var p = await Database.Posts.GetAsync();
             IEnumerable<Post> result = null;
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             for (int i = 0; i < num; i++)
             {
-                result = Database.Posts.Get(val);
+                result = Database.Posts.Get(salary);
             }
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
             using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
             {
-                sw.WriteLine("Общее количество должностей: " + cnt + "; Условие выборки: MaxSalary == 60000; Индекс: нет; Количество найденных должностей: " + result.Count() + "; Количество выборок: " + num + "; Время: " + elapsedTime);
+                sw.WriteLine("Общее количество должностей: " + p.Count() + "; Условие выборки: MaxSalary == 60000; Индекс: нет; Количество найденных должностей: " + result.Count() + "; Количество выборок: " + num + "; Время: " + elapsedTime);
             }
         }
 
@@ -187,7 +186,7 @@ namespace DiplomMSSQLApp.BLL.Services
         public override async Task TestDeleteAsync(int num, string path)
         {
             Stopwatch stopWatch = new Stopwatch();
-            IEnumerable<Post> posts = Database.Posts.Get();
+            IEnumerable<Post> posts = await Database.Posts.GetAsync();
             Database.Posts.RemoveSeries(posts.Take(num));
             stopWatch.Start();
             await Database.SaveAsync();

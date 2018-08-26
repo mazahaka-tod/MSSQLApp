@@ -94,7 +94,7 @@
                 var div = document.createElement('div');
                 div.className = "employee" + i.toString();
                 $('.employees').append(div);
-                $('.employee' + i.toString()).load('@Url.Action("AddEmployee", "BusinessTrip")?index=' + i)
+                $('.employee' + i.toString()).load('@Url.Action("AddEmployeeAsync", "BusinessTrip")?index=' + i)
             });
             // Удаление сотрудника
             $('.deleteEmployee').click(function (e) {

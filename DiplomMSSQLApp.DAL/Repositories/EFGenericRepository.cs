@@ -34,9 +34,9 @@ namespace DiplomMSSQLApp.DAL.Repositories
             return await _dbSet.FindAsync(id);
         }
         // Получение всех элементов
-        public IEnumerable<TEntity> Get()
+        public async Task<IEnumerable<TEntity>> GetAsync()
         {
-            return _dbSet.ToList();
+            return await _dbSet.ToListAsync();
         }
         // Получение элементов, удовлетворяющих предикату
         public virtual IEnumerable<TEntity> Get(Func<TEntity, bool> predicate)
@@ -59,9 +59,9 @@ namespace DiplomMSSQLApp.DAL.Repositories
             _dbSet.RemoveRange(items);
         }
         // Удаление всех элементов
-        public void RemoveAll()
+        public async Task RemoveAllAsync()
         {
-            _dbSet.RemoveRange(Get());
+            _dbSet.RemoveRange(await GetAsync());
         }
         // Обновление элемента
         public void Update(TEntity item)

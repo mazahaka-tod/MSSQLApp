@@ -17,9 +17,9 @@ namespace DiplomMSSQLApp.BLL.Services
         public abstract Task EditAsync(T item);
         public abstract Task<T> FindByIdAsync(int? id);
         public abstract IEnumerable<T> Get(EmployeeFilter f, string path, ref int cnt);
-        public abstract IEnumerable<T> GetAll();
+        public abstract Task<IEnumerable<T>> GetAllAsync();
         public abstract Task TestCreateAsync(int num, string path);
-        public abstract void TestRead(int num, string path, int val);
+        public abstract Task TestReadAsync(int num, string path, int val);
         public abstract Task TestUpdateAsync(int num, string path);
         public abstract Task TestDeleteAsync(int num, string path);
 

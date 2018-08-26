@@ -22,10 +22,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
             employeeService = es;
         }
 
-        public ActionResult Index(int page = 1)
+        [ActionName("Index")]
+        public async Task<ActionResult> IndexAsync(int page = 1)
         {
             // Получаем список командировок
-            IEnumerable<BusinessTripDTO> bDto = businessTripService.GetAll();
+            IEnumerable<BusinessTripDTO> bDto = await businessTripService.GetAllAsync();
             var cnt = bDto.Count();
             // Пагинация (paging)
             bDto = businessTripService.GetPage(bDto, page, cnt);
@@ -40,9 +41,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Добавление новой командировки
-        public ActionResult Create()
+        [ActionName("Create")]
+        public async Task<ActionResult> CreateAsync()
         {
-            ViewBag.Employees = GetSelectList();
+            ViewBag.Employees = await GetSelectListAsync();
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
@@ -64,7 +66,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
             {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = GetSelectList();
+            ViewBag.Employees = await GetSelectListAsync();
             return View(bt);
         }
 
@@ -82,7 +84,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
                     cfg.CreateMap<DepartmentDTO, DepartmentViewModel>();
                 });
                 BusinessTripViewModel bt = Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(bDto);
-                ViewBag.Employees = GetSelectList();
+                ViewBag.Employees = await GetSelectListAsync();
                 return View(bt);
             }
             catch (ValidationException ex)
@@ -109,14 +111,15 @@ namespace DiplomMSSQLApp.WEB.Controllers
             {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = GetSelectList();
+            ViewBag.Employees = await GetSelectListAsync();
             return View(bt);
         }
 
         // Получение списка сотрудников
-        private SelectList GetSelectList()
+        private async Task<SelectList> GetSelectListAsync()
         {
-            List<SelectListItem> items = employeeService.GetAll().Select(e => new SelectListItem()
+            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
+            List<SelectListItem> items = employees.Select(e => new SelectListItem()
             {
                 Value = e.Id.ToString(),
                 Text = e.LastName + " " + e.FirstName
@@ -125,11 +128,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Частичное представление
-        public ActionResult AddEmployee(int index)
+        public async Task<ActionResult> AddEmployeeAsync(int index)
         {
             ViewBag.Index = index;
-            ViewBag.Employees = GetSelectList();
-            return PartialView();
+            ViewBag.Employees = await GetSelectListAsync();
+            return PartialView("AddEmployee");
         }
 
         // Удаление командировки

@@ -54,10 +54,13 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Добавление нового сотрудника
-        public ActionResult Create()
+        [ActionName("Create")]
+        public async Task<ActionResult> CreateAsync()
         {
-            ViewBag.Posts = new SelectList(postService.GetAll().ToList(), "Id", "Title");
-            ViewBag.Departments = new SelectList(departmentService.GetAll().ToList(), "Id", "DepartmentName");
+            var p = await postService.GetAllAsync();
+            ViewBag.Posts = new SelectList(p.ToList(), "Id", "Title");
+            var d = await departmentService.GetAllAsync();
+            ViewBag.Departments = new SelectList(d.ToList(), "Id", "DepartmentName");
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
@@ -74,8 +77,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
             {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Posts = new SelectList(postService.GetAll().ToList(), "Id", "Title");
-            ViewBag.Departments = new SelectList(departmentService.GetAll().ToList(), "Id", "DepartmentName");
+            var p = await postService.GetAllAsync();
+            ViewBag.Posts = new SelectList(p.ToList(), "Id", "Title");
+            var d = await departmentService.GetAllAsync();
+            ViewBag.Departments = new SelectList(d.ToList(), "Id", "DepartmentName");
             return View(e);
         }
 
@@ -88,14 +93,16 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
-                        .ForMember(d => d.BusinessTrips, opt => opt.Ignore());
+                        .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
                     cfg.CreateMap<PostDTO, PostViewModel>();
                     cfg.CreateMap<DepartmentDTO, DepartmentViewModel>();
                 });
-                EmployeeViewModel e = Mapper.Map<EmployeeDTO, EmployeeViewModel>(eDto);
-                ViewBag.Posts = new SelectList(postService.GetAll().ToList(), "Id", "Title");
-                ViewBag.Departments = new SelectList(departmentService.GetAll().ToList(), "Id", "DepartmentName");
-                return View(e);
+                EmployeeViewModel emp = Mapper.Map<EmployeeDTO, EmployeeViewModel>(eDto);
+                var p = await postService.GetAllAsync();
+                ViewBag.Posts = new SelectList(p.ToList(), "Id", "Title");
+                var d = await departmentService.GetAllAsync();
+                ViewBag.Departments = new SelectList(d.ToList(), "Id", "DepartmentName");
+                return View(emp);
             }
             catch (ValidationException ex)
             {
@@ -117,8 +124,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
             {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Posts = new SelectList(postService.GetAll().ToList(), "Id", "Title");
-            ViewBag.Departments = new SelectList(departmentService.GetAll().ToList(), "Id", "DepartmentName");
+            var p = await postService.GetAllAsync();
+            ViewBag.Posts = new SelectList(p.ToList(), "Id", "Title");
+            var d = await departmentService.GetAllAsync();
+            ViewBag.Departments = new SelectList(d.ToList(), "Id", "DepartmentName");
             return View(e);
         }
 
@@ -206,10 +215,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Запись базы в файл
-        public ActionResult ExportJson()
+        [ActionName("ExportJson")]
+        public async Task<ActionResult> ExportJsonAsync()
         {
             string path = Server.MapPath("~/Results/Employee/Json.txt");
-            IEnumerable<EmployeeDTO> eDto = employeeService.GetAll();
+            IEnumerable<EmployeeDTO> eDto = await employeeService.GetAllAsync();
             var employees = eDto.Select(e => new
             {
                 SurName = e.LastName,
@@ -244,10 +254,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Тест выборки сотрудников
-        public ActionResult TestRead(int num, int val)
+        [ActionName("TestRead")]
+        public async Task<ActionResult> TestReadAsync(int num, int salary)
         {
             string path = Server.MapPath("~/Results/Employee/Read.txt");
-            employeeService.TestRead(num, path, val);
+            await employeeService.TestReadAsync(num, path, salary);
             return RedirectToAction("Index");
         }
 

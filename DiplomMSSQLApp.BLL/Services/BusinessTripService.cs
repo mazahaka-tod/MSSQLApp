@@ -52,7 +52,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление всех командировок
         public override async Task DeleteAllAsync()
         {
-            Database.BusinessTrips.RemoveAll();
+            await Database.BusinessTrips.RemoveAllAsync();
             await Database.SaveAsync();
         }
 
@@ -99,7 +99,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Получение списка всех командировок
-        public override IEnumerable<BusinessTripDTO> GetAll()
+        public override async Task<IEnumerable<BusinessTripDTO>> GetAllAsync()
         {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
@@ -107,7 +107,7 @@ namespace DiplomMSSQLApp.BLL.Services
                     .ForMember(p => p.Post, opt => opt.Ignore())
                     .ForMember(d => d.Department, opt => opt.Ignore());
             });
-            return Mapper.Map<IEnumerable<BusinessTrip>, List<BusinessTripDTO>>(Database.BusinessTrips.Get());
+            return Mapper.Map<IEnumerable<BusinessTrip>, List<BusinessTripDTO>>(await Database.BusinessTrips.GetAsync());
         }
 
         // Валидация модели
@@ -146,7 +146,7 @@ namespace DiplomMSSQLApp.BLL.Services
             throw new System.NotImplementedException();
         }
 
-        public override void TestRead(int num, string path, int val)
+        public override Task TestReadAsync(int num, string path, int val)
         {
             throw new System.NotImplementedException();
         }

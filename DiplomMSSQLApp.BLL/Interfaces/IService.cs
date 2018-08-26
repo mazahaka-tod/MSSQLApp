@@ -15,10 +15,10 @@ namespace DiplomMSSQLApp.BLL.Interfaces
         Task EditAsync(TEntity item);
         Task<TEntity> FindByIdAsync(int? id);
         IEnumerable<TEntity> Get(EmployeeFilter f, string path, ref int cnt);
-        IEnumerable<TEntity> GetAll();
+        Task<IEnumerable<TEntity> > GetAllAsync();
         IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page, int cnt);
         Task TestCreateAsync(int num, string path);
-        void TestRead(int num, string path, int val);
+        Task TestReadAsync(int num, string path, int val);
         Task TestUpdateAsync(int num, string path);
         Task TestDeleteAsync(int num, string path);
     }

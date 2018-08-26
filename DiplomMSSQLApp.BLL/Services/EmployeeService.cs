@@ -45,7 +45,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление всех сотрудников
         public override async Task DeleteAllAsync()
         {
-            Database.Employees.RemoveAll();
+            await Database.Employees.RemoveAllAsync();
             await Database.SaveAsync();
         }
 
@@ -268,13 +268,12 @@ namespace DiplomMSSQLApp.BLL.Services
             return collection;
         }
 
-
         // Получение списка всех сотрудников
-        public override IEnumerable<EmployeeDTO> GetAll()
+        public override async Task<IEnumerable<EmployeeDTO>> GetAllAsync()
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Employee, EmployeeDTO>()
                 .ForMember(e => e.BusinessTrips, opt => opt.Ignore()));
-            return Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(Database.Employees.Get());
+            return Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(await Database.Employees.GetAsync());
         }
 
         // Обновление информации о сотрудниках (при редактировании информации об отделе)
@@ -334,7 +333,7 @@ namespace DiplomMSSQLApp.BLL.Services
                     throw new ValidationException("Зарплата должна быть меньше " + item.Post.MaxSalary, "Salary");
             }
 
-            Department department = await Database.Departments.FindByIdAsync(item.DepartmentId.HasValue ? item.DepartmentId.Value : 0);
+            Department department = await Database.Departments.FindByIdAsync(item.DepartmentId ?? 0);
             if (department == null)
                 throw new ValidationException("Отдел не найден", "");
             Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
@@ -379,7 +378,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Тест выборки сотрудников
-        public override void TestRead(int num, string path, int val)
+        public override async Task TestReadAsync(int num, string path, int salary)
         {
             for (int ii = 0; ii < 3; ii++)
             {
@@ -387,22 +386,22 @@ namespace DiplomMSSQLApp.BLL.Services
                 {
                     sw.WriteLine("++-");
                 }
-                for (val = 55000; val <= 61000; val += 1000)
+                for (salary = 55000; salary <= 61000; salary += 1000)
                 {
-                    var cnt = Database.Employees.Get().Count();
+                    var e = await Database.Employees.GetAsync();
                     IEnumerable<Employee> result = null;
                     Stopwatch stopWatch = new Stopwatch();
                     stopWatch.Start();
                     for (int i = 0; i < num; i++)
                     {
-                        result = Database.Employees.Get(val);
+                        result = Database.Employees.Get(salary);
                     }
                     stopWatch.Stop();
                     TimeSpan ts = stopWatch.Elapsed;
                     string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
                     using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
                     {
-                        sw.WriteLine("Общее количество сотрудников: " + cnt + "; Условие выборки: Salary >= " + val + "; Индекс: нет; Количество найденных сотрудников: " + result.Count() + "; Количество выборок: " + num + "; Время: " + elapsedTime);
+                        sw.WriteLine("Общее количество сотрудников: " + e.Count() + "; Условие выборки: Salary >= " + salary + "; Индекс: нет; Количество найденных сотрудников: " + result.Count() + "; Количество выборок: " + num + "; Время: " + elapsedTime);
                     }
                 }
             }
@@ -453,7 +452,7 @@ namespace DiplomMSSQLApp.BLL.Services
         public override async Task TestDeleteAsync(int num, string path)
         {
             Stopwatch stopWatch = new Stopwatch();
-            IEnumerable<Employee> emps = Database.Employees.Get();
+            IEnumerable<Employee> emps = await Database.Employees.GetAsync();
             Database.Employees.RemoveSeries(emps.Take(num));
             stopWatch.Start();
             await Database.SaveAsync();

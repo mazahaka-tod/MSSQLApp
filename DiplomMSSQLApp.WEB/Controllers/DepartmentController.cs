@@ -2,7 +2,6 @@
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
-using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +21,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
             departmentService = ds;
         }
 
-        public ActionResult Index(int page = 1)
+        [ActionName("Index")]
+        public async Task<ActionResult> IndexAsync(int page = 1)
         {
             // Получаем список отделов
-            IEnumerable<DepartmentDTO> dDto = departmentService.GetAll();
+            IEnumerable<DepartmentDTO> dDto = await departmentService.GetAllAsync();
             var cnt = dDto.Count();
             // Пагинация (paging)
             dDto = departmentService.GetPage(dDto, page, cnt);
@@ -37,9 +37,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Добавление нового отдела
-        public ActionResult Create()
+        [ActionName("Create")]
+        public async Task<ActionResult> CreateAsync()
         {
-            ViewBag.Employees = new SelectList(employeeService.GetAll().ToList(), "LastName", "LastName");
+            var e = await employeeService.GetAllAsync();
+            ViewBag.Employees = new SelectList(e.ToList(), "LastName", "LastName");
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
@@ -56,7 +58,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
             {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = new SelectList(employeeService.GetAll().ToList(), "LastName", "LastName");
+            var e = await employeeService.GetAllAsync();
+            ViewBag.Employees = new SelectList(e.ToList(), "LastName", "LastName");
             return View(d);
         }
 
@@ -70,7 +73,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
                     .ForMember(dp => dp.Employees, opt => opt.Ignore()));
                 DepartmentViewModel d = Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
-                ViewBag.Employees = new SelectList(employeeService.GetAll().ToList(), "LastName", "LastName");
+                var e = await employeeService.GetAllAsync();
+                ViewBag.Employees = new SelectList(e.ToList(), "LastName", "LastName");
                 return View(d);
             }
             catch (ValidationException ex)
@@ -95,7 +99,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
             {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = new SelectList(employeeService.GetAll().ToList(), "LastName", "LastName");
+            var e = await employeeService.GetAllAsync();
+            ViewBag.Employees = new SelectList(e.ToList(), "LastName", "LastName");
             return View(d);
         }
 

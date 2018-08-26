@@ -39,7 +39,7 @@ namespace DiplomMSSQLApp.BLL.Services
         // Удаление всех отделов
         public override async Task DeleteAllAsync()
         {
-            Database.Departments.RemoveAll();
+            await Database.Departments.RemoveAllAsync();
             await Database.SaveAsync();
         }
 
@@ -76,12 +76,11 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Получение списка всех отделов
-        public override IEnumerable<DepartmentDTO> GetAll()
+        public override async Task<IEnumerable<DepartmentDTO>> GetAllAsync()
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Department, DepartmentDTO>()
-                .ForMember(d => d.Employees, opt => opt.Ignore())
-            );
-            return Mapper.Map<IEnumerable<Department>, List<DepartmentDTO>>(Database.Departments.Get());
+                .ForMember(d => d.Employees, opt => opt.Ignore()));
+            return Mapper.Map<IEnumerable<Department>, List<DepartmentDTO>>(await Database.Departments.GetAsync());
         }
 
         // Валидация модели
@@ -102,7 +101,7 @@ namespace DiplomMSSQLApp.BLL.Services
             throw new System.NotImplementedException();
         }
 
-        public override void TestRead(int num, string path, int val)
+        public override Task TestReadAsync(int num, string path, int val)
         {
             throw new System.NotImplementedException();
         }

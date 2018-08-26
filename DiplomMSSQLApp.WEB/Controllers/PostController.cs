@@ -24,18 +24,15 @@ namespace DiplomMSSQLApp.WEB.Controllers
             departmentService = ds;
         }
 
-        public ActionResult Index(int page = 1)
+        [ActionName("Index")]
+        public async Task<ActionResult> IndexAsync(int page = 1)
         {
             // Получаем список должностей
-            IEnumerable<PostDTO> pDto = postService.GetAll();
-            var cnt = pDto.Count();
-            //pDto = pDto.Take(8);
+            IEnumerable<PostDTO> pDto = await postService.GetAllAsync();
             // Пагинация (paging)
-            pDto = postService.GetPage(pDto, page, cnt);
-
+            pDto = postService.GetPage(pDto, page, pDto.Count());
             Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, PostViewModel>());
             var p = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
-
             return View(new PostListViewModel { Posts = p, PageInfo = postService.PageInfo });
         }
 
@@ -155,10 +152,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Запись базы в файл
-        public ActionResult ExportJson()
+        [ActionName("ExportJson")]
+        public async Task<ActionResult> ExportJsonAsync()
         {
             string path = Server.MapPath("~/Results/Post/Json.txt");
-            IEnumerable<PostDTO> pDto = postService.GetAll();
+            IEnumerable<PostDTO> pDto = await postService.GetAllAsync();
             var posts = pDto.Select(p => new
             {
                 p.Title,
@@ -185,10 +183,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
         }
 
         // Тест выборки сотрудников
-        public ActionResult TestRead(int num, int val)
+        [ActionName("TestRead")]
+        public async Task<ActionResult> TestReadAsync(int num, int salary)
         {
             string path = Server.MapPath("~/Results/Post/Read.txt");
-            postService.TestRead(num, path, val);
+            await postService.TestReadAsync(num, path, salary);
             return RedirectToAction("Index");
         }
 

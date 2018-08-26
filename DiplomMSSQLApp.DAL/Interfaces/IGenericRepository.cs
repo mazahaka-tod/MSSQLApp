@@ -9,14 +9,14 @@ namespace DiplomMSSQLApp.DAL.Interfaces
         void Create(TEntity item);                                      // Добавление элемента
         void Create(IEnumerable<TEntity> items);                        // Добавление последовательности элементов
         Task<TEntity> FindByIdAsync(int id);                            // Поиск по id
-        IEnumerable<TEntity> Get();                                     // Получение всех элементов
+        Task<IEnumerable<TEntity>> GetAsync();                          // Получение всех элементов
         IEnumerable<TEntity> Get(int salary);                           // Получение элементов по условию
         IEnumerable<TEntity> Get(bool flag);                            // Получение элементов по условию
         IEnumerable<TEntity> Get(Func<TEntity, bool> predicate);        // Получение элементов, удовлетворяющих предикату
         TEntity GetFirst();                                             // Получение первого элемента
         void Remove(TEntity item);                                      // Удаление элемента
         void RemoveSeries(IEnumerable<TEntity> items);                  // Удаление последовательности элементов
-        void RemoveAll();                                               // Удаление всех элементов
+        Task RemoveAllAsync();                                          // Удаление всех элементов
         void Update(TEntity item);                                      // Обновление элемента
     }
 }
