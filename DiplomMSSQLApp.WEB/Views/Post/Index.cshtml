@@ -6,54 +6,109 @@
 }
 
 <h2>Список должностей</h2>
+<hr />
+<details>
+    <summary><span style="font-size:large"><b><ins>Тесты</ins></b></span></summary>
+    <p>
+        @using (Html.BeginForm("TestCreate", "Post"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест добавления должностей")</h4>
 
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Добавить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+    <hr />
+    <p>
+        @using (Html.BeginForm("TestRead", "Post"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест выборки должностей")</h4>
+
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Salary", "MaxSalary >= ", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=50000 name="salary" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Выбрать" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+    <hr />
+    <p>
+        @using (Html.BeginForm("TestUpdate", "Post"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест обновления должностей")</h4>
+
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Обновить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+    <hr />
+    <p>
+        @using (Html.BeginForm("TestDelete", "Post"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест удаления должностей")</h4>
+
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Удалить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+</details>
+<hr />
 <p>
     @Html.ActionLink("Добавить должность", "Create", null, new { @class = "btn btn-default" })
     @Html.ActionLink("Удалить все должности", "DeleteAll", null, new { @class = "btn btn-default" })
     @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
-</p>
-
-<p>
-    @using (Html.BeginForm("TestCreate", "Post"))
-    {
-        <div>
-            @Html.Label("Num", "Тест добавления должностей")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        <input type="submit" value="Добавить" />
-    }
-</p>
-<p>
-    @using (Html.BeginForm("TestRead", "Post"))
-    {
-        <div>
-            @Html.Label("Num", "Тест выборки должностей")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        @Html.Label("Salary", "MaxSalary >= ")
-        <input type="number" value=55000 name="salary" /><br />
-        <input type="submit" value="Поиск" />
-    }
-</p>
-<p>
-    @using (Html.BeginForm("TestUpdate", "Post"))
-    {
-        <div>
-            @Html.Label("Num", "Тест обновления должностей")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        <input type="submit" value="Обновить" />
-    }
-</p>
-<p>
-    @using (Html.BeginForm("TestDelete", "Post"))
-    {
-        <div>
-            @Html.Label("Num", "Тест удаления должностей")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        <input type="submit" value="Удалить" />
-    }
 </p>
 
 @if (Model.Posts.Count() > 0)

@@ -6,10 +6,10 @@
 }
 
 <h2>Список сотрудников</h2>
-
+<hr />
 <p>
     <details>
-        <summary>Поиск по фильтру</summary>
+        <summary><span style="font-size:large"><b><ins>Поиск по фильтру</ins></b></span></summary>
         @using (Html.BeginForm("Index", "Home"))
         {
             <table>
@@ -144,7 +144,7 @@
                             <dt>
                             </dt>
                             <dd>
-                                <input type="submit" value="Поиск" class="btn btn-default" />
+                                <input type="submit" value="Найти" class="btn btn-default" />
                             </dd>
                         </dl>
                     </td>
@@ -153,54 +153,109 @@
         }
     </details>
 </p>
+<hr />
+<details>
+    <summary><span style="font-size:large"><b><ins>Тесты</ins></b></span></summary>
+    <p>
+        @using (Html.BeginForm("TestCreate", "Home"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест добавления сотрудников")</h4>
 
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Добавить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+    <hr />
+    <p>
+        @using (Html.BeginForm("TestRead", "Home"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест выборки сотрудников")</h4>
+
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Salary", "Salary >= ", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=50000 name="salary" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Выбрать" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+    <hr />
+    <p>
+        @using (Html.BeginForm("TestUpdate", "Home"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест обновления сотрудников")</h4>
+
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Обновить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+    <hr />
+    <p>
+        @using (Html.BeginForm("TestDelete", "Home"))
+        {
+            <div class="form-horizontal">
+                <h4>@Html.Label("Test", "Тест удаления сотрудников")</h4>
+
+                <div class="form-group">
+                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="number" value=10 name="num" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Удалить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </p>
+</details>
+<hr />
 <p>
     @Html.ActionLink("Добавить сотрудника", "Create", null, new { @class = "btn btn-default" })
     @Html.ActionLink("Удалить всех сотрудников", "DeleteAll", null, new { @class = "btn btn-default" })
     @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
-</p>
-
-<p>
-    @using (Html.BeginForm("TestCreate", "Home"))
-    {
-        <div>
-            @Html.Label("Num", "Тест добавления сотрудников")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        <input type="submit" value="Добавить" />
-    }
-</p>
-<p>
-    @using (Html.BeginForm("TestRead", "Home"))
-    {
-        <div>
-            @Html.Label("Num", "Тест выборки сотрудников")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        @Html.Label("Salary", "Salary >= ")
-        <input type="number" value=55000 name="salary" /><br />
-        <input type="submit" value="Поиск" />
-    }
-</p>
-<p>
-    @using (Html.BeginForm("TestUpdate", "Home"))
-    {
-        <div>
-            @Html.Label("Num", "Тест обновления сотрудников")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        <input type="submit" value="Обновить" />
-    }
-</p>
-<p>
-    @using (Html.BeginForm("TestDelete", "Home"))
-    {
-        <div>
-            @Html.Label("Num", "Тест удаления сотрудников")
-        </div>
-        <input type="number" value=10 name="num" /><br />
-        <input type="submit" value="Удалить" />
-    }
 </p>
 
 @if (Model.Employees.Count() > 0)
@@ -342,67 +397,67 @@
 @section scripts {
     @Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
     <script>
-        // Устанавлеваем checkbox, textbox и dropdownlist на форме поиска
-        $(document).ready(function() {
-            @{ string f = Model.Filter.Columns.Contains("0") ? "true" : "false"; }
-            $('#Columns0').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("1") ? "true" : "false"; }
-            $('#Columns1').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("2") ? "true" : "false"; }
-            $('#Columns2').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("3") ? "true" : "false"; }
-            $('#Columns3').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("4") ? "true" : "false"; }
-            $('#Columns4').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("5") ? "true" : "false"; }
-            $('#Columns5').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("6") ? "true" : "false"; }
-            $('#Columns6').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("7") ? "true" : "false"; }
-            $('#Columns7').prop('checked', @f);
-            @{ f = Model.Filter.Columns.Contains("8") ? "true" : "false"; }
-            $('#Columns8').prop('checked', @f);
+    // Устанавлеваем checkbox, textbox и dropdownlist на форме поиска
+    $(document).ready(function() {
+        @{ string f = Model.Filter.Columns.Contains("0") ? "true" : "false"; }
+        $('#Columns0').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("1") ? "true" : "false"; }
+        $('#Columns1').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("2") ? "true" : "false"; }
+        $('#Columns2').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("3") ? "true" : "false"; }
+        $('#Columns3').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("4") ? "true" : "false"; }
+        $('#Columns4').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("5") ? "true" : "false"; }
+        $('#Columns5').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("6") ? "true" : "false"; }
+        $('#Columns6').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("7") ? "true" : "false"; }
+        $('#Columns7').prop('checked', @f);
+        @{ f = Model.Filter.Columns.Contains("8") ? "true" : "false"; }
+        $('#Columns8').prop('checked', @f);
 
-            $('#Or').prop('checked', @Model.Filter.Or.ToString().ToLower());
-            $('#PhoneNumber').prop('checked', @Model.Filter.PhoneNumber.ToString().ToLower());
-            $('#BonusExists').prop('checked', @Model.Filter.BonusExists.ToString().ToLower());
-            $('#Not').prop('checked', @Model.Filter.Not.ToString().ToLower());
+        $('#Or').prop('checked', @Model.Filter.Or.ToString().ToLower());
+        $('#PhoneNumber').prop('checked', @Model.Filter.PhoneNumber.ToString().ToLower());
+        $('#BonusExists').prop('checked', @Model.Filter.BonusExists.ToString().ToLower());
+        $('#Not').prop('checked', @Model.Filter.Not.ToString().ToLower());
 
-        @if (Model.Filter.LastName != null)
-            {
-                @:$('#LastName').prop('value', "@Model.Filter.LastName[0]");
-            }
-            @if (Model.Filter.Email != null)
-            {
-                @:$('#Email').prop('value', "@Model.Filter.Email");
-            }
-            @if (Model.Filter.HireDate != null)
-            {
-                @:$('#HireDate').prop('value', "@Model.Filter.HireDate");
-            }
-            @if (Model.Filter.MinSalary != null)
-            {
-                @:$('#MinSalary').prop('value', "@Model.Filter.MinSalary");
-            }
-            @if (Model.Filter.MaxSalary != null)
-            {
-                @:$('#MaxSalary').prop('value', "@Model.Filter.MaxSalary");
-            }
-            @if (Model.Filter.Bonus != null)
-            {
-                @:$('#Bonus').prop('value', "@Model.Filter.Bonus[0]");
-            }
-            @if (Model.Filter.Post != null)
-            {
-                @:$('#Post').prop('value', "@Model.Filter.Post");
-            }
-            @if (Model.Filter.DepartmentName != null)
-            {
-                @:$('#DepartmentName').prop('value', "@Model.Filter.DepartmentName");
-            }
+    @if (Model.Filter.LastName != null)
+        {
+            @:$('#LastName').prop('value', "@Model.Filter.LastName[0]");
+        }
+        @if (Model.Filter.Email != null)
+        {
+            @:$('#Email').prop('value', "@Model.Filter.Email");
+        }
+        @if (Model.Filter.HireDate != null)
+        {
+            @:$('#HireDate').prop('value', "@Model.Filter.HireDate");
+        }
+        @if (Model.Filter.MinSalary != null)
+        {
+            @:$('#MinSalary').prop('value', "@Model.Filter.MinSalary");
+        }
+        @if (Model.Filter.MaxSalary != null)
+        {
+            @:$('#MaxSalary').prop('value', "@Model.Filter.MaxSalary");
+        }
+        @if (Model.Filter.Bonus != null)
+        {
+            @:$('#Bonus').prop('value', "@Model.Filter.Bonus[0]");
+        }
+        @if (Model.Filter.Post != null)
+        {
+            @:$('#Post').prop('value', "@Model.Filter.Post");
+        }
+        @if (Model.Filter.DepartmentName != null)
+        {
+            @:$('#DepartmentName').prop('value', "@Model.Filter.DepartmentName");
+        }
 
-            $('select#Sort option[value="@Model.Filter.Sort"]').prop('selected', true);
-            $('select#Asc option[value="@Model.Filter.Asc"]').prop('selected', true);
-        });
+        $('select#Sort option[value="@Model.Filter.Sort"]').prop('selected', true);
+        $('select#Asc option[value="@Model.Filter.Asc"]').prop('selected', true);
+    });
     </script>
 }
