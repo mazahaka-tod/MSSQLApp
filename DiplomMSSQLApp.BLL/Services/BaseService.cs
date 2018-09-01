@@ -16,18 +16,18 @@ namespace DiplomMSSQLApp.BLL.Services
         public abstract void Dispose();
         public abstract Task EditAsync(T item);
         public abstract Task<T> FindByIdAsync(int? id);
-        public abstract IEnumerable<T> Get(EmployeeFilter f, string path, ref int cnt);
+        public abstract IEnumerable<T> Get(EmployeeFilter f, string path);
         public abstract Task<IEnumerable<T>> GetAllAsync();
         public abstract Task TestCreateAsync(int num, string path);
         public abstract Task TestReadAsync(int num, string path, int val);
         public abstract Task TestUpdateAsync(int num, string path);
         public abstract Task TestDeleteAsync(int num, string path);
 
-        public IEnumerable<T> GetPage(IEnumerable<T> col, int page, int cnt)
+        public IEnumerable<T> GetPage(IEnumerable<T> col, int page)
         {
             // Пагинация (paging)
             int pageSize = 8; // количество объектов на страницу
-            PageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = col.Count(), RealPages = cnt };
+            PageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = col.Count() };
             if (page < 1) PageInfo.PageNumber = 1;
             if (page > PageInfo.TotalPages) PageInfo.PageNumber = PageInfo.TotalPages;
             IEnumerable<T> pageEntities = col.Skip((PageInfo.PageNumber - 1) * pageSize).Take(pageSize);

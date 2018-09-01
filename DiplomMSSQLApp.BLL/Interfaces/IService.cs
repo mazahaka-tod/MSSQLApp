@@ -14,9 +14,9 @@ namespace DiplomMSSQLApp.BLL.Interfaces
         void Dispose();
         Task EditAsync(TEntity item);
         Task<TEntity> FindByIdAsync(int? id);
-        IEnumerable<TEntity> Get(EmployeeFilter f, string path, ref int cnt);
+        IEnumerable<TEntity> Get(EmployeeFilter f, string path);
         Task<IEnumerable<TEntity> > GetAllAsync();
-        IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page, int cnt);
+        IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page);
         Task TestCreateAsync(int num, string path);
         Task TestReadAsync(int num, string path, int val);
         Task TestUpdateAsync(int num, string path);

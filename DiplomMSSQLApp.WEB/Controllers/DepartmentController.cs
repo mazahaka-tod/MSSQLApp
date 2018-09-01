@@ -26,10 +26,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             // Получаем список отделов
             IEnumerable<DepartmentDTO> dDto = await departmentService.GetAllAsync();
-            var cnt = dDto.Count();
             // Пагинация (paging)
-            dDto = departmentService.GetPage(dDto, page, cnt);
-
+            dDto = departmentService.GetPage(dDto, page);
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, DepartmentViewModel>());
             var d = Mapper.Map<IEnumerable<DepartmentDTO>, IEnumerable<DepartmentViewModel>>(dDto);
 

@@ -30,7 +30,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
             // Получаем список должностей
             IEnumerable<PostDTO> pDto = await postService.GetAllAsync();
             // Пагинация (paging)
-            pDto = postService.GetPage(pDto, page, pDto.Count());
+            pDto = postService.GetPage(pDto, page);
             Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, PostViewModel>());
             var p = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
             return View(new PostListViewModel { Posts = p, PageInfo = postService.PageInfo });

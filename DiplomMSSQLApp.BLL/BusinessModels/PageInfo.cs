@@ -12,6 +12,5 @@ namespace DiplomMSSQLApp.BLL.BusinessModels
         {
             get { return (int)Math.Ceiling((decimal)TotalItems / PageSize); }
         }
-        public int RealPages { get; set; }
     }
 }

@@ -155,7 +155,7 @@
 </p>
 <hr />
 <details>
-    <summary><span style="font-size:large"><b><ins>Тесты</ins></b></span></summary>
+    <summary><span style="font-size:large"><b><ins>Тесты производительности</ins></b></span></summary>
     <p>
         @using (Html.BeginForm("TestCreate", "Home"))
         {
@@ -387,7 +387,7 @@
 }
 
 <p>
-    @Html.Label("Count", "Количество сотрудников: " + Model.PageInfo.RealPages)
+    @Html.Label("Count", "Количество сотрудников: " + Model.PageInfo.TotalItems)
 </p>
 
 <div class="btn-group">

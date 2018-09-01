@@ -200,7 +200,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Нереализованные методы
-        public override IEnumerable<PostDTO> Get(EmployeeFilter f, string path, ref int cnt)
+        public override IEnumerable<PostDTO> Get(EmployeeFilter f, string path)
         {
             throw new NotImplementedException();
         }

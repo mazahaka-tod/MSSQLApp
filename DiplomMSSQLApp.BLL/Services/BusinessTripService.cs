@@ -136,7 +136,7 @@ namespace DiplomMSSQLApp.BLL.Services
             throw new System.NotImplementedException();
         }
 
-        public override IEnumerable<BusinessTripDTO> Get(EmployeeFilter f, string path, ref int cnt)
+        public override IEnumerable<BusinessTripDTO> Get(EmployeeFilter f, string path)
         {
             throw new System.NotImplementedException();
         }

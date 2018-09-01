@@ -81,7 +81,7 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Получение списка сотрудников по фильтру
-        public override IEnumerable<EmployeeDTO> Get(EmployeeFilter f, string path, ref int cnt)
+        public override IEnumerable<EmployeeDTO> Get(EmployeeFilter f, string path)
         {
             bool bl = true;
             string message = "";
@@ -183,14 +183,11 @@ namespace DiplomMSSQLApp.BLL.Services
                 {
                     case "LastName":
                         col = Database.Employees.Get(predicate).OrderBy(e => e.LastName);
-                        cnt = col.Count();
-                        //col = col.Take(8);
                         break;
                     case "SurName":
                         Stopwatch stopWatch = new Stopwatch();
                         stopWatch.Start();
                         col = Database.Employees.Get(predicate);
-                        cnt = col.Count();
                         stopWatch.Stop();
                         TimeSpan ts = stopWatch.Elapsed;
                         string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
@@ -201,27 +198,21 @@ namespace DiplomMSSQLApp.BLL.Services
                         break;
                     case "Email":
                         col = Database.Employees.Get(predicate).OrderBy(e => e.Email);
-                        cnt = col.Count();
                         break;
                     case "HireDate":
                         col = Database.Employees.Get(predicate).OrderBy(e => e.HireDate);
-                        cnt = col.Count();
                         break;
                     case "Salary":
                         col = Database.Employees.Get(predicate).OrderBy(e => e.Salary);
-                        cnt = col.Count();
                         break;
                     case "Bonus":
                         col = Database.Employees.Get(predicate).OrderBy(e => e.Bonus);
-                        cnt = col.Count();
                         break;
                     case "Post":
                         col = Database.Employees.Get(predicate).OrderBy(e => e.Post.Title);
-                        cnt = col.Count();
                         break;
                     default:
                         col = Database.Employees.Get(predicate).OrderBy(e => e.Department.DepartmentName);
-                        cnt = col.Count();
                         break;
                 }
             else
@@ -229,31 +220,24 @@ namespace DiplomMSSQLApp.BLL.Services
                 {
                     case "LastName":
                         col = Database.Employees.Get(predicate).OrderByDescending(e => e.LastName);
-                        cnt = col.Count();
                         break;
                     case "Email":
                         col = Database.Employees.Get(predicate).OrderByDescending(e => e.Email);
-                        cnt = col.Count();
                         break;
                     case "HireDate":
                         col = Database.Employees.Get(predicate).OrderByDescending(e => e.HireDate);
-                        cnt = col.Count();
                         break;
                     case "Salary":
                         col = Database.Employees.Get(predicate).OrderByDescending(e => e.Salary);
-                        cnt = col.Count();
                         break;
                     case "Bonus":
                         col = Database.Employees.Get(predicate).OrderByDescending(e => e.Bonus);
-                        cnt = col.Count();
                         break;
                     case "Post":
                         col = Database.Employees.Get(predicate).OrderByDescending(e => e.Post.Title);
-                        cnt = col.Count();
                         break;
                     default:
                         col = Database.Employees.Get(predicate).OrderByDescending(e => e.Department.DepartmentName);
-                        cnt = col.Count();
                         break;
                 }
             Mapper.Initialize(cfg =>

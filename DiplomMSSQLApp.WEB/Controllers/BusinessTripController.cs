@@ -27,10 +27,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             // Получаем список командировок
             IEnumerable<BusinessTripDTO> bDto = await businessTripService.GetAllAsync();
-            var cnt = bDto.Count();
             // Пагинация (paging)
-            bDto = businessTripService.GetPage(bDto, page, cnt);
-
+            bDto = businessTripService.GetPage(bDto, page);
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();

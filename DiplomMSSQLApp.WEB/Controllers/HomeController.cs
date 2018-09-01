@@ -33,10 +33,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
             if (str != null) f = System.Web.Helpers.Json.Decode<EmployeeFilter>(str);
             string path = Server.MapPath("~/Results/Employee/Filter.txt");
             // Получаем список сотрудников
-            int cnt = 0;
-            IEnumerable<EmployeeDTO> eDto = employeeService.Get(f, path, ref cnt);     // фильтруем данные
+            IEnumerable<EmployeeDTO> eDto = employeeService.Get(f, path);     // фильтруем данные
             // Пагинация (paging)
-            eDto = employeeService.GetPage(eDto, page, cnt);
+            eDto = employeeService.GetPage(eDto, page);
 
             Mapper.Initialize(cfg =>
             {
