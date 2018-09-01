@@ -19,6 +19,8 @@ namespace DiplomMSSQLApp.BLL.Services
             Database = uow;
         }
 
+        public BusinessTripService() {}
+
         // Добавление новой командировки (с валидацией)
         public async Task CreateAsync(BusinessTripDTO item, int[] ids)
         {
