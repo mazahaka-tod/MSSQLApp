@@ -71,6 +71,10 @@
       <Project>{c2fe3672-be6a-4680-9381-d79cfb3bfd01}</Project>
       <Name>DiplomMSSQLApp.BLL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DiplomMSSQLApp.DAL\DiplomMSSQLApp.DAL.csproj">
+      <Project>{C4BD5697-057F-4327-8BD3-CFE187549D1C}</Project>
+      <Name>DiplomMSSQLApp.DAL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

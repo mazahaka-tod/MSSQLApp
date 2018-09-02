@@ -12,7 +12,7 @@ namespace DiplomMSSQLApp.BLL.Services
 {
     public class BusinessTripService : BaseService<BusinessTripDTO>
     {
-        IUnitOfWork Database { get; set; }
+        private IUnitOfWork Database { get; set; }
 
         public BusinessTripService(IUnitOfWork uow)
         {
@@ -115,16 +115,8 @@ namespace DiplomMSSQLApp.BLL.Services
         // Валидация модели
         private void ValidationBusinessTrip(BusinessTripDTO item)
         {
-            if (item.Name == null)
-                throw new ValidationException("Требуется ввести код командировки", "Name");
-            if (item.DateStart == null)
-                throw new ValidationException("Требуется ввести дату начала командировки", "DateStart");
-            if (item.DateEnd == null)
-                throw new ValidationException("Требуется ввести дату окончания командировки", "DateEnd");
             if (item.DateStart > item.DateEnd)
-                throw new ValidationException("Дата окончания командировки не должна быть до даты начала", "DateEnd");
-            if (item.Destination == null)
-                throw new ValidationException("Требуется ввести место назначения", "Destination");
+                throw new ValidationException("Дата окончания командировки не должна быть до даты начала", "");
         }
 
         // Нереализованные методы
