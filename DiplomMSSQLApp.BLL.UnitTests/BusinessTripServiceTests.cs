@@ -91,6 +91,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("04.09.2018_024", result[0].Name);
             Assert.AreEqual("05.09.2018_025", result[1].Name);
         }
+
         /// <summary>
         /// // CreateAsync method
         /// </summary>
@@ -107,6 +108,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             StringAssert.Contains("Дата окончания командировки не должна быть до даты начала", ex.Message);
         }
+
         [Test]
         public async Task CreateAsync_IdsParameterContainsThreeDifferentValues_CallsFindByIdAsyncMethodThreeTimes()
         {
@@ -120,6 +122,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             mock.Verify(m => m.Employees.FindByIdAsync(It.IsAny<int>()), Times.Exactly(3));
         }
+
         [Test]
         public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe()
         {
@@ -131,6 +134,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             mock.Verify(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()), Times.Once());
         }
+
         [Test]
         public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
         {
@@ -141,6 +145,61 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             await bts.CreateAsync(new BusinessTripDTO(), new int[0]);
 
             mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        /// <summary>
+        /// // DeleteAsync method
+        /// </summary>
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
+
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            await bts.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.BusinessTrips.Remove(It.IsAny<BusinessTrip>()), Times.Never);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
+
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            await bts.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Never);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
+
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            await bts.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.BusinessTrips.Remove(It.IsAny<BusinessTrip>()), Times.Once);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
+
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            await bts.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
         }
     }
 }

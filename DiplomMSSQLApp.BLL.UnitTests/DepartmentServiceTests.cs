@@ -1,8 +1,11 @@
 ﻿using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Services;
+using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
+using Moq;
 using NUnit.Framework;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.UnitTests
 {
@@ -86,6 +89,61 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual(5, result[1].Id);
             Assert.AreEqual("Logistics", result[0].DepartmentName);
             Assert.AreEqual("Production", result[1].DepartmentName);
+        }
+
+        /// <summary>
+        /// // DeleteAsync method
+        /// </summary>
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
+
+            DepartmentService ds = GetNewService(mock.Object);
+
+            await ds.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.Departments.Remove(It.IsAny<Department>()), Times.Never);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
+
+            DepartmentService ds = GetNewService(mock.Object);
+
+            await ds.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Never);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+
+            DepartmentService ds = GetNewService(mock.Object);
+
+            await ds.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.Departments.Remove(It.IsAny<Department>()), Times.Once);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+
+            DepartmentService ds = GetNewService(mock.Object);
+
+            await ds.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
         }
     }
 }
