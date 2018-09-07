@@ -4,6 +4,7 @@ using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -89,6 +90,52 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual(5, result[1].Id);
             Assert.AreEqual("Logistics", result[0].DepartmentName);
             Assert.AreEqual("Production", result[1].DepartmentName);
+        }
+
+        /// <summary>
+        /// // CreateAsync method
+        /// </summary>
+        [Test]
+        public void CreateAsync_DepartmentNamePropertyIsNull_Throws()
+        {
+            DepartmentService ds = GetNewService();
+            DepartmentDTO item = new DepartmentDTO {
+                DepartmentName = null
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await ds.CreateAsync(item));
+
+            StringAssert.Contains("Требуется ввести название отдела", ex.Message);
+        }
+
+        [Test]
+        public async Task CreateAsync_CallsWithGoodParameter_CallsCreateMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.Create(It.IsAny<Department>()));
+            DepartmentService ds = GetNewService(mock.Object);
+            DepartmentDTO item = new DepartmentDTO {
+                DepartmentName = "IT"
+            };
+
+            await ds.CreateAsync(item);
+
+            mock.Verify(m => m.Departments.Create(It.IsAny<Department>()), Times.Once);
+        }
+
+        [Test]
+        public async Task CreateAsync_CallsWithGoodParameter_CallsSaveAsyncMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.Create(It.IsAny<Department>()));
+            DepartmentService ds = GetNewService(mock.Object);
+            DepartmentDTO item = new DepartmentDTO {
+                DepartmentName = "IT"
+            };
+
+            await ds.CreateAsync(item);
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
         }
 
         /// <summary>

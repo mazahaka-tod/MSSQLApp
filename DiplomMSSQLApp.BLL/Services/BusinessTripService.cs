@@ -115,8 +115,14 @@ namespace DiplomMSSQLApp.BLL.Services
         // Валидация модели
         private void ValidationBusinessTrip(BusinessTripDTO item)
         {
+            if (item.Name == null)
+                throw new ValidationException("Требуется ввести код командировки", "Name");
             if (item.DateStart > item.DateEnd)
-                throw new ValidationException("Дата окончания командировки не должна быть до даты начала", "");
+                throw new ValidationException("Дата окончания командировки не должна быть до даты начала", "DateEnd");
+            if (item.Destination == null)
+                throw new ValidationException("Требуется ввести место назначения", "Destination");
+            if (item.Purpose == null)
+                throw new ValidationException("Требуется ввести цель командировки", "Purpose");
         }
 
         // Нереализованные методы

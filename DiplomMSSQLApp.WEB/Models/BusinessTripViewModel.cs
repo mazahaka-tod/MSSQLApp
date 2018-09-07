@@ -13,11 +13,11 @@ namespace DiplomMSSQLApp.WEB.Models
         [Required(ErrorMessage = "Требуется ввести дату начала командировки")]
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Дата начала")]
-        public DateTime DateStart { get; set; }
+        public DateTime DateStart { get; set; } = DateTime.Now;
         [Required(ErrorMessage = "Требуется ввести дату окончания командировки")]
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Дата окончания")]
-        public DateTime DateEnd { get; set; }
+        public DateTime DateEnd { get; set; } = DateTime.Now;
         [Required(ErrorMessage = "Требуется ввести место назначения")]
         [Display(Name = "Место назначения")]
         public string Destination { get; set; }

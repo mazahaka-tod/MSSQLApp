@@ -96,17 +96,72 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // CreateAsync method
         /// </summary>
         [Test]
+        public void CreateAsync_NamePropertyIsNull_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = null,
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
+
+            StringAssert.Contains("Требуется ввести код командировки", ex.Message);
+        }
+
+        [Test]
         public void CreateAsync_DateStartPropertyMoreThanDateEndProperty_Throws()
         {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
                 DateStart = new DateTime(2018, 8, 20),
-                DateEnd = new DateTime(2018, 8, 10)
+                DateEnd = new DateTime(2018, 8, 10),
+                Destination = "Moscow",
+                Purpose = "Seminar"
             };
 
             Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
 
             StringAssert.Contains("Дата окончания командировки не должна быть до даты начала", ex.Message);
+        }
+
+        [Test]
+        public void CreateAsync_DestinationPropertyIsNull_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO
+            {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = null,
+                Purpose = "Seminar"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
+
+            StringAssert.Contains("Требуется ввести место назначения", ex.Message);
+        }
+
+        [Test]
+        public void CreateAsync_PurposePropertyIsNull_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = null
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
+
+            StringAssert.Contains("Требуется ввести цель командировки", ex.Message);
         }
 
         [Test]
@@ -117,8 +172,15 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(It.IsAny<Employee>());
             BusinessTripService bts = GetNewService(mock.Object);
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
 
-            await bts.CreateAsync(new BusinessTripDTO(), ids);
+            await bts.CreateAsync(item, ids);
 
             mock.Verify(m => m.Employees.FindByIdAsync(It.IsAny<int>()), Times.Exactly(3));
         }
@@ -129,8 +191,15 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
             BusinessTripService bts = GetNewService(mock.Object);
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
 
-            await bts.CreateAsync(new BusinessTripDTO(), new int[0]);
+            await bts.CreateAsync(item, new int[0]);
 
             mock.Verify(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()), Times.Once());
         }
@@ -141,8 +210,15 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
             BusinessTripService bts = GetNewService(mock.Object);
-            
-            await bts.CreateAsync(new BusinessTripDTO(), new int[0]);
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
+
+            await bts.CreateAsync(item, new int[0]);
 
             mock.Verify((m => m.SaveAsync()), Times.Once());
         }
