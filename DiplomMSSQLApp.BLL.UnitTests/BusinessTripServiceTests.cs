@@ -2,137 +2,145 @@
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
-using DiplomMSSQLApp.DAL.Repositories;
 using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.UnitTests
 {
     [TestFixture]
-    public class BusinessTripServiceTests
+    public class BusinessTripServiceTests : BaseServiceTests<BusinessTripService>
     {
+        protected override BusinessTripService GetNewService()
+        {
+            return new BusinessTripService();
+        }
+
+        protected override BusinessTripService GetNewService(IUnitOfWork uow)
+        {
+            return new BusinessTripService(uow);
+        }
+
         /// <summary>
         /// // GetPage method
         /// </summary>
         [Test]
-        public void GetPage_Calls_FillsPropertyPageinfo()
+        public override void GetPage_CallsWithGoodParams_FillsPageInfoProperty()
         {
-            BusinessTripService bts = new BusinessTripService();
-            List<BusinessTripDTO> col = new List<BusinessTripDTO>() { new BusinessTripDTO() { Id = 1 } };
+            BusinessTripService bts = GetNewService();
+            bts.NumberOfObjectsPerPage = 2;
+            BusinessTripDTO[] col = new BusinessTripDTO[] {
+                new BusinessTripDTO() { Id = 1 },
+                new BusinessTripDTO() { Id = 2 },
+                new BusinessTripDTO() { Id = 3 }
+            };
 
             bts.GetPage(col, 1);
 
             Assert.AreEqual(1, bts.PageInfo.PageNumber);
-            Assert.AreEqual(1, bts.PageInfo.TotalItems);
+            Assert.AreEqual(2, bts.PageInfo.PageSize);
+            Assert.AreEqual(col.Length, bts.PageInfo.TotalItems);
         }
 
         [Test]
-        public void GetPage_SecondParamPageLess1_PageinfoPagenumberEqualsTo1()
+        public override void GetPage_RequestedPageLessThan1_ReturnsFirstPage()
         {
-            BusinessTripService bts = new BusinessTripService();
-            List<BusinessTripDTO> col = new List<BusinessTripDTO>() { new BusinessTripDTO() { Id = 1 } };
+            BusinessTripService bts = GetNewService();
 
-            bts.GetPage(col, -5);
+            bts.GetPage(new BusinessTripDTO[0], -5);
 
             Assert.AreEqual(1, bts.PageInfo.PageNumber);
         }
 
         [Test]
-        public void GetPage_SecondParamPageLargerPageinfoTotalpages_PageinfoPagenumberEqualsToPageinfoTotalpages()
+        public override void GetPage_RequestedPageMoreThanTotalPages_ReturnsLastPage()
         {
-            BusinessTripService bts = new BusinessTripService();
-            List<BusinessTripDTO> col = new List<BusinessTripDTO>() { new BusinessTripDTO() { Id = 1 } };
-
-            bts.GetPage(col, 5);
-            int totalPages = bts.PageInfo.TotalPages;
+            BusinessTripService bts = GetNewService();
+            bts.NumberOfObjectsPerPage = 3;
+            BusinessTripDTO[] col = new BusinessTripDTO[] {
+                new BusinessTripDTO() { Id = 1 },
+                new BusinessTripDTO() { Id = 2 },
+                new BusinessTripDTO() { Id = 3 }
+            };
+            bts.GetPage(col, 2);
+            int totalPages = bts.PageInfo.TotalPages;   // 1
 
             Assert.AreEqual(totalPages, bts.PageInfo.PageNumber);
         }
 
         [Test]
-        public void GetPage_Calls_ReturnsSpecifiedPage()
+        public override void GetPage_CallsExistingPage_ReturnsSpecifiedPage()
         {
-            BusinessTripService bts = new BusinessTripService();
-            int numberOfObjectsPerPage = bts.NumberOfObjectsPerPage;
-            List<BusinessTripDTO> col = new List<BusinessTripDTO>();
-            for (int i = 1; i < 20; i++)
-            {
-                col.Add(new BusinessTripDTO() { Id = i });
-            }
-            List<BusinessTripDTO> expectedCol = new List<BusinessTripDTO>();
-            for (int i = numberOfObjectsPerPage + 1; i < 2 * numberOfObjectsPerPage + 1; i++)
-            {
-                expectedCol.Add(new BusinessTripDTO() { Id = i });     // second page
-            }
+            BusinessTripService bts = GetNewService();
+            bts.NumberOfObjectsPerPage = 3;
+            BusinessTripDTO[] col = new BusinessTripDTO[] {
+                new BusinessTripDTO() { Id = 1, Name = "01.09.2018_021" },
+                new BusinessTripDTO() { Id = 2, Name = "02.09.2018_022" },
+                new BusinessTripDTO() { Id = 3, Name = "03.09.2018_023" },
+                new BusinessTripDTO() { Id = 4, Name = "04.09.2018_024" },
+                new BusinessTripDTO() { Id = 5, Name = "05.09.2018_025" }
+            };
 
-            var result = bts.GetPage(col, 2);
+            BusinessTripDTO[] result = bts.GetPage(col, 2).ToArray();
 
-            CollectionAssert.AreEqual(expectedCol, result);
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(4, result[0].Id);
+            Assert.AreEqual(5, result[1].Id);
+            Assert.AreEqual("04.09.2018_024", result[0].Name);
+            Assert.AreEqual("05.09.2018_025", result[1].Name);
         }
         /// <summary>
         /// // CreateAsync method
         /// </summary>
         [Test]
-        public void CreateAsync_PropertyDatestartLargerPropertyDateend_Throws()
+        public void CreateAsync_DateStartPropertyMoreThanDateEndProperty_Throws()
         {
-            BusinessTripService bts = new BusinessTripService();
-            BusinessTripDTO btDTO = new BusinessTripDTO
-            {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO {
                 DateStart = new DateTime(2018, 8, 20),
                 DateEnd = new DateTime(2018, 8, 10)
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(btDTO, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
 
             StringAssert.Contains("Дата окончания командировки не должна быть до даты начала", ex.Message);
         }
         [Test]
-        public async Task CreateAsync_Calls_CallsFindbyidasyncMethodThreeTimes()
+        public async Task CreateAsync_IdsParameterContainsThreeDifferentValues_CallsFindByIdAsyncMethodThreeTimes()
         {
-            int actual = 0;
             int[] ids = new int[] { 1, 2, 2, 3 };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(It.IsAny<Employee>())
-                .Callback(() => actual++);
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
-            BusinessTripService bts = new BusinessTripService(mock.Object);
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(It.IsAny<Employee>());
+            BusinessTripService bts = GetNewService(mock.Object);
 
             await bts.CreateAsync(new BusinessTripDTO(), ids);
 
-            Assert.AreEqual(3, actual);
+            mock.Verify(m => m.Employees.FindByIdAsync(It.IsAny<int>()), Times.Exactly(3));
         }
         [Test]
-        public async Task CreateAsync_Calls_CallsCreateMethodOnсe()
+        public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe()
         {
-            int actual = 0;
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>())).Callback(() => actual++);
-            BusinessTripService bts = new BusinessTripService(mock.Object);
+            mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
+            BusinessTripService bts = GetNewService(mock.Object);
 
             await bts.CreateAsync(new BusinessTripDTO(), new int[0]);
 
-            Assert.AreEqual(1, actual);
+            mock.Verify(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()), Times.Once());
         }
         [Test]
-        public async Task CreateAsync_Calls_CallsSaveasyncMethodOnсe()
+        public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
         {
-            int actual = 0;
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
-            mock.Setup(m => m.SaveAsync())
-                .Returns(Task.CompletedTask)
-                .Callback(() => actual++);
-            BusinessTripService bts = new BusinessTripService(mock.Object);
+            BusinessTripService bts = GetNewService(mock.Object);
             
             await bts.CreateAsync(new BusinessTripDTO(), new int[0]);
 
-            Assert.AreEqual(1, actual);
+            mock.Verify((m => m.SaveAsync()), Times.Once());
         }
     }
 }

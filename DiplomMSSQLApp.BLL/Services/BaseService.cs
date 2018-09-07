@@ -23,11 +23,9 @@ namespace DiplomMSSQLApp.BLL.Services
         public abstract Task TestReadAsync(int num, string path, int val);
         public abstract Task TestUpdateAsync(int num, string path);
         public abstract Task TestDeleteAsync(int num, string path);
-
+        // Paging
         public IEnumerable<T> GetPage(IEnumerable<T> col, int page)
         {
-            // Пагинация (paging)
-            //int pageSize = 8; // количество объектов на страницу
             PageInfo = new PageInfo { PageNumber = page, PageSize = NumberOfObjectsPerPage, TotalItems = col.Count() };
             if (page < 1) PageInfo.PageNumber = 1;
             if (page > PageInfo.TotalPages) PageInfo.PageNumber = PageInfo.TotalPages;

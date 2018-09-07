@@ -18,6 +18,8 @@ namespace DiplomMSSQLApp.BLL.Services
             Database = uow;
         }
 
+        public DepartmentService() { }
+
         // Добавление нового отдела (с валидацией)
         public override async Task CreateAsync(DepartmentDTO item)
         {
