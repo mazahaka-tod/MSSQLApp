@@ -239,6 +239,57 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         /// <summary>
+        /// // DeleteAsync method
+        /// </summary>
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Employee>(null));
+            EmployeeService es = GetNewService(mock.Object);
+
+            await es.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.Employees.Remove(It.IsAny<Employee>()), Times.Never);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Employee>(null));
+            EmployeeService es = GetNewService(mock.Object);
+
+            await es.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Never);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
+            EmployeeService es = GetNewService(mock.Object);
+
+            await es.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.Employees.Remove(It.IsAny<Employee>()), Times.Once);
+        }
+
+        [Test]
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
+            EmployeeService es = GetNewService(mock.Object);
+
+            await es.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
+        }
+
+        /// <summary>
         /// // DeleteAllAsync method
         /// </summary>
         public override Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
@@ -251,25 +302,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             throw new NotImplementedException();
         }
 
-        public override Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce()
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public override Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
         {
