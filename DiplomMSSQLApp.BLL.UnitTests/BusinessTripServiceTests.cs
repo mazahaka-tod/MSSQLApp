@@ -430,5 +430,42 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             mock.Verify(m => m.SaveAsync(), Times.Once);
         }
+
+        /// <summary>
+        /// // FindByIdAsync method
+        /// </summary>
+        [Test]
+        public override void FindByIdAsync_IdParameterIsNull_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+
+            Exception ex = Assert.CatchAsync(async () => await bts.FindByIdAsync(null));
+
+            StringAssert.Contains("Не установлено id командировки", ex.Message);
+        }
+
+        [Test]
+        public void FindByIdAsync_BusinessTripNotFound_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            Exception ex = Assert.CatchAsync(async () => await bts.FindByIdAsync(It.IsAny<int>()));
+
+            StringAssert.Contains("Командировка не найдена", ex.Message);
+        }
+
+        [Test]
+        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync((int item_id) => new BusinessTrip() { Id = item_id });
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            BusinessTripDTO result = await bts.FindByIdAsync(2);
+
+            Assert.AreEqual(2, result.Id);
+        }
     }
 }

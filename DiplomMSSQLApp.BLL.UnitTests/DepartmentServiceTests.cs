@@ -262,5 +262,42 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             mock.Verify(m => m.SaveAsync(), Times.Once);
         }
+
+        /// <summary>
+        /// // FindByIdAsync method
+        /// </summary>
+        [Test]
+        public override void FindByIdAsync_IdParameterIsNull_Throws()
+        {
+            DepartmentService ds = GetNewService();
+
+            Exception ex = Assert.CatchAsync(async () => await ds.FindByIdAsync(null));
+
+            StringAssert.Contains("Не установлено id отдела", ex.Message);
+        }
+
+        [Test]
+        public void FindByIdAsync_DepartmentNotFound_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
+            DepartmentService ds = GetNewService(mock.Object);
+
+            Exception ex = Assert.CatchAsync(async () => await ds.FindByIdAsync(It.IsAny<int>()));
+
+            StringAssert.Contains("Отдел не найден", ex.Message);
+        }
+
+        [Test]
+        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync((int item_id) => new Department() { Id = item_id });
+            DepartmentService ds = GetNewService(mock.Object);
+
+            DepartmentDTO result = await ds.FindByIdAsync(2);
+
+            Assert.AreEqual(2, result.Id);
+        }
     }
 }

@@ -23,5 +23,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         public abstract Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe();
         public abstract Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe();
+
+        public abstract void FindByIdAsync_IdParameterIsNull_Throws();
+        public abstract Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2();
     }
 }
