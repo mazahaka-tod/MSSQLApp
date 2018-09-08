@@ -467,5 +467,29 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             Assert.AreEqual(2, result.Id);
         }
+
+        /// <summary>
+        /// // GetAllAsync method
+        /// </summary>
+        [Test]
+        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.GetAsync()).ReturnsAsync(() => new BusinessTrip[] {
+                new BusinessTrip() { Id = 1, Name = "01.09.2018_022" },
+                new BusinessTrip() { Id = 2, Name = "02.09.2018_023" },
+                new BusinessTrip() { Id = 3, Name = "03.09.2018_024" }
+            });
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            BusinessTripDTO[] result = (await bts.GetAllAsync()).ToArray();
+
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
+            Assert.AreEqual(3, result[2].Id);
+            Assert.AreEqual("01.09.2018_022", result[0].Name);
+            Assert.AreEqual("02.09.2018_023", result[1].Name);
+            Assert.AreEqual("03.09.2018_024", result[2].Name);
+        }
     }
 }

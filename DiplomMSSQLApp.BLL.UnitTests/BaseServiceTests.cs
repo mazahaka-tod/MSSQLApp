@@ -26,5 +26,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         public abstract void FindByIdAsync_IdParameterIsNull_Throws();
         public abstract Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2();
+
+        public abstract Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray();
     }
 }

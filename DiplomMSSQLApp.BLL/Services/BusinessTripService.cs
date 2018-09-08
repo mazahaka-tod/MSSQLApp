@@ -109,7 +109,8 @@ namespace DiplomMSSQLApp.BLL.Services
                     .ForMember(p => p.Post, opt => opt.Ignore())
                     .ForMember(d => d.Department, opt => opt.Ignore());
             });
-            return Mapper.Map<IEnumerable<BusinessTrip>, List<BusinessTripDTO>>(await Database.BusinessTrips.GetAsync());
+            List<BusinessTripDTO> col = Mapper.Map<IEnumerable<BusinessTrip>, List<BusinessTripDTO>>(await Database.BusinessTrips.GetAsync());
+            return col;
         }
 
         // Валидация модели

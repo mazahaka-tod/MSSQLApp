@@ -82,7 +82,8 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Department, DepartmentDTO>()
                 .ForMember(d => d.Employees, opt => opt.Ignore()));
-            return Mapper.Map<IEnumerable<Department>, List<DepartmentDTO>>(await Database.Departments.GetAsync());
+            List<DepartmentDTO> col = Mapper.Map<IEnumerable<Department>, List<DepartmentDTO>>(await Database.Departments.GetAsync());
+            return col;
         }
 
         // Валидация модели
