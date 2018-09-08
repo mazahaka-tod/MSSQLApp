@@ -259,7 +259,8 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Employee, EmployeeDTO>()
                 .ForMember(e => e.BusinessTrips, opt => opt.Ignore()));
-            return Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(await Database.Employees.GetAsync());
+            List<EmployeeDTO> col = Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(await Database.Employees.GetAsync());
+            return col;
         }
 
         // Обновление информации о сотрудниках (при редактировании информации об отделе)

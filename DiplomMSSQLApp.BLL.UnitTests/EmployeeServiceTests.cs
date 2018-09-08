@@ -501,9 +501,25 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// <summary>
         /// // GetAllAsync method
         /// </summary>
-        public override Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
+        [Test]
+        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
         {
-            throw new NotImplementedException();
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(() => new Employee[] {
+                new Employee() { Id = 1, LastName = "Petrov" },
+                new Employee() { Id = 2, LastName = "Popov" },
+                new Employee() { Id = 3, LastName = "Ivanov" }
+            });
+            EmployeeService es = GetNewService(mock.Object);
+
+            EmployeeDTO[] result = (await es.GetAllAsync()).ToArray();
+
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
+            Assert.AreEqual(3, result[2].Id);
+            Assert.AreEqual("Petrov", result[0].LastName);
+            Assert.AreEqual("Popov", result[1].LastName);
+            Assert.AreEqual("Ivanov", result[2].LastName);
         }
     }
 }

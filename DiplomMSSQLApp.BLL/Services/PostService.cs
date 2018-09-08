@@ -86,7 +86,8 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Post, PostDTO>()
                 .ForMember(p => p.Employees, opt => opt.Ignore()));
-            return Mapper.Map<IEnumerable<Post>, List<PostDTO>>(await Database.Posts.GetAsync());
+            List<PostDTO> col = Mapper.Map<IEnumerable<Post>, List<PostDTO>>(await Database.Posts.GetAsync());
+            return col;
         }
 
         // Валидация модели
