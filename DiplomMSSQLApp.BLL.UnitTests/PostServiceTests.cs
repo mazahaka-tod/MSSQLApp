@@ -1,6 +1,8 @@
 ﻿using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Services;
+using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -91,9 +93,70 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Engineer", result[1].Title);
         }
 
+        /// <summary>
+        /// // CreateAsync method
+        /// </summary>
+        [Test]
+        public void CreateAsync_TitlePropertyIsNull_Throws()
+        {
+            PostService ps = GetNewService();
+            PostDTO item = new PostDTO {
+                Title = null
+            };
 
+            Exception ex = Assert.CatchAsync(async () => await ps.CreateAsync(item));
 
+            StringAssert.Contains("Требуется ввести название должности", ex.Message);
+        }
 
+        [Test]
+        public void CreateAsync_MinSalaryPropertyMoreThanMaxSalaryProperty_Throws()
+        {
+            PostService ps = GetNewService();
+            PostDTO item = new PostDTO {
+                Title = "Administrator",
+                MinSalary = 20000,
+                MaxSalary = 10000
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await ps.CreateAsync(item));
+
+            StringAssert.Contains("Минимальная зарплата не может быть больше максимальной", ex.Message);
+        }
+
+        [Test]
+        public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Create(It.IsAny<Post>()));
+            PostService ps = GetNewService(mock.Object);
+            PostDTO item = new PostDTO {
+                Title = "Administrator"
+            };
+
+            await ps.CreateAsync(item);
+
+            mock.Verify(m => m.Posts.Create(It.IsAny<Post>()), Times.Once());
+        }
+
+        [Test]
+        public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Create(It.IsAny<Post>()));
+            PostService ps = GetNewService(mock.Object);
+            PostDTO item = new PostDTO {
+                Title = "Administrator"
+            };
+
+            await ps.CreateAsync(item);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        /// <summary>
+        /// // DeleteAllAsync method
+        /// </summary>
         public override Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
         {
             throw new NotImplementedException();
