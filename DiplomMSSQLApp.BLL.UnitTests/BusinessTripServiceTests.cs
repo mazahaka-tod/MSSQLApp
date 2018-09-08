@@ -64,6 +64,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new BusinessTripDTO() { Id = 2 },
                 new BusinessTripDTO() { Id = 3 }
             };
+
             bts.GetPage(col, 2);
             int totalPages = bts.PageInfo.TotalPages;   // 1
 
@@ -133,8 +134,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public void CreateAsync_DestinationPropertyIsNull_Throws()
         {
             BusinessTripService bts = GetNewService();
-            BusinessTripDTO item = new BusinessTripDTO
-            {
+            BusinessTripDTO item = new BusinessTripDTO {
                 Name = "01.09.2018_021",
                 DateStart = new DateTime(2018, 8, 10),
                 DateEnd = new DateTime(2018, 8, 20),
@@ -231,7 +231,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
-
             BusinessTripService bts = GetNewService(mock.Object);
 
             await bts.DeleteAsync(It.IsAny<int>());
@@ -244,7 +243,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
-
             BusinessTripService bts = GetNewService(mock.Object);
 
             await bts.DeleteAsync(It.IsAny<int>());
@@ -257,7 +255,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
-
             BusinessTripService bts = GetNewService(mock.Object);
 
             await bts.DeleteAsync(It.IsAny<int>());
@@ -270,10 +267,36 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
-
             BusinessTripService bts = GetNewService(mock.Object);
 
             await bts.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
+        }
+
+        /// <summary>
+        /// // DeleteAllAsync method
+        /// </summary>
+        [Test]
+        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            await bts.DeleteAllAsync();
+
+            mock.Verify(m => m.BusinessTrips.RemoveAllAsync(), Times.Once);
+        }
+
+        [Test]
+        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
+            BusinessTripService bts = GetNewService(mock.Object);
+
+            await bts.DeleteAllAsync();
 
             mock.Verify(m => m.SaveAsync(), Times.Once);
         }

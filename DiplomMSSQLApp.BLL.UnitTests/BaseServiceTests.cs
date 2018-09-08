@@ -17,5 +17,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public abstract Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled();
         public abstract Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce();
         public abstract Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce();
+
+        public abstract Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce();
+        public abstract Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce();
+
+        //public void EditAsync_DateStartPropertyMoreThanDateEndProperty_Throws();
+
     }
 }

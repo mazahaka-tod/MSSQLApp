@@ -64,6 +64,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new DepartmentDTO() { Id = 2 },
                 new DepartmentDTO() { Id = 3 }
             };
+
             ds.GetPage(col, 2);
             int totalPages = ds.PageInfo.TotalPages;   // 1
 
@@ -146,7 +147,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
-
             DepartmentService ds = GetNewService(mock.Object);
 
             await ds.DeleteAsync(It.IsAny<int>());
@@ -159,7 +159,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
-
             DepartmentService ds = GetNewService(mock.Object);
 
             await ds.DeleteAsync(It.IsAny<int>());
@@ -172,7 +171,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
-
             DepartmentService ds = GetNewService(mock.Object);
 
             await ds.DeleteAsync(It.IsAny<int>());
@@ -185,10 +183,36 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
-
             DepartmentService ds = GetNewService(mock.Object);
 
             await ds.DeleteAsync(It.IsAny<int>());
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
+        }
+
+        /// <summary>
+        /// // DeleteAllAsync method
+        /// </summary>
+        [Test]
+        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.RemoveAllAsync()).Returns(Task.CompletedTask);
+            DepartmentService ds = GetNewService(mock.Object);
+
+            await ds.DeleteAllAsync();
+
+            mock.Verify(m => m.Departments.RemoveAllAsync(), Times.Once);
+        }
+
+        [Test]
+        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.RemoveAllAsync()).Returns(Task.CompletedTask);
+            DepartmentService ds = GetNewService(mock.Object);
+
+            await ds.DeleteAllAsync();
 
             mock.Verify(m => m.SaveAsync(), Times.Once);
         }
