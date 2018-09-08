@@ -24,6 +24,8 @@ namespace DiplomMSSQLApp.BLL.Services
             Database = uow;
         }
 
+        public EmployeeService() {}
+
         // Добавление нового сотрудника (с валидацией)
         public override async Task CreateAsync(EmployeeDTO item)
         {

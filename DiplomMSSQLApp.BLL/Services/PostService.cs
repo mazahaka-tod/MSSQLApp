@@ -22,6 +22,8 @@ namespace DiplomMSSQLApp.BLL.Services
             Database = uow;
         }
 
+        public PostService() {}
+
         // Добавление новой должности (с валидацией)
         public override async Task CreateAsync(PostDTO item)
         {
