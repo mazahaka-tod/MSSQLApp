@@ -1,6 +1,8 @@
 ﻿using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Services;
+using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -91,12 +93,154 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Sidorov", result[1].LastName);
         }
 
+        /// <summary>
+        /// // CreateAsync method
+        /// </summary>
+        [Test]
+        public void CreateAsync_LastNamePropertyIsNull_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = null
+            };
 
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
 
+            StringAssert.Contains("Требуется ввести фамилию", ex.Message);
+        }
 
+        [Test]
+        public void CreateAsync_FirstNamePropertyIsNull_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov"
+            };
 
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
 
+            StringAssert.Contains("Требуется ввести имя", ex.Message);
+        }
 
+        [Test]
+        public void CreateAsync_EmailPropertyIsNotCorrectFormat_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Email = "this is a bad email"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
+
+            StringAssert.Contains("Некорректный email", ex.Message);
+        }
+
+        [Test]
+        public void CreateAsync_SalaryPropertyLessThanMinSalaryProperty_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Salary = 10000,
+                Post = new PostDTO() { MinSalary = 20000 }
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
+
+            StringAssert.Contains("Зарплата должна быть больше 20000", ex.Message);
+        }
+
+        [Test]
+        public void CreateAsync_SalaryPropertyMoreThanMaxSalaryProperty_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Salary = 30000,
+                Post = new PostDTO() { MaxSalary = 20000 }
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
+
+            StringAssert.Contains("Зарплата должна быть меньше 20000", ex.Message);
+        }
+
+        [Test]
+        public void CreateAsync_DepartmentPropertyIsNull_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
+
+            StringAssert.Contains("Отдел не найден", ex.Message);
+        }
+
+        [Test]
+        public void CreateAsync_PostPropertyIsNull_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Post>(null));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
+
+            StringAssert.Contains("Должность не найдена", ex.Message);
+        }
+
+        [Test]
+        public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
+            mock.Setup(m => m.Employees.Create(It.IsAny<Employee>()));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            await es.CreateAsync(item);
+
+            mock.Verify(m => m.Employees.Create(It.IsAny<Employee>()), Times.Once());
+        }
+
+        [Test]
+        public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
+            mock.Setup(m => m.Employees.Create(It.IsAny<Employee>()));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            await es.CreateAsync(item);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        /// <summary>
+        /// // DeleteAllAsync method
+        /// </summary>
         public override Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
         {
             throw new NotImplementedException();

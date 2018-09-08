@@ -308,9 +308,6 @@ namespace DiplomMSSQLApp.BLL.Services
                     throw new ValidationException("Некорректный email", "Email");
                 }
             }
-            if (item.HireDate == null)
-                throw new ValidationException("Требуется ввести дату приема на работу", "HireDate");
-
             if (item.Salary != null && item.Post != null)
             {
                 if (item.Salary < item.Post.MinSalary)
