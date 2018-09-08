@@ -464,14 +464,38 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// <summary>
         /// // FindByIdAsync method
         /// </summary>
-        public override Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
-        {
-            throw new NotImplementedException();
-        }
-
+        [Test]
         public override void FindByIdAsync_IdParameterIsNull_Throws()
         {
-            throw new NotImplementedException();
+            EmployeeService es = GetNewService();
+
+            Exception ex = Assert.CatchAsync(async () => await es.FindByIdAsync(null));
+
+            StringAssert.Contains("Не установлено id сотрудника", ex.Message);
+        }
+
+        [Test]
+        public void FindByIdAsync_EmployeeNotFound_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Employee>(null));
+            EmployeeService es = GetNewService(mock.Object);
+
+            Exception ex = Assert.CatchAsync(async () => await es.FindByIdAsync(It.IsAny<int>()));
+
+            StringAssert.Contains("Сотрудник не найден", ex.Message);
+        }
+
+        [Test]
+        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync((int item_id) => new Employee() { Id = item_id });
+            EmployeeService es = GetNewService(mock.Object);
+
+            EmployeeDTO result = await es.FindByIdAsync(2);
+
+            Assert.AreEqual(2, result.Id);
         }
 
         /// <summary>

@@ -68,9 +68,9 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             if (id == null)
                 throw new ValidationException("Не установлено id должности", "");
-            Post p = await Database.Posts.FindByIdAsync(id.Value);
-            if (p == null)
-                throw new ValidationException("Должность не найден", "");
+            Post post = await Database.Posts.FindByIdAsync(id.Value);
+            if (post == null)
+                throw new ValidationException("Должность не найдена", "");
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Post, PostDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
@@ -78,7 +78,7 @@ namespace DiplomMSSQLApp.BLL.Services
                     .ForMember(dp => dp.Department, opt => opt.Ignore())
                     .ForMember(dp => dp.Post, opt => opt.Ignore());
             });
-            return Mapper.Map<Post, PostDTO>(p);
+            return Mapper.Map<Post, PostDTO>(post);
         }
 
         // Получение списка всех должностей

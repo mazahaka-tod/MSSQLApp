@@ -296,14 +296,38 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// <summary>
         /// // FindByIdAsync method
         /// </summary>
-        public override Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
-        {
-            throw new NotImplementedException();
-        }
-
+        [Test]
         public override void FindByIdAsync_IdParameterIsNull_Throws()
         {
-            throw new NotImplementedException();
+            PostService ps = GetNewService();
+
+            Exception ex = Assert.CatchAsync(async () => await ps.FindByIdAsync(null));
+
+            StringAssert.Contains("Не установлено id должности", ex.Message);
+        }
+
+        [Test]
+        public void FindByIdAsync_PostNotFound_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Post>(null));
+            PostService ps = GetNewService(mock.Object);
+
+            Exception ex = Assert.CatchAsync(async () => await ps.FindByIdAsync(It.IsAny<int>()));
+
+            StringAssert.Contains("Должность не найдена", ex.Message);
+        }
+
+        [Test]
+        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync((int item_id) => new Post() { Id = item_id });
+            PostService ps = GetNewService(mock.Object);
+
+            PostDTO result = await ps.FindByIdAsync(2);
+
+            Assert.AreEqual(2, result.Id);
         }
 
         /// <summary>

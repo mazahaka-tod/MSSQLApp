@@ -70,8 +70,8 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             if (id == null)
                 throw new ValidationException("Не установлено id сотрудника", "");
-            Employee e = await Database.Employees.FindByIdAsync(id.Value);
-            if (e == null)
+            Employee employee = await Database.Employees.FindByIdAsync(id.Value);
+            if (employee == null)
                 throw new ValidationException("Сотрудник не найден", "");
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Employee, EmployeeDTO>();
@@ -79,7 +79,7 @@ namespace DiplomMSSQLApp.BLL.Services
                 cfg.CreateMap<Post, PostDTO>();
                 cfg.CreateMap<Department, DepartmentDTO>();
             });
-            return Mapper.Map<Employee, EmployeeDTO>(e);
+            return Mapper.Map<Employee, EmployeeDTO>(employee);
         }
 
         // Получение списка сотрудников по фильтру
