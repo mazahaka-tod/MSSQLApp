@@ -208,23 +208,33 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// <summary>
         /// // DeleteAllAsync method
         /// </summary>
-        public override Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
+        [Test]
+        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
         {
-            throw new NotImplementedException();
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.RemoveAllAsync()).Returns(Task.CompletedTask);
+            PostService ps = GetNewService(mock.Object);
+
+            await ps.DeleteAllAsync();
+
+            mock.Verify(m => m.Posts.RemoveAllAsync(), Times.Once);
         }
 
-        public override Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce()
+        [Test]
+        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce()
         {
-            throw new NotImplementedException();
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.RemoveAllAsync()).Returns(Task.CompletedTask);
+            PostService ps = GetNewService(mock.Object);
+
+            await ps.DeleteAllAsync();
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
         }
 
-
-
-
-
-
-        
-
+        /// <summary>
+        /// // EditAsync method
+        /// </summary>
         public override Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
         {
             throw new NotImplementedException();
@@ -235,6 +245,9 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// // FindByIdAsync method
+        /// </summary>
         public override Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
         {
             throw new NotImplementedException();
@@ -245,6 +258,9 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// // GetAllAsync method
+        /// </summary>
         public override Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
         {
             throw new NotImplementedException();
