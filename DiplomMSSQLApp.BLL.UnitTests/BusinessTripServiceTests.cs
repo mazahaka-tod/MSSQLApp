@@ -300,5 +300,135 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             mock.Verify(m => m.SaveAsync(), Times.Once);
         }
+
+        /// <summary>
+        /// // EditAsync method
+        /// </summary>
+        [Test]
+        public void EditAsync_NamePropertyIsNull_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = null,
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+
+            StringAssert.Contains("Требуется ввести код командировки", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_DateStartPropertyMoreThanDateEndProperty_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 20),
+                DateEnd = new DateTime(2018, 8, 10),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+
+            StringAssert.Contains("Дата окончания командировки не должна быть до даты начала", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_DestinationPropertyIsNull_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = null,
+                Purpose = "Seminar"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+
+            StringAssert.Contains("Требуется ввести место назначения", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_PurposePropertyIsNull_Throws()
+        {
+            BusinessTripService bts = GetNewService();
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = null
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+
+            StringAssert.Contains("Требуется ввести цель командировки", ex.Message);
+        }
+
+        [Test]
+        public async Task EditAsync_IdsParameterContainsThreeDifferentValue_CallsFindByIdAsyncMethodThreeTimes()
+        {
+            int[] ids = new int[] { 1, 2, 2, 3 };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
+            mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
+            BusinessTripService bts = GetNewService(mock.Object);
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
+
+            await bts.EditAsync(item, ids);
+
+            mock.Verify(m => m.Employees.FindByIdAsync(It.IsAny<int>()), Times.Exactly(3));
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
+            BusinessTripService bts = GetNewService(mock.Object);
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
+
+            await bts.EditAsync(item, new int[0]);
+
+            mock.Verify(m => m.BusinessTrips.Update(It.IsAny<BusinessTrip>()), Times.Once);
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
+            BusinessTripService bts = GetNewService(mock.Object);
+            BusinessTripDTO item = new BusinessTripDTO {
+                Name = "01.09.2018_021",
+                DateStart = new DateTime(2018, 8, 10),
+                DateEnd = new DateTime(2018, 8, 20),
+                Destination = "Moscow",
+                Purpose = "Seminar"
+            };
+
+            await bts.EditAsync(item, new int[0]);
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
+        }
     }
 }

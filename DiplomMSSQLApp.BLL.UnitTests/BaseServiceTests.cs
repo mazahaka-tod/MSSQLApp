@@ -21,7 +21,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public abstract Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce();
         public abstract Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce();
 
-        //public void EditAsync_DateStartPropertyMoreThanDateEndProperty_Throws();
-
+        public abstract Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe();
+        public abstract Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe();
     }
 }

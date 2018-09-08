@@ -216,5 +216,51 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
             mock.Verify(m => m.SaveAsync(), Times.Once);
         }
+
+        /// <summary>
+        /// // EditAsync method
+        /// </summary>
+        [Test]
+        public void EditAsync_DepartmentNamePropertyIsNull_Throws()
+        {
+            DepartmentService ds = GetNewService();
+            DepartmentDTO item = new DepartmentDTO {
+                DepartmentName = null
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await ds.EditAsync(item));
+
+            StringAssert.Contains("Требуется ввести название отдела", ex.Message);
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.Update(It.IsAny<Department>()));
+            DepartmentService ds = GetNewService(mock.Object);
+            DepartmentDTO item = new DepartmentDTO {
+                DepartmentName = "IT"
+            };
+
+            await ds.EditAsync(item);
+
+            mock.Verify(m => m.Departments.Update(It.IsAny<Department>()), Times.Once);
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.Update(It.IsAny<Department>()));
+            DepartmentService ds = GetNewService(mock.Object);
+            DepartmentDTO item = new DepartmentDTO {
+                DepartmentName = "IT"
+            };
+
+            await ds.EditAsync(item);
+
+            mock.Verify(m => m.SaveAsync(), Times.Once);
+        }
     }
 }
