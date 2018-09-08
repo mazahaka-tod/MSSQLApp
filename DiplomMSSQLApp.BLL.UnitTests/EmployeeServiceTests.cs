@@ -319,14 +319,146 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// <summary>
         /// // EditAsync method
         /// </summary>
-        public override Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        [Test]
+        public void EditAsync_LastNamePropertyIsNull_Throws()
         {
-            throw new NotImplementedException();
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = null
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Требуется ввести фамилию", ex.Message);
         }
 
-        public override Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
+        [Test]
+        public void EditAsync_FirstNamePropertyIsNull_Throws()
         {
-            throw new NotImplementedException();
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Требуется ввести имя", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_EmailPropertyIsNotCorrectFormat_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Email = "this is a bad email"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Некорректный email", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_SalaryPropertyLessThanMinSalaryProperty_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Salary = 10000,
+                Post = new PostDTO() { MinSalary = 20000 }
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Зарплата должна быть больше 20000", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_SalaryPropertyMoreThanMaxSalaryProperty_Throws()
+        {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Salary = 30000,
+                Post = new PostDTO() { MaxSalary = 20000 }
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Зарплата должна быть меньше 20000", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_DepartmentPropertyIsNull_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Отдел не найден", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_PostPropertyIsNull_Throws()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Post>(null));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Должность не найдена", ex.Message);
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
+            mock.Setup(m => m.Employees.Update(It.IsAny<Employee>()));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            await es.EditAsync(item);
+
+            mock.Verify(m => m.Employees.Update(It.IsAny<Employee>()), Times.Once());
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
+            mock.Setup(m => m.Employees.Update(It.IsAny<Employee>()));
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max"
+            };
+
+            await es.EditAsync(item);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
         }
 
         /// <summary>

@@ -235,14 +235,62 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// <summary>
         /// // EditAsync method
         /// </summary>
-        public override Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        [Test]
+        public void EditAsync_TitlePropertyIsNull_Throws()
         {
-            throw new NotImplementedException();
+            PostService ps = GetNewService();
+            PostDTO item = new PostDTO {
+                Title = null
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await ps.EditAsync(item));
+
+            StringAssert.Contains("Требуется ввести название должности", ex.Message);
         }
 
-        public override Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
+        [Test]
+        public void EditAsync_MinSalaryPropertyMoreThanMaxSalaryProperty_Throws()
         {
-            throw new NotImplementedException();
+            PostService ps = GetNewService();
+            PostDTO item = new PostDTO {
+                Title = "Administrator",
+                MinSalary = 20000,
+                MaxSalary = 10000
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await ps.EditAsync(item));
+
+            StringAssert.Contains("Минимальная зарплата не может быть больше максимальной", ex.Message);
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Update(It.IsAny<Post>()));
+            PostService ps = GetNewService(mock.Object);
+            PostDTO item = new PostDTO {
+                Title = "Administrator"
+            };
+
+            await ps.EditAsync(item);
+
+            mock.Verify(m => m.Posts.Update(It.IsAny<Post>()), Times.Once());
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
+        {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Update(It.IsAny<Post>()));
+            PostService ps = GetNewService(mock.Object);
+            PostDTO item = new PostDTO {
+                Title = "Administrator"
+            };
+
+            await ps.EditAsync(item);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
         }
 
         /// <summary>
