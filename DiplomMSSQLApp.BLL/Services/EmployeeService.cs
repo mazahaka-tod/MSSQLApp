@@ -83,174 +83,162 @@ namespace DiplomMSSQLApp.BLL.Services
         }
 
         // Получение списка сотрудников по фильтру
-        public override IEnumerable<EmployeeDTO> Get(EmployeeFilter f, string path)
+        public override IEnumerable<EmployeeDTO> Get(EmployeeFilter filter, string path)
         {
-            bool bl = true;
-            string message = "";
-            bool predicate(Employee e)
+            bool predicate(Employee employee)
             {
-                bool flag = true;
+                bool returnValue = false;
+                if (filter.Not)
+                    returnValue = true;
                 // Фильтр по фамилии
-                if (f.LastName != null && !string.IsNullOrEmpty(f.LastName[0]))
+                if (filter.LastName != null)
                 {
-                    List<bool> list = new List<bool>();
-                    foreach (var item in f.LastName)
+                    string[] lastNameArray = filter.LastName.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();   // Удаляем пустые элементы из массива
+                    if (lastNameArray.Length == 1)  // Если заполнено только одно поле LastName
                     {
-                        if (!string.IsNullOrWhiteSpace(item))
+                        if (!Regex.IsMatch(employee.LastName, lastNameArray[0], RegexOptions.IgnoreCase))
+                            return returnValue;
+                    }
+                    else if (lastNameArray.Length > 1)  // Если заполнено несколько полей LastName
+                    {
+                        if (filter.IsMatchAnyLastName)  // Если установлена галка "Минимум одно соответствие"
                         {
-                            if (bl) message += "Фамилия = " + item + "; ";
-                            if (Regex.IsMatch(e.LastName, item, RegexOptions.IgnoreCase))
-                                list.Add(true);
-                            else
-                                list.Add(false);
+                            bool flag = true;
+                            foreach (string lastName in lastNameArray)
+                                if (Regex.IsMatch(employee.LastName, lastName, RegexOptions.IgnoreCase))
+                                {
+                                    flag = false;
+                                    break;
+                                }
+                            if (flag) return returnValue;
+                        }
+                        else    // Если не установлена галка "Минимум одно соответствие" (т.е. фамилия должна соответствовать всем шаблонам)
+                        {
+                            foreach (string lastName in lastNameArray)
+                                if (!Regex.IsMatch(employee.LastName, lastName, RegexOptions.IgnoreCase))
+                                    return returnValue;
                         }
                     }
-                    if (list.Count != 0)
-                        if (f.Or)
-                            flag = list.Contains(true) ? true : false;
-                        else
-                            flag = list.Contains(false) ? false : true;
                 }
                 // Фильтр по email
-                if (!string.IsNullOrWhiteSpace(f.Email))
-                {
-                    if (bl) message += "Email = " + f.Email + "; ";
-                    flag = Regex.IsMatch(e.Email, f.Email, RegexOptions.IgnoreCase) ? true : false;
-                }
+                if (!string.IsNullOrWhiteSpace(filter.Email) && !Regex.IsMatch(employee.Email, filter.Email, RegexOptions.IgnoreCase))
+                    return returnValue;
                 // Фильтр по номеру телефона
-                if (f.PhoneNumber)
-                {
-                    if (bl) message += "Есть телефон; ";
-                    flag = !string.IsNullOrWhiteSpace(e.PhoneNumber) ? true : false;
-                }
+                if (filter.PhoneNumber && string.IsNullOrWhiteSpace(employee.PhoneNumber))
+                    return returnValue;
                 // Фильтр по дате найма на работу
-                if (!string.IsNullOrWhiteSpace(f.HireDate))
-                {
-                    if (bl) message += "Дата приема на работу = " + f.HireDate + "; ";
-                    if (DateTime.TryParse(f.HireDate, out DateTime date))
-                    {
-                        flag = e.HireDate == date ? true : false;
-                        //filters.Add(builder.Eq("HireDate", new DateTime(date.Year, date.Month, date.Day)));
-                    }
-                }
+                if (!string.IsNullOrWhiteSpace(filter.HireDate) && DateTime.TryParse(filter.HireDate, out DateTime date) && employee.HireDate != date)
+                    return returnValue;
                 // Фильтры по зарплате
-                if (f.MinSalary.HasValue)
-                {
-                    //if (bl)
-                    message += "Зарплата >= " + f.MinSalary + "; ";
-                    flag = e.Salary >= f.MinSalary ? true : false;
-                }
-                if (f.MaxSalary.HasValue)
-                {
-                    if (bl) message += "Зарплата <= " + f.MaxSalary + "; ";
-                    flag = e.Salary <= f.MaxSalary ? true : false;
-                }
+                if (filter.MinSalary.HasValue && employee.Salary.HasValue && employee.Salary.Value < filter.MinSalary.Value)
+                    return returnValue;
+                if (filter.MaxSalary.HasValue && employee.Salary.HasValue && employee.Salary.Value > filter.MaxSalary.Value)
+                    return returnValue;
                 // Фильтр по премии
-                if (f.Bonus != null && f.Bonus.Where(b => b != null).Count() > 0)
+                if (filter.Bonus != null)
                 {
-                    if (bl) message += "Премия = " + f.Bonus + "; ";
-                    flag = f.Bonus.Where(c => c != null).Contains(e.Bonus) ? true : false;
+                    double?[] bonuses = filter.Bonus.Where(b => b != null).ToArray();
+                    if (bonuses.Length > 0 && !bonuses.Contains(employee.Bonus))
+                        return returnValue;
                 }
-                if (f.BonusExists)
-                {
-                    if (bl) message += "Есть премия; ";
-                    flag = e.Bonus.HasValue ? true : false;
-                }
+                if (filter.BonusExists && !employee.Bonus.HasValue)
+                    return returnValue;
                 // Фильтр по должности
-                if (!string.IsNullOrWhiteSpace(f.Post))
-                {
-                    if (bl) message += "Должность = " + f.Post + "; ";
-                    flag = Regex.IsMatch(e.Post.Title, f.Post, RegexOptions.IgnoreCase) ? true : false;
-                }
+                if (!string.IsNullOrWhiteSpace(filter.Post) && !Regex.IsMatch(employee.Post.Title, filter.Post, RegexOptions.IgnoreCase))
+                    return returnValue;
                 // Фильтр по названию отдела
-                if (!string.IsNullOrWhiteSpace(f.DepartmentName))
-                {
-                    if (bl) message += "Название отдела = " + f.DepartmentName + "; ";
-                    flag = Regex.IsMatch(e.Department.DepartmentName, f.DepartmentName, RegexOptions.IgnoreCase) ? true : false;
-                }
-                if (f.Not)
-                {
-                    if (bl) message += "Используется отрицание; ";
-                    flag = !flag;
-                }
-                if (bl) bl = false;
-                return flag;
+                if (!string.IsNullOrWhiteSpace(filter.DepartmentName) && !Regex.IsMatch(employee.Department.DepartmentName, filter.DepartmentName, RegexOptions.IgnoreCase))
+                    return returnValue;
+                return !returnValue;
             }
-            // Параметры для сортировки
-            string sort = f.Sort ?? "LastName";
-            string asc = f.Asc ?? "1";
-            IEnumerable<Employee> col;
-            if (asc.Equals("1"))
-                switch (sort)
-                {
-                    case "LastName":
-                        col = Database.Employees.Get(predicate).OrderBy(e => e.LastName);
-                        break;
-                    case "SurName":
-                        Stopwatch stopWatch = new Stopwatch();
-                        stopWatch.Start();
-                        col = Database.Employees.Get(predicate);
-                        stopWatch.Stop();
-                        TimeSpan ts = stopWatch.Elapsed;
-                        string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-                        using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
-                        {
-                            sw.WriteLine(message.Length.ToString() + " - " + message + "Время: " + elapsedTime);
-                        }
-                        break;
-                    case "Email":
-                        col = Database.Employees.Get(predicate).OrderBy(e => e.Email);
-                        break;
-                    case "HireDate":
-                        col = Database.Employees.Get(predicate).OrderBy(e => e.HireDate);
-                        break;
-                    case "Salary":
-                        col = Database.Employees.Get(predicate).OrderBy(e => e.Salary);
-                        break;
-                    case "Bonus":
-                        col = Database.Employees.Get(predicate).OrderBy(e => e.Bonus);
-                        break;
-                    case "Post":
-                        col = Database.Employees.Get(predicate).OrderBy(e => e.Post.Title);
-                        break;
-                    default:
-                        col = Database.Employees.Get(predicate).OrderBy(e => e.Department.DepartmentName);
-                        break;
-                }
-            else
-                switch (sort)
-                {
-                    case "LastName":
-                        col = Database.Employees.Get(predicate).OrderByDescending(e => e.LastName);
-                        break;
-                    case "Email":
-                        col = Database.Employees.Get(predicate).OrderByDescending(e => e.Email);
-                        break;
-                    case "HireDate":
-                        col = Database.Employees.Get(predicate).OrderByDescending(e => e.HireDate);
-                        break;
-                    case "Salary":
-                        col = Database.Employees.Get(predicate).OrderByDescending(e => e.Salary);
-                        break;
-                    case "Bonus":
-                        col = Database.Employees.Get(predicate).OrderByDescending(e => e.Bonus);
-                        break;
-                    case "Post":
-                        col = Database.Employees.Get(predicate).OrderByDescending(e => e.Post.Title);
-                        break;
-                    default:
-                        col = Database.Employees.Get(predicate).OrderByDescending(e => e.Department.DepartmentName);
-                        break;
-                }
-            Mapper.Initialize(cfg =>
-            {
+            string message = "";    // Сообщение записывается в файл WEB/Results/Employee/Filter.txt
+            // Анализируем фильтр и формируем тестовое сообщение
+            CreateMessage(filter, ref message);
+            // Сортировка
+            IEnumerable<Employee> collection = SortEmployees(filter, predicate, path, message);
+
+            Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTrip, BusinessTripDTO>()
                     .ForMember(bt => bt.Employees, opt => opt.Ignore());
                 cfg.CreateMap<Employee, EmployeeDTO>();
                 cfg.CreateMap<Department, DepartmentDTO>();
                 cfg.CreateMap<Post, PostDTO>();
             });
-            var collection = Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(col);
+            List<EmployeeDTO> col = Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(collection);
+            return col;
+        }
+
+        private void CreateMessage(EmployeeFilter filter, ref string message)
+        {
+            // Фильтр по фамилии
+            if (filter.LastName != null)
+                foreach (string lastName in filter.LastName)
+                    if (!string.IsNullOrWhiteSpace(lastName))
+                        message += "Фамилия = " + lastName + "; ";
+            // Фильтр по email
+            if (!string.IsNullOrWhiteSpace(filter.Email))
+                message += "Email = " + filter.Email + "; ";
+            // Фильтр по номеру телефона
+            if (filter.PhoneNumber)
+                message += "Есть телефон; ";
+            // Фильтр по дате найма на работу
+            if (!string.IsNullOrWhiteSpace(filter.HireDate))
+                message += "Дата приема на работу = " + filter.HireDate + "; ";
+            // Фильтры по зарплате
+            if (filter.MinSalary.HasValue)
+                message += "Зарплата >= " + filter.MinSalary.Value + "; ";
+            if (filter.MaxSalary.HasValue)
+                message += "Зарплата <= " + filter.MaxSalary.Value + "; ";
+            // Фильтры по премии
+            if (filter.Bonus != null)
+                foreach (var bonus in filter.Bonus)
+                    if (bonus.HasValue)
+                        message += "Премия = " + bonus + "; ";
+            if (filter.BonusExists)
+                message += "Есть премия; ";
+            // Фильтр по должности
+            if (!string.IsNullOrWhiteSpace(filter.Post))
+                message += "Должность = " + filter.Post + "; ";
+            // Фильтр по названию отдела
+            if (!string.IsNullOrWhiteSpace(filter.DepartmentName))
+                message += "Название отдела = " + filter.DepartmentName + "; ";
+            if (filter.Not)
+                message += "Используется отрицание; ";
+            if (message == "")
+                message = "Фильтр не задан; ";
+        }
+
+        private IEnumerable<Employee> SortEmployees(EmployeeFilter filter, Func<Employee, bool> predicate, string path, string message)
+        {
+            IEnumerable<Employee> collection;
+            // Параметры сортировки
+            string sortField = filter.SortField ?? "Default";
+            string order = filter.Order ?? "1";
+            // Компараторы сортировки по возрастанию или по убыванию
+            IComparer<string> stringComparer = Comparer<string>.Create((x, y) => order.Equals("1") ? x.CompareTo(y) : y.CompareTo(x));
+            IComparer<double?> doubleNullableComparer = Comparer<double?>.Create((x, y) => order.Equals("1") ? x.Value.CompareTo(y) : y.Value.CompareTo(x));
+            IComparer<DateTime> dateTimeComparer = Comparer<DateTime>.Create((x, y) => order.Equals("1") ? x.CompareTo(y) : y.CompareTo(x));
+            switch (sortField) {
+                // Если используется сортировка по фамилии сотрудника, записываем результат в файл для анализа
+                case "LastName":
+                    Stopwatch stopWatch = new Stopwatch();
+                    stopWatch.Start();
+                    collection = Database.Employees.Get(predicate).OrderBy(e => e.LastName, stringComparer);
+                    stopWatch.Stop();
+                    TimeSpan ts = stopWatch.Elapsed;
+                    string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
+                    using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8)) {
+                        sw.WriteLine(message  + "Время: " + elapsedTime);
+                    }
+                    break;
+                case "Email":           collection = Database.Employees.Get(predicate).OrderBy(e => e.Email, stringComparer); break;
+                case "HireDate":        collection = Database.Employees.Get(predicate).OrderBy(e => e.HireDate, dateTimeComparer); break;
+                case "Salary":          collection = Database.Employees.Get(predicate).OrderBy(e => e.Salary, doubleNullableComparer); break;
+                case "Bonus":           collection = Database.Employees.Get(predicate).OrderBy(e => e.Bonus, doubleNullableComparer); break;
+                case "Post":            collection = Database.Employees.Get(predicate).OrderBy(e => e.Post.Title, stringComparer); break;
+                case "DepartmentName":  collection = Database.Employees.Get(predicate).OrderBy(e => e.Department.DepartmentName, stringComparer); break;
+                default:                collection = Database.Employees.Get(predicate).OrderBy(e => e.LastName); break;
+            }
             return collection;
         }
 
@@ -261,34 +249,6 @@ namespace DiplomMSSQLApp.BLL.Services
                 .ForMember(e => e.BusinessTrips, opt => opt.Ignore()));
             List<EmployeeDTO> col = Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(await Database.Employees.GetAsync());
             return col;
-        }
-
-        // Обновление информации о сотрудниках (при редактировании информации об отделе)
-        public async Task UpdateEmployeesAsync(string old, DepartmentDTO dDto)
-        {
-            // Если при обновлении изменился начальник отдела, то нужно внести изменения в таблицу сотрудников:
-            // 1. У сотрудника, который был начальником, установить должность в null
-            // 2. У сотрудника, который стал начальником, обновить должность и отдел
-            if (old != dDto.Manager)
-            {
-                // 1.
-                Employee oldManager = Database.Employees.Get(e => e.LastName == old).FirstOrDefault();
-                if (oldManager != null)
-                {
-                    oldManager.PostId = null;
-                    Database.Employees.Update(oldManager);
-                    await Database.SaveAsync();
-                }
-                // 2.
-                Post postManager = Database.Posts.Get(p => p.Title == "Manager").FirstOrDefault();
-                Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>());
-                Department d = Mapper.Map<DepartmentDTO, Department>(dDto);
-                Employee newManager = Database.Employees.Get(e => e.LastName == dDto.Manager).FirstOrDefault();
-                newManager.PostId = postManager.Id;
-                newManager.DepartmentId = d.Id;
-                Database.Employees.Update(newManager);
-                await Database.SaveAsync();
-            }
         }
 
         // Валидация модели
@@ -328,6 +288,8 @@ namespace DiplomMSSQLApp.BLL.Services
         // Тест добавления сотрудников
         public override async Task TestCreateAsync(int num, string path)
         {
+            Post firstPost = Database.Posts.GetFirst() ?? new Post();
+            Department firstDepartment = Database.Departments.GetFirst() ?? new Department();
             List<Employee> emps = new List<Employee>();
             string[] lastNames = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller",
                 "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris",
@@ -345,7 +307,11 @@ namespace DiplomMSSQLApp.BLL.Services
                     Salary = new double?(10000.0 + Math.Round(new Random(i).NextDouble() * 100) * 500),
                     PhoneNumber = "+7-935-728-35-07",
                     Bonus = 0.15,
-                    Address = "Moskow, Kutuzovsky Avenue 57"
+                    Address = "Moskow, Kutuzovsky Avenue 57",
+                    Post = firstPost,
+                    PostId = firstPost.Id,
+                    Department = firstDepartment,
+                    DepartmentId = firstDepartment.Id
                 };
                 emps.Add(e);
             }

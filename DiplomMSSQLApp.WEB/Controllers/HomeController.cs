@@ -221,12 +221,11 @@ namespace DiplomMSSQLApp.WEB.Controllers
             IEnumerable<EmployeeDTO> eDto = await employeeService.GetAllAsync();
             var employees = eDto.Select(e => new
             {
-                SurName = e.LastName,
+                e.LastName,
                 e.FirstName,
                 e.Email,
                 e.PhoneNumber,
                 Addresses = "Addresses",
-                //"[{ \"Name\" : \"home\", \"City\" : \"Moskow\", \"Street\" : \"Kutuzovsky Avenue 57\", \"Zip\" : \"643976\" }]",
                 HireDate = "HireDate",
                 e.Salary,
                 e.Bonus,

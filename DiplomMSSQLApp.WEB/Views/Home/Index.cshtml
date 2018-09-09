@@ -25,8 +25,8 @@
                                 </span>
                                 @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "LastName" }, new AjaxOptions { UpdateTargetId = "lastname", InsertionMode = InsertionMode.InsertAfter })
                                 <br />
-                                @Html.CheckBox("Or", new { style = "margin-bottom: 12px" })
-                                @Html.Label("Or", "Минимум одно соответствие")
+                                @Html.CheckBox("IsMatchAnyLastName", new { style = "margin-bottom: 12px" })
+                                @Html.Label("IsMatchAnyLastName", "Минимум одно соответствие")
                             </dd>
 
                             <dt>
@@ -97,8 +97,8 @@
                                 @Html.Label("Sort", "Сортировка")
                             </dt>
                             <dd>
-                                @Html.DropDownList("Sort", new SelectList(new[] { new { label = "По фамилии сотрудника", value = "SurName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
-                                @Html.DropDownList("Asc", new SelectList(new[] { new { label = "По возрастанию", value = "1" }, new { label = "По убыванию", value = "-1" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownList("SortField", new SelectList(new[] { new { label = "По фамилии сотрудника", value = "LastName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownList("Order", new SelectList(new[] { new { label = "По возрастанию", value = "1" }, new { label = "По убыванию", value = "-1" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
                             </dd>
 
                             <dt>
@@ -418,7 +418,7 @@
         @{ f = Model.Filter.Columns.Contains("8") ? "true" : "false"; }
         $('#Columns8').prop('checked', @f);
 
-        $('#Or').prop('checked', @Model.Filter.Or.ToString().ToLower());
+        $('#IsMatchAnyLastName').prop('checked', @Model.Filter.IsMatchAnyLastName.ToString().ToLower());
         $('#PhoneNumber').prop('checked', @Model.Filter.PhoneNumber.ToString().ToLower());
         $('#BonusExists').prop('checked', @Model.Filter.BonusExists.ToString().ToLower());
         $('#Not').prop('checked', @Model.Filter.Not.ToString().ToLower());
@@ -456,8 +456,8 @@
             @:$('#DepartmentName').prop('value', "@Model.Filter.DepartmentName");
         }
 
-        $('select#Sort option[value="@Model.Filter.Sort"]').prop('selected', true);
-        $('select#Asc option[value="@Model.Filter.Asc"]').prop('selected', true);
+        $('select#SortField option[value="@Model.Filter.SortField"]').prop('selected', true);
+        $('select#Order option[value="@Model.Filter.Order"]').prop('selected', true);
     });
     </script>
 }

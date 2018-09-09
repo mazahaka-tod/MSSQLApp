@@ -29,7 +29,7 @@ namespace DiplomMSSQLApp.DAL.Repositories
 
         public override Post GetFirst()
         {
-            return _dbSet.FirstOrDefault(p => p.MaxSalary < 50000);
+            return _dbSet.FirstOrDefault();
         }
     }
 }
