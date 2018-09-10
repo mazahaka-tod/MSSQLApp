@@ -215,8 +215,8 @@ namespace DiplomMSSQLApp.BLL.Services
             string sortField = filter.SortField ?? "Default";
             string order = filter.Order ?? "1";
             // Компараторы сортировки по возрастанию или по убыванию
-            IComparer<string> stringComparer = Comparer<string>.Create((x, y) => order.Equals("1") ? x.CompareTo(y) : y.CompareTo(x));
-            IComparer<double?> doubleNullableComparer = Comparer<double?>.Create((x, y) => order.Equals("1") ? x.Value.CompareTo(y) : y.Value.CompareTo(x));
+            IComparer<string> stringComparer = Comparer<string>.Create((x, y) => order.Equals("1") ? (x ?? "").CompareTo(y ?? "") : (y ?? "").CompareTo(x ?? ""));
+            IComparer<double?> doubleNullableComparer = Comparer<double?>.Create((x, y) => order.Equals("1") ? (x ?? 0).CompareTo(y ?? 0) : (y ?? 0).CompareTo(x ?? 0));
             IComparer<DateTime> dateTimeComparer = Comparer<DateTime>.Create((x, y) => order.Equals("1") ? x.CompareTo(y) : y.CompareTo(x));
             switch (sortField) {
                 // Если используется сортировка по фамилии сотрудника, записываем результат в файл для анализа
