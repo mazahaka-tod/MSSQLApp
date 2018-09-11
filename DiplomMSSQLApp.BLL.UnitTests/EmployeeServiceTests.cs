@@ -1,4 +1,5 @@
-﻿using DiplomMSSQLApp.BLL.DTO;
+﻿using DiplomMSSQLApp.BLL.BusinessModels;
+using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
@@ -520,6 +521,482 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Petrov", result[0].LastName);
             Assert.AreEqual("Popov", result[1].LastName);
             Assert.AreEqual("Ivanov", result[2].LastName);
+        }
+
+        /// <summary>
+        /// // Get method
+        /// </summary>
+        [TestCase("P", false, null, false, null, null, null, null, false, null, null)]          // LastName
+        [TestCase(null, false, "mail.ru", false, null, null, null, null, false, null, null)]    // Email
+        [TestCase(null, false, null, true, null, null, null, null, false, null, null)]          // IsPhoneNumber
+        [TestCase(null, false, null, false, "2018-09-01", null, null, null, false, null, null)] // HireDate
+        [TestCase(null, false, null, false, null, null, 20000, null, false, null, null)]        // MaxSalary
+        [TestCase(null, false, null, false, null, null, null, 0.1, false, null, null)]          // Bonus
+        [TestCase(null, false, null, false, null, null, null, null, true, null, null)]          // IsBonus
+        [TestCase(null, false, null, false, null, null, null, null, false, "Manager", null)]    // PostTitle
+        [TestCase(null, false, null, false, null, null, null, null, false, null, "Management")] // DepartmentName
+        public void OneFilterParameterIsSet_ReturnsFilteredArray(string ln, bool im, string em, 
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
+        {
+            EmployeeFilter filter = new EmployeeFilter {
+                LastName = new string[] { ln, null, "" },
+                IsMatchAnyLastName = im,
+                Email = em,
+                IsPhoneNumber = ipn,
+                HireDate = hd,
+                MinSalary = min,
+                MaxSalary = max,
+                Bonus = new double?[] { b },
+                IsBonus = ib,
+                PostTitle = pt,
+                DepartmentName = dn
+            };
+            Employee[] employees = new Employee[] {
+                new Employee() {
+                    Id = 1,
+                    LastName = "Petrov",
+                    Email = "Petrov@mail.ru",
+                    PhoneNumber = "89991554545",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 13000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 2,
+                    LastName = "Panin",
+                    Email = "Panin@mail.ru",
+                    PhoneNumber = "89991554546",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 17000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 3,
+                    LastName = "Ivanov",
+                    Email = "Ivanov@yandex.ru",
+                    HireDate = new DateTime(2018, 09, 02),
+                    Salary = 21000,
+                    Post = new Post { Title = "Intern" },
+                    Department = new Department { DepartmentName = "IT" }
+                },
+                new Employee() {
+                    Id = 4,
+                    LastName = "Brown",
+                    Email = "Brown@gmail.com",
+                    HireDate = new DateTime(2018, 09, 03),
+                    Salary = 23000,
+                    Post = new Post { Title = "Engineer" },
+                    Department = new Department { DepartmentName = "Logistics" }
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
+                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(2, result[0].Id);
+            Assert.AreEqual(1, result[1].Id);
+            Assert.AreEqual("Panin", result[0].LastName);
+            Assert.AreEqual("Petrov", result[1].LastName);
+        }
+
+        [TestCase("P", false, null, false, null, null, null, null, false, null, null)]          // LastName
+        [TestCase(null, false, "mail.ru", false, null, null, null, null, false, null, null)]    // Email
+        [TestCase(null, false, null, true, null, null, null, null, false, null, null)]          // IsPhoneNumber
+        [TestCase(null, false, null, false, "2018-09-01", null, null, null, false, null, null)] // HireDate
+        [TestCase(null, false, null, false, null, 12000, null, null, false, null, null)]        // MinSalary
+        [TestCase(null, false, null, false, null, null, null, 0.1, false, null, null)]          // Bonus
+        [TestCase(null, false, null, false, null, null, null, null, true, null, null)]          // IsBonus
+        [TestCase(null, false, null, false, null, null, null, null, false, "Manager", null)]    // PostTitle
+        [TestCase(null, false, null, false, null, null, null, null, false, null, "Management")] // DepartmentName
+        public void OneFilterParameterAndIsAntiFilterIsSet_ReturnsFilteredArray(string ln, bool im, string em,
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
+        {
+            EmployeeFilter filter = new EmployeeFilter {
+                LastName = new string[] { ln, null, "" },
+                IsMatchAnyLastName = im,
+                Email = em,
+                IsPhoneNumber = ipn,
+                HireDate = hd,
+                MinSalary = min,
+                MaxSalary = max,
+                Bonus = new double?[] { b },
+                IsBonus = ib,
+                PostTitle = pt,
+                DepartmentName = dn,
+                IsAntiFilter = true
+            };
+            Employee[] employees = new Employee[] {
+                new Employee() {
+                    Id = 1,
+                    LastName = "Petrov",
+                    Email = "Petrov@mail.ru",
+                    PhoneNumber = "89991554545",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 13000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 2,
+                    LastName = "Panin",
+                    Email = "Panin@mail.ru",
+                    PhoneNumber = "89991554546",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 17000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 3,
+                    LastName = "Ivanov",
+                    Email = "Ivanov@yandex.ru",
+                    HireDate = new DateTime(2018, 09, 02),
+                    Salary = 11000,
+                    Post = new Post { Title = "Intern" },
+                    Department = new Department { DepartmentName = "IT" }
+                },
+                new Employee() {
+                    Id = 4,
+                    LastName = "Brown",
+                    Email = "Brown@gmail.com",
+                    HireDate = new DateTime(2018, 09, 03),
+                    Salary = 9000,
+                    Post = new Post { Title = "Engineer" },
+                    Department = new Department { DepartmentName = "Logistics" }
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
+                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(4, result[0].Id);
+            Assert.AreEqual(3, result[1].Id);
+            Assert.AreEqual("Brown", result[0].LastName);
+            Assert.AreEqual("Ivanov", result[1].LastName);
+        }
+
+        [TestCase("P", "n",   false, null, false, null, null, null, null, false, null, null)]           // LastName1, LastName2
+        [TestCase("P", null, false, "mail.ru", false, null, null, null, null, false, null, null)]       // LastName, Email
+        [TestCase(null, null, false, "mail.ru", true, null, null, null, null, false, null, null)]       // Email, IsPhoneNumber
+        [TestCase(null, null, false, null, true, "2018-09-01", null, null, null, false, null, null)]    // IsPhoneNumber, HireDate
+        [TestCase(null, null, false, null, false, "2018-09-01", 12000, null, null, false, null, null)]  // HireDate, MinSalary
+        [TestCase(null, null, false, null, false, null, 12000, 15000, null, false, null, null)]         // MinSalary, MaxSalary
+        [TestCase(null, null, false, null, false, null, null, 15000, 0.1, false, null, null)]           // MaxSalary, Bonus
+        [TestCase(null, null, false, null, false, null, null, null, null, true, "Manager", null)]       // IsBonus, PostTitle
+        [TestCase(null, null, false, null, false, null, null, null, null, true, null, "Management")]    // IsBonus, DepartmentName
+        public void TwoFilterParametersAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
+        {
+            EmployeeFilter filter = new EmployeeFilter {
+                LastName = new string[] { ln1, ln2, null, "" },
+                IsMatchAnyLastName = im,
+                Email = em,
+                IsPhoneNumber = ipn,
+                HireDate = hd,
+                MinSalary = min,
+                MaxSalary = max,
+                Bonus = new double?[] { b },
+                IsBonus = ib,
+                PostTitle = pt,
+                DepartmentName = dn
+            };
+            Employee[] employees = new Employee[] {
+                new Employee() {
+                    Id = 1,
+                    LastName = "Petrov",
+                    Email = "Petrov@yandex.ru",
+                    PhoneNumber = "89991554545",
+                    HireDate = new DateTime(2018, 09, 02),
+                    Salary = 17000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Intern" },
+                    Department = new Department { DepartmentName = "IT" }
+                },
+                new Employee() {
+                    Id = 2,
+                    LastName = "Panin",
+                    Email = "Panin@mail.ru",
+                    PhoneNumber = "89991554546",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 13000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 3,
+                    LastName = "Ivanov",
+                    Email = "Ivanov@mail.ru",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 11000,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 4,
+                    LastName = "Sidorov",
+                    Email = "Sidorov@gmail.com",
+                    HireDate = new DateTime(2018, 09, 03),
+                    Salary = 9000,
+                    Post = new Post { Title = "Engineer" },
+                    Department = new Department { DepartmentName = "Logistics" }
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
+                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual(2, result[0].Id);
+            Assert.AreEqual("Panin", result[0].LastName);
+        }
+
+        [TestCase("P", "n", false, null, false, null, null, null, null, false, null, null)]             // LastName1, LastName2
+        [TestCase("P", null, false, "mail.ru", false, null, null, null, null, false, null, null)]       // LastName, Email
+        [TestCase(null, null, false, "mail.ru", true, null, null, null, null, false, null, null)]       // Email, IsPhoneNumber
+        [TestCase(null, null, false, null, true, "2018-09-01", null, null, null, false, null, null)]    // IsPhoneNumber, HireDate
+        [TestCase(null, null, false, null, false, "2018-09-01", 12000, null, null, false, null, null)]  // HireDate, MinSalary
+        [TestCase(null, null, false, null, false, null, 12000, 15000, null, false, null, null)]         // MinSalary, MaxSalary
+        [TestCase(null, null, false, null, false, null, null, 15000, 0.1, false, null, null)]           // MaxSalary, Bonus
+        [TestCase(null, null, false, null, false, null, null, null, null, true, "Manager", null)]       // IsBonus, PostTitle
+        [TestCase(null, null, false, null, false, null, null, null, null, true, null, "Management")]    // IsBonus, DepartmentName
+        public void TwoFilterParametersAndIsAntiFilterAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
+        {
+            EmployeeFilter filter = new EmployeeFilter {
+                LastName = new string[] { ln1, ln2, null, "" },
+                IsMatchAnyLastName = im,
+                Email = em,
+                IsPhoneNumber = ipn,
+                HireDate = hd,
+                MinSalary = min,
+                MaxSalary = max,
+                Bonus = new double?[] { b },
+                IsBonus = ib,
+                PostTitle = pt,
+                DepartmentName = dn,
+                IsAntiFilter = true
+            };
+            Employee[] employees = new Employee[] {
+                new Employee() {
+                    Id = 1,
+                    LastName = "Petrov",
+                    Email = "Petrov@yandex.ru",
+                    PhoneNumber = "89991554545",
+                    HireDate = new DateTime(2018, 09, 02),
+                    Salary = 17000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Intern" },
+                    Department = new Department { DepartmentName = "IT" }
+                },
+                new Employee() {
+                    Id = 2,
+                    LastName = "Panin",
+                    Email = "Panin@mail.ru",
+                    PhoneNumber = "89991554546",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 13000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 3,
+                    LastName = "Ivanov",
+                    Email = "Ivanov@mail.ru",
+                    HireDate = new DateTime(2018, 09, 01),
+                    Salary = 11000,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 4,
+                    LastName = "Sidorov",
+                    Email = "Sidorov@gmail.com",
+                    HireDate = new DateTime(2018, 09, 03),
+                    Salary = 9000,
+                    Post = new Post { Title = "Engineer" },
+                    Department = new Department { DepartmentName = "Logistics" }
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
+                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+
+            Assert.AreEqual(3, result.Length);
+            Assert.AreEqual(3, result[0].Id);
+            Assert.AreEqual(1, result[1].Id);
+            Assert.AreEqual(4, result[2].Id);
+            Assert.AreEqual("Ivanov", result[0].LastName);
+            Assert.AreEqual("Petrov", result[1].LastName);
+            Assert.AreEqual("Sidorov", result[2].LastName);
+        }
+
+        [TestCase(null)]
+        [TestCase("Email")]
+        [TestCase("HireDate")]
+        [TestCase("Salary")]
+        [TestCase("Bonus")]
+        [TestCase("PostTitle")]
+        [TestCase("DepartmentName")]
+        public void AscSortIsSet_ReturnsSortedArray(string field)
+        {
+            EmployeeFilter filter = new EmployeeFilter {
+                SortField = field,
+                SortOrder = "1"     // По возрастанию
+            };
+            Employee[] employees = new Employee[] {
+                new Employee() {
+                    Id = 1,
+                    LastName = "Sidorov",
+                    Email = "Sidorov@yandex.ru",
+                    PhoneNumber = "89991554547",
+                    HireDate = new DateTime(2018, 09, 05),
+                    Salary = 17000,
+                    Bonus = 0.3,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 2,
+                    LastName = "Petrov",
+                    Email = "Petrov@mail.ru",
+                    PhoneNumber = "89991554546",
+                    HireDate = new DateTime(2018, 09, 04),
+                    Salary = 16000,
+                    Bonus = 0.2,
+                    Post = new Post { Title = "Intern" },
+                    Department = new Department { DepartmentName = "Logistics" }
+                },
+                new Employee() {
+                    Id = 3,
+                    LastName = "Panin",
+                    Email = "Panin@mail.ru",
+                    PhoneNumber = "89991554545",
+                    HireDate = new DateTime(2018, 09, 03),
+                    Salary = 15000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Engineer" },
+                    Department = new Department { DepartmentName = "IT" }
+                },
+                new Employee() {
+                    Id = 4,
+                    LastName = "Ivanov",
+                    PhoneNumber = "89991554544",
+                    HireDate = new DateTime(2018, 09, 02),
+                    Post = new Post { Title = "Administrator" },
+                    Department = new Department { DepartmentName = "HR" }
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
+                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+
+            Assert.AreEqual(4, result.Length);
+            Assert.AreEqual(4, result[0].Id);
+            Assert.AreEqual(3, result[1].Id);
+            Assert.AreEqual(2, result[2].Id);
+            Assert.AreEqual(1, result[3].Id);
+            Assert.AreEqual("Ivanov", result[0].LastName);
+            Assert.AreEqual("Panin", result[1].LastName);
+            Assert.AreEqual("Petrov", result[2].LastName);
+            Assert.AreEqual("Sidorov", result[3].LastName);
+        }
+
+        [TestCase("Email")]
+        [TestCase("HireDate")]
+        [TestCase("Salary")]
+        [TestCase("Bonus")]
+        [TestCase("PostTitle")]
+        [TestCase("DepartmentName")]
+        public void DescSortIsSet_ReturnsSortedArray(string field)
+        {
+            EmployeeFilter filter = new EmployeeFilter {
+                SortField = field,
+                SortOrder = "-1"     // По возрастанию
+            };
+            Employee[] employees = new Employee[] {
+                new Employee() {
+                    Id = 1,
+                    LastName = "Sidorov",
+                    Email = "Sidorov@yandex.ru",
+                    PhoneNumber = "89991554547",
+                    HireDate = new DateTime(2018, 09, 05),
+                    Salary = 17000,
+                    Bonus = 0.3,
+                    Post = new Post { Title = "Manager" },
+                    Department = new Department { DepartmentName = "Management" }
+                },
+                new Employee() {
+                    Id = 2,
+                    LastName = "Petrov",
+                    Email = "Petrov@mail.ru",
+                    PhoneNumber = "89991554546",
+                    HireDate = new DateTime(2018, 09, 04),
+                    Salary = 16000,
+                    Bonus = 0.2,
+                    Post = new Post { Title = "Intern" },
+                    Department = new Department { DepartmentName = "Logistics" }
+                },
+                new Employee() {
+                    Id = 3,
+                    LastName = "Panin",
+                    Email = "Panin@mail.ru",
+                    PhoneNumber = "89991554545",
+                    HireDate = new DateTime(2018, 09, 03),
+                    Salary = 15000,
+                    Bonus = 0.1,
+                    Post = new Post { Title = "Engineer" },
+                    Department = new Department { DepartmentName = "IT" }
+                },
+                new Employee() {
+                    Id = 4,
+                    LastName = "Ivanov",
+                    PhoneNumber = "89991554544",
+                    HireDate = new DateTime(2018, 09, 02),
+                    Post = new Post { Title = "Administrator" },
+                    Department = new Department { DepartmentName = "HR" }
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
+                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+
+            Assert.AreEqual(4, result.Length);
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
+            Assert.AreEqual(3, result[2].Id);
+            Assert.AreEqual(4, result[3].Id);
+            Assert.AreEqual("Sidorov", result[0].LastName);
+            Assert.AreEqual("Petrov", result[1].LastName);
+            Assert.AreEqual("Panin", result[2].LastName);
+            Assert.AreEqual("Ivanov", result[3].LastName);
         }
     }
 }

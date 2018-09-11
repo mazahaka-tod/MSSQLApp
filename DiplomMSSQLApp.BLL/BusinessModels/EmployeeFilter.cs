@@ -6,17 +6,17 @@
         public string[] LastName { get; set; }
         public bool IsMatchAnyLastName { get; set; }
         public string Email { get; set; }
-        public bool PhoneNumber { get; set; }
+        public bool IsPhoneNumber { get; set; }
         public string HireDate { get; set; }
         public double? MinSalary { get; set; }
         public double? MaxSalary { get; set; }
         public double?[] Bonus { get; set; }
-        public bool BonusExists { get; set; }
-        public string Post { get; set; }
+        public bool IsBonus { get; set; }
+        public string PostTitle { get; set; }
         public string DepartmentName { get; set; }
-        public bool Not { get; set; }
+        public bool IsAntiFilter { get; set; }
         public string SortField { get; set; }
-        public string Order { get; set; }
+        public string SortOrder { get; set; }
         public string[] Columns { get; set; }
 
         public EmployeeFilter()

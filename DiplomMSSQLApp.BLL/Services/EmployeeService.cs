@@ -88,7 +88,7 @@ namespace DiplomMSSQLApp.BLL.Services
             bool predicate(Employee employee)
             {
                 bool returnValue = false;
-                if (filter.Not)
+                if (filter.IsAntiFilter)
                     returnValue = true;
                 // Фильтр по фамилии
                 if (filter.LastName != null)
@@ -124,7 +124,7 @@ namespace DiplomMSSQLApp.BLL.Services
                 if (!string.IsNullOrWhiteSpace(filter.Email) && !Regex.IsMatch(employee.Email, filter.Email, RegexOptions.IgnoreCase))
                     return returnValue;
                 // Фильтр по номеру телефона
-                if (filter.PhoneNumber && string.IsNullOrWhiteSpace(employee.PhoneNumber))
+                if (filter.IsPhoneNumber && string.IsNullOrWhiteSpace(employee.PhoneNumber))
                     return returnValue;
                 // Фильтр по дате найма на работу
                 if (!string.IsNullOrWhiteSpace(filter.HireDate) && DateTime.TryParse(filter.HireDate, out DateTime date) && employee.HireDate != date)
@@ -141,10 +141,10 @@ namespace DiplomMSSQLApp.BLL.Services
                     if (bonuses.Length > 0 && !bonuses.Contains(employee.Bonus))
                         return returnValue;
                 }
-                if (filter.BonusExists && !employee.Bonus.HasValue)
+                if (filter.IsBonus && !employee.Bonus.HasValue)
                     return returnValue;
                 // Фильтр по должности
-                if (!string.IsNullOrWhiteSpace(filter.Post) && !Regex.IsMatch(employee.Post.Title, filter.Post, RegexOptions.IgnoreCase))
+                if (!string.IsNullOrWhiteSpace(filter.PostTitle) && !Regex.IsMatch(employee.Post.Title, filter.PostTitle, RegexOptions.IgnoreCase))
                     return returnValue;
                 // Фильтр по названию отдела
                 if (!string.IsNullOrWhiteSpace(filter.DepartmentName) && !Regex.IsMatch(employee.Department.DepartmentName, filter.DepartmentName, RegexOptions.IgnoreCase))
@@ -179,7 +179,7 @@ namespace DiplomMSSQLApp.BLL.Services
             if (!string.IsNullOrWhiteSpace(filter.Email))
                 message += "Email = " + filter.Email + "; ";
             // Фильтр по номеру телефона
-            if (filter.PhoneNumber)
+            if (filter.IsPhoneNumber)
                 message += "Есть телефон; ";
             // Фильтр по дате найма на работу
             if (!string.IsNullOrWhiteSpace(filter.HireDate))
@@ -194,15 +194,15 @@ namespace DiplomMSSQLApp.BLL.Services
                 foreach (var bonus in filter.Bonus)
                     if (bonus.HasValue)
                         message += "Премия = " + bonus + "; ";
-            if (filter.BonusExists)
+            if (filter.IsBonus)
                 message += "Есть премия; ";
             // Фильтр по должности
-            if (!string.IsNullOrWhiteSpace(filter.Post))
-                message += "Должность = " + filter.Post + "; ";
+            if (!string.IsNullOrWhiteSpace(filter.PostTitle))
+                message += "Должность = " + filter.PostTitle + "; ";
             // Фильтр по названию отдела
             if (!string.IsNullOrWhiteSpace(filter.DepartmentName))
                 message += "Название отдела = " + filter.DepartmentName + "; ";
-            if (filter.Not)
+            if (filter.IsAntiFilter)
                 message += "Используется отрицание; ";
             if (message == "")
                 message = "Фильтр не задан; ";
@@ -213,7 +213,7 @@ namespace DiplomMSSQLApp.BLL.Services
             IEnumerable<Employee> collection;
             // Параметры сортировки
             string sortField = filter.SortField ?? "Default";
-            string order = filter.Order ?? "1";
+            string order = filter.SortOrder ?? "1";
             // Компараторы сортировки по возрастанию или по убыванию
             IComparer<string> stringComparer = Comparer<string>.Create((x, y) => order.Equals("1") ? (x ?? "").CompareTo(y ?? "") : (y ?? "").CompareTo(x ?? ""));
             IComparer<double?> doubleNullableComparer = Comparer<double?>.Create((x, y) => order.Equals("1") ? (x ?? 0).CompareTo(y ?? 0) : (y ?? 0).CompareTo(x ?? 0));
@@ -235,7 +235,7 @@ namespace DiplomMSSQLApp.BLL.Services
                 case "HireDate":        collection = Database.Employees.Get(predicate).OrderBy(e => e.HireDate, dateTimeComparer); break;
                 case "Salary":          collection = Database.Employees.Get(predicate).OrderBy(e => e.Salary, doubleNullableComparer); break;
                 case "Bonus":           collection = Database.Employees.Get(predicate).OrderBy(e => e.Bonus, doubleNullableComparer); break;
-                case "Post":            collection = Database.Employees.Get(predicate).OrderBy(e => e.Post.Title, stringComparer); break;
+                case "PostTitle":       collection = Database.Employees.Get(predicate).OrderBy(e => e.Post.Title, stringComparer); break;
                 case "DepartmentName":  collection = Database.Employees.Get(predicate).OrderBy(e => e.Department.DepartmentName, stringComparer); break;
                 default:                collection = Database.Employees.Get(predicate).OrderBy(e => e.LastName); break;
             }

@@ -40,8 +40,8 @@
                                 @Html.Label("Phone", "Телефон")
                             </dt>
                             <dd>
-                                @Html.CheckBox("PhoneNumber", new { style = "margin-bottom: 12px" })
-                                @Html.Label("PhoneNumber", "Есть")
+                                @Html.CheckBox("IsPhoneNumber", new { style = "margin-bottom: 12px" })
+                                @Html.Label("IsPhoneNumber", "Есть телефон")
                             </dd>
 
                             <dt>
@@ -72,15 +72,15 @@
                                 <span id="bonus">@Html.TextBox("Bonus", null, new { @class = "form-control" })</span>
                                 @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "Bonus" }, new AjaxOptions { UpdateTargetId = "bonus", InsertionMode = InsertionMode.InsertAfter })
                                 <br />
-                                @Html.CheckBox("BonusExists", new { style = "margin-bottom: 12px" })
-                                @Html.Label("BonusExists", "Есть")
+                                @Html.CheckBox("IsBonus", new { style = "margin-bottom: 12px" })
+                                @Html.Label("IsBonus", "Есть премия")
                             </dd>
 
                             <dt>
-                                @Html.Label("Post", "Должность")
+                                @Html.Label("PostTitle", "Должность")
                             </dt>
                             <dd>
-                                @Html.TextBox("Post", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.TextBox("PostTitle", null, new { @class = "form-control", style = "margin-bottom: 12px" })
                             </dd>
 
                             <dt>
@@ -98,7 +98,7 @@
                             </dt>
                             <dd>
                                 @Html.DropDownList("SortField", new SelectList(new[] { new { label = "По фамилии сотрудника", value = "LastName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
-                                @Html.DropDownList("Order", new SelectList(new[] { new { label = "По возрастанию", value = "1" }, new { label = "По убыванию", value = "-1" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownList("SortOrder", new SelectList(new[] { new { label = "По возрастанию", value = "1" }, new { label = "По убыванию", value = "-1" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
                             </dd>
 
                             <dt>
@@ -134,11 +134,11 @@
                             </dd>
 
                             <dt>
-                                @Html.Label("Not", "Не соответствующие фильтру")
+                                @Html.Label("AntiFilter", "Несоответствующие фильтру")
                             </dt>
                             <dd>
-                                @Html.CheckBox("Not", new { style = "margin-bottom: 12px" })
-                                @Html.Label("Not", "Да")
+                                @Html.CheckBox("IsAntiFilter", new { style = "margin-bottom: 12px" })
+                                @Html.Label("IsAntiFilter", "Да")
                             </dd>
 
                             <dt>
@@ -419,9 +419,9 @@
         $('#Columns8').prop('checked', @f);
 
         $('#IsMatchAnyLastName').prop('checked', @Model.Filter.IsMatchAnyLastName.ToString().ToLower());
-        $('#PhoneNumber').prop('checked', @Model.Filter.PhoneNumber.ToString().ToLower());
-        $('#BonusExists').prop('checked', @Model.Filter.BonusExists.ToString().ToLower());
-        $('#Not').prop('checked', @Model.Filter.Not.ToString().ToLower());
+        $('#IsPhoneNumber').prop('checked', @Model.Filter.IsPhoneNumber.ToString().ToLower());
+        $('#IsBonus').prop('checked', @Model.Filter.IsBonus.ToString().ToLower());
+        $('#IsAntiFilter').prop('checked', @Model.Filter.IsAntiFilter.ToString().ToLower());
 
     @if (Model.Filter.LastName != null)
         {
@@ -447,9 +447,9 @@
         {
             @:$('#Bonus').prop('value', "@Model.Filter.Bonus[0]");
         }
-        @if (Model.Filter.Post != null)
+        @if (Model.Filter.PostTitle != null)
         {
-            @:$('#Post').prop('value', "@Model.Filter.Post");
+            @:$('#PostTitle').prop('value', "@Model.Filter.PostTitle");
         }
         @if (Model.Filter.DepartmentName != null)
         {
@@ -457,7 +457,7 @@
         }
 
         $('select#SortField option[value="@Model.Filter.SortField"]').prop('selected', true);
-        $('select#Order option[value="@Model.Filter.Order"]').prop('selected', true);
+        $('select#SortOrder option[value="@Model.Filter.SortOrder"]').prop('selected', true);
     });
     </script>
 }

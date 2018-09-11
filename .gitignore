@@ -5,6 +5,3 @@ packages
 Results
 *.suo
 *.user
-*.csproj
-hr.mdf
-hr_log.ldf
