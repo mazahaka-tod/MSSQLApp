@@ -598,7 +598,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(2, result[0].Id);
@@ -680,7 +680,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(4, result[0].Id);
@@ -761,7 +761,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual(2, result[0].Id);
@@ -841,7 +841,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
             Assert.AreEqual(3, result.Length);
             Assert.AreEqual(3, result[0].Id);
@@ -863,7 +863,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             EmployeeFilter filter = new EmployeeFilter {
                 SortField = field,
-                SortOrder = "1"     // По возрастанию
+                SortOrder = "Asc"
             };
             Employee[] employees = new Employee[] {
                 new Employee() {
@@ -913,7 +913,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
             Assert.AreEqual(4, result.Length);
             Assert.AreEqual(4, result[0].Id);
@@ -936,7 +936,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         {
             EmployeeFilter filter = new EmployeeFilter {
                 SortField = field,
-                SortOrder = "-1"     // По возрастанию
+                SortOrder = "Desc"
             };
             Employee[] employees = new Employee[] {
                 new Employee() {
@@ -986,7 +986,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter, It.IsAny<string>()).ToArray();
+            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
             Assert.AreEqual(4, result.Length);
             Assert.AreEqual(1, result[0].Id);

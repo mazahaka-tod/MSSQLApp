@@ -3,6 +3,7 @@ using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
+using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using System.Collections.Generic;
 using System.IO;
@@ -25,20 +26,16 @@ namespace DiplomMSSQLApp.WEB.Controllers
             departmentService = ds;
         }
 
-        public ActionResult Index(EmployeeFilter f, string str, int page = 1)
+        public ActionResult Index(EmployeeFilter filter, string str, int page = 1)
         {
             // Условие истинно, когда пользователь использует paging,
-            // в этом случае передается строка str, а фильтр EmployeeFilter f нет,
-            // поэтому производим декодирование строки в объект EmployeeFilter и присваиваем его фильтру f
-            if (str != null) f = System.Web.Helpers.Json.Decode<EmployeeFilter>(str);
-            string path = Server.MapPath("~/Results/Employee/Filter.txt");
-            // Получаем список сотрудников
-            IEnumerable<EmployeeDTO> eDto = employeeService.Get(f, path);     // фильтруем данные
-            // Пагинация (paging)
-            eDto = employeeService.GetPage(eDto, page);
-
-            Mapper.Initialize(cfg =>
-            {
+            // в этом случае передается строка str, а фильтр EmployeeFilter filter нет,
+            // поэтому производим декодирование строки в объект EmployeeFilter и присваиваем его фильтру filter
+            if (str != null) filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(str);
+            (employeeService as EmployeeService).PathToFileForTests = Server.MapPath("~/Results/Employee/Filter.txt");
+            IEnumerable<EmployeeDTO> eDto = employeeService.Get(filter);
+            eDto = employeeService.GetPage(eDto, page);     // Paging
+            Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
                     .ForMember(bt => bt.Employees, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
@@ -47,9 +44,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
                 cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
             });
-            var e = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
-
-            return View(new EmployeeListViewModel { Employees = e, Filter = f, PageInfo = employeeService.PageInfo });
+            IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
+            return View(new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo });
         }
 
         // Добавление нового сотрудника

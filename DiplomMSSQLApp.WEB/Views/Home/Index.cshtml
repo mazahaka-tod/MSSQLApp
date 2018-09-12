@@ -98,7 +98,7 @@
                             </dt>
                             <dd>
                                 @Html.DropDownList("SortField", new SelectList(new[] { new { label = "По фамилии сотрудника", value = "LastName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
-                                @Html.DropDownList("SortOrder", new SelectList(new[] { new { label = "По возрастанию", value = "1" }, new { label = "По убыванию", value = "-1" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownList("SortOrder", new SelectList(new[] { new { label = "По возрастанию", value = "Asc" }, new { label = "По убыванию", value = "Desc" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
                             </dd>
 
                             <dt>
