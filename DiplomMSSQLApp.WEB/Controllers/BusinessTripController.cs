@@ -27,15 +27,13 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             // Получаем список командировок
             IEnumerable<BusinessTripDTO> bDto = await businessTripService.GetAllAsync();
-            // Пагинация (paging)
-            bDto = businessTripService.GetPage(bDto, page);
+            bDto = businessTripService.GetPage(bDto, page);     // Paging
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
-                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
+                cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
+                    .ForMember(bt => bt.Employees, opt => opt.Ignore());
             });
-            var b = Mapper.Map<IEnumerable<BusinessTripDTO>, IEnumerable<BusinessTripViewModel>>(bDto);
-
-            return View(new BusinessTripListViewModel { BusinessTrips = b, PageInfo = businessTripService.PageInfo });
+            IEnumerable<BusinessTripViewModel> businessTrips = Mapper.Map<IEnumerable<BusinessTripDTO>, IEnumerable<BusinessTripViewModel>>(bDto);
+            return View(new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = businessTripService.PageInfo });
         }
 
         // Добавление новой командировки
@@ -50,14 +48,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             try
             {
-                Mapper.Initialize(cfg => {
-                    cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
-                    cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
-                    cfg.CreateMap<PostViewModel, PostDTO>();
-                    cfg.CreateMap<DepartmentViewModel, DepartmentDTO>();
-                });
-                BusinessTripDTO bDto = Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
-                await (businessTripService as BusinessTripService).CreateAsync(bDto, ids);
+                BusinessTripDTO btDto = InitializeMapper(bt);
+                await (businessTripService as BusinessTripService).CreateAsync(btDto, ids);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -74,14 +66,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             try
             {
-                BusinessTripDTO bDto = await businessTripService.FindByIdAsync(id);
-                Mapper.Initialize(cfg => {
-                    cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
-                    cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
-                    cfg.CreateMap<PostDTO, PostViewModel>();
-                    cfg.CreateMap<DepartmentDTO, DepartmentViewModel>();
-                });
-                BusinessTripViewModel bt = Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(bDto);
+                BusinessTripDTO btDto = await businessTripService.FindByIdAsync(id);
+                BusinessTripViewModel bt = InitializeMapper(btDto);
                 ViewBag.Employees = await GetSelectListAsync();
                 return View(bt);
             }
@@ -95,14 +81,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             try
             {
-                Mapper.Initialize(cfg => {
-                    cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
-                    cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
-                    cfg.CreateMap<PostViewModel, PostDTO>();
-                    cfg.CreateMap<DepartmentViewModel, DepartmentDTO>();
-                });
-                BusinessTripDTO bDto = Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
-                await (businessTripService as BusinessTripService).EditAsync(bDto, ids);
+                BusinessTripDTO btDto = InitializeMapper(bt);
+                await (businessTripService as BusinessTripService).EditAsync(btDto, ids);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex)
@@ -111,18 +91,6 @@ namespace DiplomMSSQLApp.WEB.Controllers
             }
             ViewBag.Employees = await GetSelectListAsync();
             return View(bt);
-        }
-
-        // Получение списка сотрудников
-        private async Task<SelectList> GetSelectListAsync()
-        {
-            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
-            List<SelectListItem> items = employees.Select(e => new SelectListItem()
-            {
-                Value = e.Id.ToString(),
-                Text = e.LastName + " " + e.FirstName
-            }).ToList();
-            return new SelectList(items, "Value", "Text");
         }
 
         // Частичное представление
@@ -139,15 +107,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             try
             {
-                BusinessTripDTO bDto = await businessTripService.FindByIdAsync(id);
-                Mapper.Initialize(cfg => {
-                    cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
-                    cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
-                        .ForMember(d => d.Post, opt => opt.Ignore())
-                        .ForMember(d => d.Department, opt => opt.Ignore());
-                });
-                BusinessTripViewModel b = Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(bDto);
-                return View(b);
+                BusinessTripDTO btDto = await businessTripService.FindByIdAsync(id);
+                BusinessTripViewModel businessTrip = InitializeMapper(btDto);
+                return View(businessTrip);
             }
             catch (ValidationException ex)
             {
@@ -167,15 +129,9 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             try
             {
-                BusinessTripDTO bDto = await businessTripService.FindByIdAsync(id);
-                Mapper.Initialize(cfg => {
-                    cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
-                    cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
-                        .ForMember(d => d.Post, opt => opt.Ignore())
-                        .ForMember(d => d.Department, opt => opt.Ignore());
-                });
-                BusinessTripViewModel b = Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(bDto);
-                return View(b);
+                BusinessTripDTO btDto = await businessTripService.FindByIdAsync(id);
+                BusinessTripViewModel businessTrip = InitializeMapper(btDto);
+                return View(businessTrip);
             }
             catch (ValidationException ex)
             {
@@ -200,6 +156,40 @@ namespace DiplomMSSQLApp.WEB.Controllers
             businessTripService.Dispose();
             employeeService.Dispose();
             base.Dispose(disposing);
+        }
+
+        // Получение списка сотрудников
+        private async Task<SelectList> GetSelectListAsync()
+        {
+            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
+            List<SelectListItem> items = employees.Select(e => new SelectListItem()
+            {
+                Value = e.Id.ToString(),
+                Text = e.LastName + " " + e.FirstName
+            }).OrderBy(e => e.Text).ToList();
+            return new SelectList(items, "Value", "Text");
+        }
+
+        private BusinessTripViewModel InitializeMapper(BusinessTripDTO btDTO)
+        {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
+                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
+            });
+            return Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(btDTO);
+        }
+
+        private BusinessTripDTO InitializeMapper(BusinessTripViewModel bt)
+        {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
+                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
+            });
+            return Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
         }
     }
 }

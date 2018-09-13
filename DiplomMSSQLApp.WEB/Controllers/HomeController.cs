@@ -36,9 +36,8 @@ namespace DiplomMSSQLApp.WEB.Controllers
             IEnumerable<EmployeeDTO> eDto = employeeService.Get(filter);
             eDto = employeeService.GetPage(eDto, page);     // Paging
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
-                    .ForMember(bt => bt.Employees, opt => opt.Ignore());
-                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
+                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
                 cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
                     .ForMember(d => d.Employees, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, PostViewModel>()
@@ -63,7 +62,10 @@ namespace DiplomMSSQLApp.WEB.Controllers
         {
             try
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<EmployeeViewModel, EmployeeDTO>());
+                Mapper.Initialize(cfg => {
+                    cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
+                    cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
+                });
                 var eDto = Mapper.Map<EmployeeViewModel, EmployeeDTO>(e);
                 await employeeService.CreateAsync(eDto);
                 return RedirectToAction("Index");
@@ -183,7 +185,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
             {
                 EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
                 Mapper.Initialize(cfg => {
-                    cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
+                    cfg.CreateMap<BaseBusinessTripDTO, BusinessTripViewModel>();
                     cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
                     cfg.CreateMap<PostDTO, PostViewModel>().MaxDepth(0);
                     cfg.CreateMap<DepartmentDTO, DepartmentViewModel>().MaxDepth(0);

@@ -70,9 +70,9 @@ namespace DiplomMSSQLApp.BLL.Services
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Department, DepartmentDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
-                    .ForMember(dp => dp.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(dp => dp.Department, opt => opt.Ignore())
-                    .ForMember(dp => dp.Post, opt => opt.Ignore());
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
             });
             return Mapper.Map<Department, DepartmentDTO>(d);
         }

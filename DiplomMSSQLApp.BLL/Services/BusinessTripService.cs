@@ -93,9 +93,10 @@ namespace DiplomMSSQLApp.BLL.Services
                 throw new ValidationException("Командировка не найдена", "");
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
-                cfg.CreateMap<Employee, EmployeeDTO>();
-                cfg.CreateMap<Post, PostDTO>();
-                cfg.CreateMap<Department, DepartmentDTO>();
+                cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
             });
             return Mapper.Map<BusinessTrip, BusinessTripDTO>(bt);
         }
@@ -104,13 +105,12 @@ namespace DiplomMSSQLApp.BLL.Services
         public override async Task<IEnumerable<BusinessTripDTO>> GetAllAsync()
         {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
-                cfg.CreateMap<Employee, EmployeeDTO>()
-                    .ForMember(p => p.Post, opt => opt.Ignore())
-                    .ForMember(d => d.Department, opt => opt.Ignore());
+                cfg.CreateMap<BusinessTrip, BusinessTripDTO>()
+                    .ForMember(bt => bt.Employees, opt => opt.Ignore());
             });
-            List<BusinessTripDTO> col = Mapper.Map<IEnumerable<BusinessTrip>, List<BusinessTripDTO>>(await Database.BusinessTrips.GetAsync());
-            return col;
+            IEnumerable<BusinessTrip> businessTrips = await Database.BusinessTrips.GetAsync();
+            IEnumerable<BusinessTripDTO> collection = Mapper.Map<IEnumerable<BusinessTrip>, IEnumerable<BusinessTripDTO>>(businessTrips);
+            return collection.ToList();
         }
 
         // Валидация модели

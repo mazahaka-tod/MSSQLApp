@@ -15,11 +15,12 @@ namespace DiplomMSSQLApp.DAL.EF
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             // Создаем таблицу для связи "многие-ко-многим"
-            modelBuilder.Entity<Employee>().HasMany(e => e.BusinessTrips)
-                .WithMany(bt => bt.Employees)
-                .Map(t => t.MapLeftKey("EmployeeId")
-                .MapRightKey("BusinessTripId")
-                .ToTable("EmployeeBusinessTrip"));
+            modelBuilder.Entity<Employee>()
+                        .HasMany(e => e.BusinessTrips)
+                        .WithMany(bt => bt.Employees)
+                        .Map(t => t.MapLeftKey("EmployeeId")
+                        .MapRightKey("BusinessTripId")
+                        .ToTable("EmployeeBusinessTrip"));
         }
     }
 }

@@ -80,10 +80,12 @@ namespace DiplomMSSQLApp.BLL.Services
             if (employee == null)
                 throw new ValidationException("Сотрудник не найден", "");
             Mapper.Initialize(cfg => {
+                cfg.CreateMap<BusinessTrip, BaseBusinessTripDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>();
-                cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
-                cfg.CreateMap<Post, PostDTO>();
-                cfg.CreateMap<Department, DepartmentDTO>();
+                cfg.CreateMap<Department, DepartmentDTO>()
+                    .ForMember(d => d.Employees, opt => opt.Ignore());
+                cfg.CreateMap<Post, PostDTO>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
             });
             return Mapper.Map<Employee, EmployeeDTO>(employee);
         }
@@ -95,11 +97,12 @@ namespace DiplomMSSQLApp.BLL.Services
             CreateMessageAboutFilterParametersUsed(filter);
             IEnumerable<Employee> sortedCollection = SortEmployees(filter, predicate);
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTrip, BusinessTripDTO>()
-                    .ForMember(bt => bt.Employees, opt => opt.Ignore());
-                cfg.CreateMap<Employee, EmployeeDTO>();
-                cfg.CreateMap<Department, DepartmentDTO>();
-                cfg.CreateMap<Post, PostDTO>();
+                cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
+                cfg.CreateMap<Department, DepartmentDTO>()
+                    .ForMember(d => d.Employees, opt => opt.Ignore());
+                cfg.CreateMap<Post, PostDTO>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
             });
             List<EmployeeDTO> col = Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(sortedCollection);
             return col;
@@ -270,8 +273,14 @@ namespace DiplomMSSQLApp.BLL.Services
         // Получение списка всех сотрудников
         public override async Task<IEnumerable<EmployeeDTO>> GetAllAsync()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Employee, EmployeeDTO>()
-                .ForMember(e => e.BusinessTrips, opt => opt.Ignore()));
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
+                cfg.CreateMap<Department, DepartmentDTO>()
+                    .ForMember(d => d.Employees, opt => opt.Ignore());
+                cfg.CreateMap<Post, PostDTO>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
+            });
             List<EmployeeDTO> col = Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(await Database.Employees.GetAsync());
             return col;
         }

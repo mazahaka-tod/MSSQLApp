@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="BusinessModels\EmployeeFilter.cs" />
     <Compile Include="BusinessModels\PageInfo.cs" />
+    <Compile Include="DTO\BaseBusinessTripDTO.cs" />
     <Compile Include="DTO\BusinessTripDTO.cs" />
     <Compile Include="DTO\DepartmentDTO.cs" />
     <Compile Include="DTO\EmployeeDTO.cs" />

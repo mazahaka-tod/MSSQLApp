@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DiplomMSSQLApp.BLL.DTO
 {
@@ -19,11 +18,11 @@ namespace DiplomMSSQLApp.BLL.DTO
         public PostDTO Post { get; set; }
         public int? DepartmentId { get; set; }
         public DepartmentDTO Department { get; set; }
-        public virtual ICollection<BusinessTripDTO> BusinessTrips { get; set; }
+        public virtual ICollection<BaseBusinessTripDTO> BusinessTrips { get; set; }
 
         public EmployeeDTO()
         {
-            BusinessTrips = new List<BusinessTripDTO>();
+            BusinessTrips = new List<BaseBusinessTripDTO>();
         }
     }
 }
