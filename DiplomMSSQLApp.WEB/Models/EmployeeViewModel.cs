@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DiplomMSSQLApp.WEB.Models
 {
     public class EmployeeViewModel
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "Требуется ввести фамилию")]
         [Display(Name = "Фамилия")]
         public string LastName { get; set; }
+        [Required(ErrorMessage = "Требуется ввести имя")]
         [Display(Name = "Имя")]
         public string FirstName { get; set; }
+        [EmailAddress(ErrorMessage = "Некорректный email")]
         public string Email { get; set; }
         [Display(Name = "Телефон")]
         public string PhoneNumber { get; set; }
@@ -32,11 +34,11 @@ namespace DiplomMSSQLApp.WEB.Models
         public int? DepartmentId { get; set; }
         public DepartmentViewModel Department { get; set; }
         [Display(Name = "Список командировок")]
-        public virtual ICollection<BusinessTripViewModel> BusinessTrips { get; set; }
+        public virtual ICollection<BaseBusinessTripViewModel> BusinessTrips { get; set; }
 
         public EmployeeViewModel()
         {
-            BusinessTrips = new List<BusinessTripViewModel>();
+            BusinessTrips = new List<BaseBusinessTripViewModel>();
         }
     }
 }

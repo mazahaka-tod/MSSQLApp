@@ -274,8 +274,8 @@ namespace DiplomMSSQLApp.BLL.Services
         public override async Task<IEnumerable<EmployeeDTO>> GetAllAsync()
         {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<Employee, EmployeeDTO>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
+                cfg.CreateMap<Employee, EmployeeDTO>();
+                cfg.CreateMap<BusinessTrip, BaseBusinessTripDTO>();
                 cfg.CreateMap<Department, DepartmentDTO>()
                     .ForMember(d => d.Employees, opt => opt.Ignore());
                 cfg.CreateMap<Post, PostDTO>()
@@ -303,20 +303,16 @@ namespace DiplomMSSQLApp.BLL.Services
                     throw new ValidationException("Некорректный email", "Email");
                 }
             }
-            if (item.Salary != null && item.Post != null)
-            {
-                if (item.Salary < item.Post.MinSalary)
-                    throw new ValidationException("Зарплата должна быть больше " + item.Post.MinSalary, "Salary");
-                if (item.Salary > item.Post.MaxSalary)
-                    throw new ValidationException("Зарплата должна быть меньше " + item.Post.MaxSalary, "Salary");
-            }
-
             Department department = await Database.Departments.FindByIdAsync(item.DepartmentId ?? 0);
             if (department == null)
                 throw new ValidationException("Отдел не найден", "");
             Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
             if (post == null)
                 throw new ValidationException("Должность не найдена", "");
+            if (item.Salary != null && post?.MinSalary != null && item.Salary < post.MinSalary)
+                throw new ValidationException("Зарплата должна быть больше " + post.MinSalary, "Salary");
+            if (item.Salary != null && post?.MaxSalary != null && item.Salary > post.MaxSalary)
+                throw new ValidationException("Зарплата должна быть меньше " + post.MaxSalary, "Salary");
         }
 
         // Тест добавления сотрудников

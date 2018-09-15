@@ -34,7 +34,7 @@ namespace DiplomMSSQLApp.DAL.Repositories
             return await _dbSet.FindAsync(id);
         }
         // Получение всех элементов
-        public async Task<IEnumerable<TEntity>> GetAsync()
+        public virtual async Task<IEnumerable<TEntity>> GetAsync()
         {
             return await _dbSet.ToListAsync();
         }

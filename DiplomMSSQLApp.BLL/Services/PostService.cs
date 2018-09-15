@@ -95,7 +95,7 @@ namespace DiplomMSSQLApp.BLL.Services
         {
             if (item.Title == null)
                 throw new ValidationException("Требуется ввести название должности", "Title");
-            if (item.MinSalary > item.MaxSalary)
+            if (item.MinSalary != null && item.MaxSalary != null && item.MinSalary > item.MaxSalary)
                 throw new ValidationException("Минимальная зарплата не может быть больше максимальной", "MinSalary");
         }
 

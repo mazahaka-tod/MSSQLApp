@@ -158,6 +158,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\PagingHelpers.cs" />
+    <Compile Include="Models\BaseBusinessTripViewModel.cs" />
     <Compile Include="Models\BusinessTripListViewModel.cs" />
     <Compile Include="Models\BusinessTripViewModel.cs" />
     <Compile Include="Models\DepartmentListViewModel.cs" />
@@ -170,14 +171,27 @@
     <Compile Include="Util\NinjectDependencyResolver.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Animations\Error.gif" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Animations\TheBest.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Results\Employee\Create.txt" />
+    <Content Include="Results\Employee\Delete.txt" />
+    <Content Include="Results\Employee\Filter.txt" />
+    <Content Include="Results\Employee\Read.txt" />
+    <Content Include="Results\Employee\Update.txt" />
+    <Content Include="Results\Post\Create.txt" />
+    <Content Include="Results\Post\Delete.txt" />
+    <Content Include="Results\Post\Read.txt" />
+    <Content Include="Results\Post\Update.txt" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Results\Employee\Employees.json" />
+    <Content Include="Results\Post\Posts.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -231,10 +245,10 @@
     <Content Include="Views\BusinessTrip\DeleteAll.cshtml" />
     <Content Include="Views\Department\DeleteAll.cshtml" />
     <Content Include="Views\Post\DeleteAll.cshtml" />
+    <Content Include="Views\Shared\CustomError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Results\Employee\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
