@@ -141,12 +141,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [Test]
         public void CreateAsync_SalaryPropertyLessThanMinSalaryProperty_Throws()
         {
-            EmployeeService es = GetNewService();
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MinSalary = 20000 });
+            EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
-                Salary = 10000,
-                Post = new PostDTO() { MinSalary = 20000 }
+                Salary = 10000
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
@@ -157,12 +158,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [Test]
         public void CreateAsync_SalaryPropertyMoreThanMaxSalaryProperty_Throws()
         {
-            EmployeeService es = GetNewService();
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MaxSalary = 20000 });
+            EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
-                Salary = 30000,
-                Post = new PostDTO() { MaxSalary = 20000 }
+                Salary = 30000
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
@@ -174,6 +176,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public void CreateAsync_DepartmentPropertyIsNull_Throws()
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
@@ -364,12 +367,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [Test]
         public void EditAsync_SalaryPropertyLessThanMinSalaryProperty_Throws()
         {
-            EmployeeService es = GetNewService();
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MinSalary = 20000 });
+            EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
-                Salary = 10000,
-                Post = new PostDTO() { MinSalary = 20000 }
+                Salary = 10000
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
@@ -380,12 +384,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [Test]
         public void EditAsync_SalaryPropertyMoreThanMaxSalaryProperty_Throws()
         {
-            EmployeeService es = GetNewService();
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MaxSalary = 20000 });
+            EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
-                Salary = 30000,
-                Post = new PostDTO() { MaxSalary = 20000 }
+                Salary = 30000
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
@@ -397,6 +402,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public void EditAsync_DepartmentPropertyIsNull_Throws()
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {

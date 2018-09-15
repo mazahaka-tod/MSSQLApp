@@ -108,6 +108,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("ExportJson")]
         public async Task<ActionResult> ExportJsonAsync() {
             string path = Server.MapPath("~/Results/Post/Posts.json");
+            System.IO.File.Delete(path);
             IEnumerable<PostDTO> pDto = await postService.GetAllAsync();
             var posts = pDto.Select(p => new {
                 p.Title,

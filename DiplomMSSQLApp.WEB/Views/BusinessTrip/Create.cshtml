@@ -67,8 +67,8 @@
             </div>
         </div>
 
-        <p><a class="addEmployee">Добавить сотрудника</a></p>
-        <p><a class="deleteEmployee">Удалить сотрудника</a></p>
+        <p><a id="addEmployee">Добавить сотрудника</a></p>
+        <p><a id="deleteEmployee">Удалить сотрудника</a></p>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
@@ -83,12 +83,11 @@
 </div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
             var i = 0;
             // Добавление сотрудника
-            $('.addEmployee').click(function (e) {
+            $('#addEmployee').click(function (e) {
                 e.preventDefault();
                 i++;
                 var div = document.createElement('div');
@@ -97,7 +96,7 @@
                 $('.employee' + i.toString()).load('@Url.Action("AddEmployeeAsync", "BusinessTrip")?index=' + i)
             });
             // Удаление сотрудника
-            $('.deleteEmployee').click(function (e) {
+            $('#deleteEmployee').click(function (e) {
                 e.preventDefault();
                 if (i > 0)
                 {

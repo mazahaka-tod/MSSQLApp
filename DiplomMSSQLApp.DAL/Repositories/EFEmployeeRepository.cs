@@ -39,7 +39,6 @@ namespace DiplomMSSQLApp.DAL.Repositories
             return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(predicate).ToList();
         }
 
-        // Получение всех элементов
         public override async Task<IEnumerable<Employee>> GetAsync() {
             return await _dbSet.Include(e => e.Department).Include(e => e.Post).ToListAsync();
         }

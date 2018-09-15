@@ -4,12 +4,10 @@ using System.Linq;
 using DiplomMSSQLApp.BLL.BusinessModels;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.BLL.Services
-{
-    public abstract class BaseService<T> : IService<T> where T : class
-    {
+namespace DiplomMSSQLApp.BLL.Services {
+    public abstract class BaseService<T> : IService<T> where T : class {
         public PageInfo PageInfo { get; set; }
-        public int NumberOfObjectsPerPage { get; set; } = 8;  // количество объектов на страницу
+        public int NumberOfObjectsPerPage { get; set; } = 8;
 
         public abstract Task CreateAsync(T item);
         public abstract Task DeleteAsync(int id);
@@ -24,8 +22,7 @@ namespace DiplomMSSQLApp.BLL.Services
         public abstract Task TestUpdateAsync(int num, string path);
         public abstract Task TestDeleteAsync(int num, string path);
         // Paging
-        public IEnumerable<T> GetPage(IEnumerable<T> col, int page)
-        {
+        public IEnumerable<T> GetPage(IEnumerable<T> col, int page) {
             PageInfo = new PageInfo { PageNumber = page, PageSize = NumberOfObjectsPerPage, TotalItems = col.Count() };
             if (page < 1) PageInfo.PageNumber = 1;
             if (page > PageInfo.TotalPages) PageInfo.PageNumber = PageInfo.TotalPages;
