@@ -49,6 +49,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View(p);
         }
 
+        private PostDTO MapViewModelWithDTO(PostViewModel p) {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<PostViewModel, PostDTO>();
+                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
+            });
+            PostDTO pDto = Mapper.Map<PostViewModel, PostDTO>(p);
+            return pDto;
+        }
+
         // Обновление информации о должности
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
@@ -67,6 +79,35 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View(p);
         }
 
+        private async Task<ActionResult> GetViewAsync(int? id) {
+            try {
+                PostDTO pDto = await postService.FindByIdAsync(id);
+                PostViewModel p = MapDTOWithViewModel(pDto);
+                return View(p);
+            }
+            catch (ValidationException ex) {
+                return View("CustomError", (object)ex.Message);
+            }
+        }
+
+        private PostViewModel MapDTOWithViewModel(PostDTO pDto) {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<PostDTO, PostViewModel>();
+                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
+            });
+            PostViewModel p = Mapper.Map<PostDTO, PostViewModel>(pDto);
+            return p;
+        }
+
+        // Подробная информация о должности
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id) {
+            return await GetViewAsync(id);
+        }
+
         // Удаление должности
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(int? id) {
@@ -81,12 +122,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 return View("CustomError", (object)"Нельзя удалить должность, пока в ней работает хотя бы один сотрудник.");
             }
             return RedirectToAction("Index");
-        }
-
-        // Подробная информация о должности
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
         }
 
         // Удаление всех должностей
@@ -169,39 +204,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             postService.Dispose();
             departmentService.Dispose();
             base.Dispose(disposing);
-        }
-
-        private async Task<ActionResult> GetViewAsync(int? id) {
-            try {
-                PostDTO pDto = await postService.FindByIdAsync(id);
-                PostViewModel p = MapDTOWithViewModel(pDto);
-                return View(p);
-            }
-            catch (ValidationException ex) {
-                return View("CustomError", (object)ex.Message);
-            }
-        }
-
-        private PostViewModel MapDTOWithViewModel(PostDTO pDto) {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<PostDTO, PostViewModel>();
-                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
-            });
-            return Mapper.Map<PostDTO, PostViewModel>(pDto);
-        }
-
-        private PostDTO MapViewModelWithDTO(PostViewModel p) {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<PostViewModel, PostDTO>();
-                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
-            });
-            return Mapper.Map<PostViewModel, PostDTO>(p);
         }
     }
 }

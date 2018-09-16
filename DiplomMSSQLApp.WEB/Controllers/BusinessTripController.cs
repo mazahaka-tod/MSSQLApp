@@ -32,7 +32,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Добавление новой командировки
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
@@ -45,14 +45,35 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View(bt);
+        }
+
+        private async Task<SelectList> GetSelectListEmployeesAsync() {
+            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
+            IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
+                                                    Value = e.Id.ToString(),
+                                                    Text = e.LastName + " " + e.FirstName
+                                                }).OrderBy(e => e.Text);
+            return new SelectList(items, "Value", "Text");
+        }
+
+        private BusinessTripDTO MapViewModelWithDTO(BusinessTripViewModel bt) {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
+                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
+            });
+            BusinessTripDTO btDto = Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
+            return btDto;
         }
 
         // Обновление информации о командировке
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return await GetViewAsync(id);
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
@@ -65,59 +86,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View(bt);
-        }
-
-        // Удаление командировки
-        [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(int? id) {
-            return await GetViewAsync(id);
-        }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public async Task<ActionResult> DeleteConfirmedAsync(int id) {
-            await businessTripService.DeleteAsync(id);
-            return RedirectToAction("Index");
-        }
-
-        // Подробная информация о командировке
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
-        }
-
-        // Удаление всех командировок
-        public ActionResult DeleteAll() {
-            return View();
-        }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
-        public async Task<ActionResult> DeleteAllAsync() {
-            await businessTripService.DeleteAllAsync();
-            return RedirectToAction("Index");
-        }
-
-        // Частичное представление добавляет выпадающий список сотрудников
-        public async Task<ActionResult> AddEmployeeAsync(int index) {
-            ViewBag.Index = index;
-            ViewBag.Employees = await GetSelectListAsync();
-            return PartialView("AddEmployee");
-        }
-
-        protected override void Dispose(bool disposing) {
-            businessTripService.Dispose();
-            employeeService.Dispose();
-            base.Dispose(disposing);
-        }
-
-        // Получение списка сотрудников
-        private async Task<SelectList> GetSelectListAsync() {
-            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
-            IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
-                                                             Value = e.Id.ToString(),
-                                                             Text = e.LastName + " " + e.FirstName
-                                                         })
-                                                         .OrderBy(e => e.Text);
-            return new SelectList(items, "Value", "Text");
         }
 
         private async Task<ActionResult> GetViewAsync(int? id) {
@@ -139,18 +109,48 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(e => e.Department, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
-            return Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(btDTO);
+            BusinessTripViewModel bt = Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(btDTO);
+            return bt;
         }
 
-        private BusinessTripDTO MapViewModelWithDTO(BusinessTripViewModel bt) {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
-                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
-            });
-            return Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
+        // Подробная информация о командировке
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id) {
+            return await GetViewAsync(id);
+        }
+
+        // Удаление командировки
+        [ActionName("Delete")]
+        public async Task<ActionResult> DeleteAsync(int? id) {
+            return await GetViewAsync(id);
+        }
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
+        public async Task<ActionResult> DeleteConfirmedAsync(int id) {
+            await businessTripService.DeleteAsync(id);
+            return RedirectToAction("Index");
+        }
+
+        // Удаление всех командировок
+        public ActionResult DeleteAll() {
+            return View();
+        }
+        [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
+        public async Task<ActionResult> DeleteAllAsync() {
+            await businessTripService.DeleteAllAsync();
+            return RedirectToAction("Index");
+        }
+
+        // Частичное представление добавляет выпадающий список сотрудников
+        public async Task<ActionResult> AddEmployeeAsync(int index) {
+            ViewBag.Index = index;
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
+            return PartialView("AddEmployee");
+        }
+
+        protected override void Dispose(bool disposing) {
+            businessTripService.Dispose();
+            employeeService.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

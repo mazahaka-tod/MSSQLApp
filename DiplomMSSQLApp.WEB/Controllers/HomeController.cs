@@ -65,6 +65,39 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View(e);
         }
 
+        private async Task<SelectList> GetSelectListDepartmentsAsync() {
+            IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
+            if (departments.Count() == 0) {
+                DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
+                await departmentService.CreateAsync(btDto);
+                departments = new List<DepartmentDTO> { btDto };
+            }
+            return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
+        }
+
+        private async Task<SelectList> GetSelectListPostsAsync() {
+            IEnumerable<PostDTO> posts = await postService.GetAllAsync();
+            if (posts.Count() == 0) {
+                PostDTO pDto = new PostDTO { Id = 1, Title = "unknown" };
+                await postService.CreateAsync(pDto);
+                posts = new List<PostDTO> { pDto };
+            }
+            return new SelectList(posts.OrderBy(p => p.Title), "Id", "Title");
+        }
+
+        private EmployeeDTO MapViewModelWithDTO(EmployeeViewModel e) {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
+                cfg.CreateMap<BaseBusinessTripViewModel, BaseBusinessTripDTO>();
+                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
+                   .ForMember(d => d.Employees, opt => opt.Ignore());
+                cfg.CreateMap<PostViewModel, PostDTO>()
+                   .ForMember(p => p.Employees, opt => opt.Ignore());
+            });
+            EmployeeDTO eDto = Mapper.Map<EmployeeViewModel, EmployeeDTO>(e);
+            return eDto;
+        }
+
         // Обновление информации о сотруднике
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
@@ -87,6 +120,36 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View(e);
         }
 
+        private async Task<ActionResult> GetViewAsync(int? id) {
+            try {
+                EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
+                EmployeeViewModel e = MapDTOWithViewModel(eDto);
+                return View(e);
+            }
+            catch (ValidationException ex) {
+                return View("CustomError", (object)ex.Message);
+            }
+        }
+
+        private EmployeeViewModel MapDTOWithViewModel(EmployeeDTO eDto) {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
+                cfg.CreateMap<BaseBusinessTripDTO, BaseBusinessTripViewModel>();
+                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
+                   .ForMember(d => d.Employees, opt => opt.Ignore());
+                cfg.CreateMap<PostDTO, PostViewModel>()
+                   .ForMember(p => p.Employees, opt => opt.Ignore());
+            });
+            EmployeeViewModel e = Mapper.Map<EmployeeDTO, EmployeeViewModel>(eDto);
+            return e;
+        }
+
+        // Подробная информация о сотруднике
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id) {
+            return await GetViewAsync(id);
+        }
+
         // Удаление сотрудника
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(int? id) {
@@ -96,12 +159,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> DeleteConfirmedAsync(int id) {
             await employeeService.DeleteAsync(id);
             return RedirectToAction("Index");
-        }
-
-        // Подробная информация о сотруднике
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
         }
 
         // Удаление всех сотрудников
@@ -196,63 +253,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             postService.Dispose();
             departmentService.Dispose();
             base.Dispose(disposing);
-        }
-
-        // Получение списка отделов
-        private async Task<SelectList> GetSelectListDepartmentsAsync() {
-            IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
-            if (departments.Count() == 0) {
-                DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
-                await departmentService.CreateAsync(btDto);
-                departments = new List<DepartmentDTO> { btDto };
-            }
-            return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
-        }
-
-        // Получение списка должностей
-        private async Task<SelectList> GetSelectListPostsAsync() {
-            IEnumerable<PostDTO> posts = await postService.GetAllAsync();
-            if (posts.Count() == 0) {
-                PostDTO pDto = new PostDTO { Id = 1, Title = "unknown" };
-                await postService.CreateAsync(pDto);
-                posts = new List<PostDTO> { pDto };
-            }
-            return new SelectList(posts.OrderBy(p => p.Title), "Id", "Title");
-        }
-
-        private async Task<ActionResult> GetViewAsync(int? id) {
-            try {
-                EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
-                EmployeeViewModel e = MapDTOWithViewModel(eDto);
-                return View(e);
-            }
-            catch (ValidationException ex) {
-                return View("CustomError", (object)ex.Message);
-            }
-        }
-
-        private EmployeeViewModel MapDTOWithViewModel(EmployeeDTO eDto) {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
-                cfg.CreateMap<BaseBusinessTripDTO, BaseBusinessTripViewModel>();
-                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                   .ForMember(d => d.Employees, opt => opt.Ignore());
-                cfg.CreateMap<PostDTO, PostViewModel>()
-                   .ForMember(p => p.Employees, opt => opt.Ignore());
-            });
-            return Mapper.Map<EmployeeDTO, EmployeeViewModel>(eDto);
-        }
-
-        private EmployeeDTO MapViewModelWithDTO(EmployeeViewModel e) {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
-                cfg.CreateMap<BaseBusinessTripViewModel, BaseBusinessTripDTO>();
-                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
-                   .ForMember(d => d.Employees, opt => opt.Ignore());
-                cfg.CreateMap<PostViewModel, PostDTO>()
-                   .ForMember(p => p.Employees, opt => opt.Ignore());
-            });
-            return Mapper.Map<EmployeeViewModel, EmployeeDTO>(e);
         }
     }
 }

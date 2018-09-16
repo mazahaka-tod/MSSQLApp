@@ -9,68 +9,66 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.BLL.Services
-{
-    public class PostService : BaseService<PostDTO>
-    {
-        IUnitOfWork Database { get; set; }
+namespace DiplomMSSQLApp.BLL.Services {
+    public class PostService : BaseService<PostDTO> {
+        public IUnitOfWork Database { get; set; }
 
-        public PostService(IUnitOfWork uow)
-        {
+        public PostService(IUnitOfWork uow) {
             Database = uow;
         }
 
-        public PostService() {}
+        public PostService() { }
 
-        // Добавление новой должности (с валидацией)
-        public override async Task CreateAsync(PostDTO item)
-        {
-            ValidationPost(item);
-            Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, Post>());
-            Database.Posts.Create(Mapper.Map<PostDTO, Post>(item));
+        // Добавление новой должности
+        public override async Task CreateAsync(PostDTO pDto) {
+            Post post = MapDTOAndDomainModelWithValidation(pDto);
+            Database.Posts.Create(post);
             await Database.SaveAsync();
         }
 
-        // Удаление должности
-        public override async Task DeleteAsync(int id)
-        {
-            Post item = await Database.Posts.FindByIdAsync(id);
-            if (item == null) return;
-            Database.Posts.Remove(item);
-            await Database.SaveAsync();
+        private Post MapDTOAndDomainModelWithValidation(PostDTO pDto) {
+            ValidationPost(pDto);
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<PostDTO, Post>();
+                cfg.CreateMap<EmployeeDTO, Employee>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
+            });
+            Post post = Mapper.Map<PostDTO, Post>(pDto);
+            return post;
         }
 
-        // Удаление всех должностей
-        public override async Task DeleteAllAsync()
-        {
-            await Database.Posts.RemoveAllAsync();
-            await Database.SaveAsync();
-        }
-
-        public override void Dispose()
-        {
-            Database.Dispose();
+        private void ValidationPost(PostDTO pDto) {
+            if (pDto.Title == null)
+                throw new ValidationException("Требуется ввести название должности", "Title");
+            if (pDto.MinSalary != null && pDto.MaxSalary != null && pDto.MinSalary > pDto.MaxSalary)
+                throw new ValidationException("Минимальная зарплата не может быть больше максимальной", "MinSalary");
         }
 
         // Обновление информации о должности
-        public override async Task EditAsync(PostDTO item)
-        {
-            ValidationPost(item);
-            Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, Post>());
-            Database.Posts.Update(Mapper.Map<PostDTO, Post>(item));
+        public override async Task EditAsync(PostDTO pDto) {
+            Post post = MapDTOAndDomainModelWithValidation(pDto);
+            Database.Posts.Update(post);
             await Database.SaveAsync();
         }
 
         // Получение должности по id
-        public override async Task<PostDTO> FindByIdAsync(int? id)
-        {
+        public override async Task<PostDTO> FindByIdAsync(int? id) {
             if (id == null)
                 throw new ValidationException("Не установлено id должности", "");
             Post post = await Database.Posts.FindByIdAsync(id.Value);
             if (post == null)
                 throw new ValidationException("Должность не найдена", "");
+            InitializeMapper();
+            PostDTO pDto = Mapper.Map<Post, PostDTO>(post);
+            return pDto;
+        }
+
+        private void InitializeMapper() {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Post, PostDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
@@ -78,133 +76,183 @@ namespace DiplomMSSQLApp.BLL.Services
                     .ForMember(e => e.Department, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
-            return Mapper.Map<Post, PostDTO>(post);
         }
 
         // Получение списка всех должностей
-        public override async Task<IEnumerable<PostDTO>> GetAllAsync()
-        {
-            Mapper.Initialize(cfg => cfg.CreateMap<Post, PostDTO>()
-                .ForMember(p => p.Employees, opt => opt.Ignore()));
-            List<PostDTO> col = Mapper.Map<IEnumerable<Post>, List<PostDTO>>(await Database.Posts.GetAsync());
-            return col;
+        public override async Task<IEnumerable<PostDTO>> GetAllAsync() {
+            IEnumerable<Post> posts = await Database.Posts.GetAsync();
+            InitializeMapper();
+            IEnumerable<PostDTO> collection = Mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(posts);
+            return collection;
         }
 
-        // Валидация модели
-        private void ValidationPost(PostDTO item)
-        {
-            if (item.Title == null)
-                throw new ValidationException("Требуется ввести название должности", "Title");
-            if (item.MinSalary != null && item.MaxSalary != null && item.MinSalary > item.MaxSalary)
-                throw new ValidationException("Минимальная зарплата не может быть больше максимальной", "MinSalary");
+        // Удаление должности
+        public override async Task DeleteAsync(int id) {
+            Post post = await Database.Posts.FindByIdAsync(id);
+            if (post == null) return;
+            Database.Posts.Remove(post);
+            await Database.SaveAsync();
+        }
+
+        // Удаление всех должностей
+        public override async Task DeleteAllAsync() {
+            await Database.Posts.RemoveAllAsync();
+            await Database.SaveAsync();
         }
 
         // Тест добавления должностей
-        public override async Task TestCreateAsync(int num, string path)
-        {
+        public override async Task TestCreateAsync(int num, string path) {
+            IEnumerable<Post> posts = CreatePostsCollectionForTest(num);
+            string elapsedTime = await RunTestCreateAsync(posts);
+            WriteResultTestCreateInFile(num, elapsedTime, path);
+        }
+
+        private IEnumerable<Post> CreatePostsCollectionForTest(int num) {
             List<Post> posts = new List<Post>();
-            string[] titles = { "Accountant", "Actuary", "Biologist", "Chemist", "Ecologist", "Economist",
-                "Geophysicist", "Investigator", "Meteorologist", "Microbiologist", "Administrator", "Analyst",
-                "Specialist", "Manager", "Statistician", "Team Leader", "Coordinator", "Writer", "Agent",
-                "Outreach", "Educator", "Scientist", "Engineer", "Clerk", "Appraiser", "Intern", "Officer",
-                "Cost Account", "Evaluator", "Technologist" };
-            Stopwatch stopWatch = new Stopwatch();
-            for (int i = 0; i < num; i++)
-            {
-                Post p = new Post
-                {
+            string[] titles = { "Accountant", "Actuary", "Biologist", "Chemist", "Ecologist", "Economist", "Geophysicist", "Investigator", "Meteorologist", "Microbiologist",
+                "Administrator", "Analyst", "Specialist", "Manager", "Statistician", "Team Leader", "Coordinator", "Writer", "Agent", "Outreach", "Educator", "Scientist",
+                "Engineer", "Clerk", "Appraiser", "Intern", "Officer", "Cost Account", "Evaluator", "Technologist" };
+            for (int i = 0; i < num; i++) {
+                Post post = new Post {
                     Title = titles[i % titles.Length],
                     MinSalary = Convert.ToInt32(10000 + Math.Round(new Random(i).NextDouble() * 100) * 400),
                     MaxSalary = Convert.ToInt32(50000 + Math.Round(new Random(i).NextDouble() * 100) * 400)
                 };
-                posts.Add(p);
+                posts.Add(post);
             }
-            Database.Posts.Create(posts);
+            return posts;
+        }
+
+        private async Task<string> RunTestCreateAsync(IEnumerable<Post> posts) {
+            Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
+            Database.Posts.Create(posts);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
-            {
-                sw.WriteLine("Количество должностей: " + num + "; Время: " + elapsedTime);
+            return elapsedTime;
+        }
+
+        private void WriteResultTestCreateInFile(int num, string elapsedTime, string path) {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Количество добавленных должностей: ");
+            sb.Append(num);
+            sb.Append("; Время: ");
+            sb.Append(elapsedTime);
+            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+                sw.WriteLine(sb.ToString());
             }
         }
 
         // Тест выборки должностей
-        public override async Task TestReadAsync(int num, string path, int salary)
-        {
-            var p = await Database.Posts.GetAsync();
-            IEnumerable<Post> result = null;
+        public override async Task TestReadAsync(int num, string path, int salary) {
+            int postsCount = (await Database.Posts.GetAsync()).Count();
+            int resultCount = Database.Posts.Get(salary).Count();
+            string elapsedTime = RunTestRead(num, salary);
+            WriteResultTestReadInFile(postsCount, resultCount, num, salary, elapsedTime, path);
+        }
+
+        private string RunTestRead(int num, int salary) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            for (int i = 0; i < num; i++)
-            {
-                result = Database.Posts.Get(salary);
+            for (int i = 0; i < num; i++) {
+                Database.Posts.Get(salary);
             }
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
-            {
-                sw.WriteLine("Общее количество должностей: " + p.Count() + "; Условие выборки: MaxSalary == 60000; Индекс: нет; Количество найденных должностей: " + result.Count() + "; Количество выборок: " + num + "; Время: " + elapsedTime);
+            return elapsedTime;
+        }
+
+        private void WriteResultTestReadInFile(int postsCount, int resultCount, int num, int salary, string elapsedTime, string path) {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Общее количество должностей: ");
+            sb.Append(postsCount);
+            sb.Append("; Количество найденных должностей: ");
+            sb.Append(resultCount);
+            sb.Append("; Количество выборок: ");
+            sb.Append(num);
+            sb.Append("; Условие выборки: Salary >= ");
+            sb.Append(salary);
+            sb.Append("; Время: ");
+            sb.Append(elapsedTime);
+            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+                sw.WriteLine(sb.ToString());
             }
         }
 
         // Тест обновления должностей
-        public override async Task TestUpdateAsync(int num, string path)
-        {
-            long matchedCount = 0;
-            TimeSpan ts = new TimeSpan();
-            Stopwatch stopWatch = new Stopwatch();
-            //stopWatch.Start();
-            for (int i = 0; i < num; i++)
-            {
-                Post post = Database.Posts.GetFirst();
-                if (post != null)
-                {
-                    post.Title = "Programmer";
-                    post.MinSalary = 10000;
-                    post.MaxSalary = 90000;
+        public override async Task TestUpdateAsync(int num, string path) {
+            Post[] posts = (await Database.Posts.GetAsync()).Take(num).ToArray();
+            int postsLength = posts.Length;
+            string elapsedTime = await RunTestUpdateAsync(posts);
+            WriteResultTestUpdateInFile(postsLength, elapsedTime, path);
+        }
 
-                    stopWatch.Start();
-                    Database.Posts.Update(post);
-                    await Database.SaveAsync();
-                    stopWatch.Stop();
-                    ts = ts.Add(stopWatch.Elapsed);
-                    ++matchedCount;
-                }
+        private async Task<string> RunTestUpdateAsync(Post[] posts) {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            for (int i = 0; i < posts.Length; i++) {
+                posts[i].Title = "Programmer";
+                posts[i].MinSalary = 50000;
+                posts[i].MaxSalary = 190000;
+                Database.Posts.Update(posts[i]);
+                await Database.SaveAsync();
             }
-            //stopWatch.Stop();
-            //TimeSpan ts = stopWatch.Elapsed;
-            ts = new TimeSpan(ts.Ticks / num);
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
-            {
-                sw.WriteLine("Количество замен: " + matchedCount + "; Количество должностей: " + num + "; Время: " + elapsedTime);
+            return elapsedTime;
+        }
+
+        private void WriteResultTestUpdateInFile(int postsLength, string elapsedTime, string path) {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Количество обновленных должностей: ");
+            sb.Append(postsLength);
+            sb.Append("; Время: ");
+            sb.Append(elapsedTime);
+            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+                sw.WriteLine(sb.ToString());
             }
         }
 
         // Тест удаления должностей
-        public override async Task TestDeleteAsync(int num, string path)
-        {
+        public override async Task TestDeleteAsync(int num, string path) {
+            IEnumerable<Post> posts = (await Database.Posts.GetAsync()).Take(num);
+            int postsCount = posts.Count();
+            string elapsedTime = await RunTestDeleteAsync(posts);
+            WriteResultTestDeleteInFile(postsCount, elapsedTime, path);
+        }
+
+        private async Task<string> RunTestDeleteAsync(IEnumerable<Post> posts) {
             Stopwatch stopWatch = new Stopwatch();
-            IEnumerable<Post> posts = await Database.Posts.GetAsync();
-            Database.Posts.RemoveSeries(posts.Take(num));
             stopWatch.Start();
+            Database.Posts.RemoveSeries(posts);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8))
-            {
-                sw.WriteLine("Количество найденных записей: " + posts.Count() + "; Количество должностей: " + num + "; Время: " + elapsedTime);
+            return elapsedTime;
+        }
+
+        private void WriteResultTestDeleteInFile(int postsCount, string elapsedTime, string path) {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Количество удаленных должностей: ");
+            sb.Append(postsCount);
+            sb.Append("; Время: ");
+            sb.Append(elapsedTime);
+            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+                sw.WriteLine(sb.ToString());
             }
         }
 
+        public override void Dispose() {
+            Database.Dispose();
+        }
+
         // Нереализованные методы
-        public override IEnumerable<PostDTO> Get(EmployeeFilter f)
-        {
+        public override IEnumerable<PostDTO> Get(EmployeeFilter f) {
             throw new NotImplementedException();
         }
     }

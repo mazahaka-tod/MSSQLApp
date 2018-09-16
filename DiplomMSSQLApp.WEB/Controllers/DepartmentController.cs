@@ -32,7 +32,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Добавление нового отдела
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
@@ -45,14 +45,35 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View(d);
+        }
+
+        private async Task<SelectList> GetSelectListEmployeesAsync() {
+            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
+            IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
+                                                    Value = e.LastName + " " + e.FirstName,
+                                                    Text = e.LastName + " " + e.FirstName
+                                                }).OrderBy(e => e.Text);
+            return new SelectList(items, "Value", "Text");
+        }
+
+        private DepartmentDTO MapViewModelWithDTO(DepartmentViewModel d) {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>();
+                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Department, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
+            });
+            DepartmentDTO dDto = Mapper.Map<DepartmentViewModel, DepartmentDTO>(d);
+            return dDto;
         }
 
         // Обновление информации об отделе
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return await GetViewAsync(id);
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
@@ -65,62 +86,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Employees = await GetSelectListAsync();
+            ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View(d);
-        }
-
-        // Удаление отдела
-        [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(int? id) {
-            return await GetViewAsync(id);
-        }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public async Task<ActionResult> DeleteConfirmedAsync(int id) {
-            try {
-                await departmentService.DeleteAsync(id);
-            }
-            catch (Exception) {
-                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем работает хотя бы один сотрудник.");
-            }
-            return RedirectToAction("Index");
-        }
-
-        // Подробная информация об отделе
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
-        }
-
-        // Удаление всех отделов
-        public ActionResult DeleteAll() {
-            return View();
-        }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
-        public async Task<ActionResult> DeleteAllAsync() {
-            try {
-                await departmentService.DeleteAllAsync();
-            }
-            catch (Exception) {
-                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем работает хотя бы один сотрудник.");
-            }
-            return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing) {
-            employeeService.Dispose();
-            departmentService.Dispose();
-            base.Dispose(disposing);
-        }
-
-        // Получение списка сотрудников
-        private async Task<SelectList> GetSelectListAsync() {
-            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
-            IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
-                                                             Value = e.LastName + " " + e.FirstName,
-                                                             Text = e.LastName + " " + e.FirstName
-                                                         })
-                                                         .OrderBy(e => e.Text);
-            return new SelectList(items, "Value", "Text");
         }
 
         private async Task<ActionResult> GetViewAsync(int? id) {
@@ -142,18 +109,51 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(e => e.Department, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
-            return Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
+            DepartmentViewModel d = Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
+            return d;
         }
 
-        private DepartmentDTO MapViewModelWithDTO(DepartmentViewModel d) {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>();
-                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
-            });
-            return Mapper.Map<DepartmentViewModel, DepartmentDTO>(d);
+        // Подробная информация об отделе
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(int? id) {
+            return await GetViewAsync(id);
+        }
+
+        // Удаление отдела
+        [ActionName("Delete")]
+        public async Task<ActionResult> DeleteAsync(int? id) {
+            return await GetViewAsync(id);
+        }
+        [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
+        public async Task<ActionResult> DeleteConfirmedAsync(int id) {
+            try {
+                await departmentService.DeleteAsync(id);
+            }
+            catch (Exception) {
+                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем работает хотя бы один сотрудник.");
+            }
+            return RedirectToAction("Index");
+        }
+
+        // Удаление всех отделов
+        public ActionResult DeleteAll() {
+            return View();
+        }
+        [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
+        public async Task<ActionResult> DeleteAllAsync() {
+            try {
+                await departmentService.DeleteAllAsync();
+            }
+            catch (Exception) {
+                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем работает хотя бы один сотрудник.");
+            }
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing) {
+            employeeService.Dispose();
+            departmentService.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

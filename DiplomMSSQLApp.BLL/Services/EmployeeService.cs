@@ -27,7 +27,7 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         public EmployeeService() { }
 
-        // Добавление нового сотрудника (с валидацией)
+        // Добавление нового сотрудника
         public override async Task CreateAsync(EmployeeDTO eDto) {
             Employee employee = await MapDTOAndDomainModelWithValidationAsync(eDto);
             Database.Employees.Create(employee);
@@ -390,11 +390,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task TestUpdateAsync(int num, string path) {
             Employee[] employees = (await Database.Employees.GetAsync()).Take(num).ToArray();
             int employeesLength = employees.Length;
-            string elapsedTime = await RunTestUpdateAsync(employees, num);
+            string elapsedTime = await RunTestUpdateAsync(employees);
             WriteResultTestUpdateInFile(employeesLength, elapsedTime, path);
         }
 
-        private async Task<string> RunTestUpdateAsync(Employee[] employees, int num) {
+        private async Task<string> RunTestUpdateAsync(Employee[] employees) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             for (int i = 0; i < employees.Length; i++) {
