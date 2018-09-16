@@ -44,25 +44,33 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<PostDTO, Post>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
             });
-            return Mapper.Map<EmployeeDTO, Employee>(eDto);
+            Employee employee = Mapper.Map<EmployeeDTO, Employee>(eDto);
+            return employee;
         }
 
-        // Удаление сотрудника
-        public override async Task DeleteAsync(int id) {
-            Employee employee = await Database.Employees.FindByIdAsync(id);
-            if (employee == null) return;
-            Database.Employees.Remove(employee);
-            await Database.SaveAsync();
-        }
-
-        // Удаление всех сотрудников
-        public override async Task DeleteAllAsync() {
-            await Database.Employees.RemoveAllAsync();
-            await Database.SaveAsync();
-        }
-
-        public override void Dispose() {
-            Database.Dispose();
+        private async Task ValidationEmployeeAsync(EmployeeDTO item) {
+            if (item.LastName == null)
+                throw new ValidationException("Требуется ввести фамилию", "LastName");
+            if (item.FirstName == null)
+                throw new ValidationException("Требуется ввести имя", "FirstName");
+            if (item.Email != null) {
+                try {
+                    MailAddress m = new MailAddress(item.Email);
+                }
+                catch (FormatException) {
+                    throw new ValidationException("Некорректный email", "Email");
+                }
+            }
+            Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
+            if (post == null)
+                throw new ValidationException("Должность не найдена", "");
+            if (item.Salary != null && post?.MinSalary != null && item.Salary < post.MinSalary)
+                throw new ValidationException("Зарплата должна быть больше " + post.MinSalary, "Salary");
+            if (item.Salary != null && post?.MaxSalary != null && item.Salary > post.MaxSalary)
+                throw new ValidationException("Зарплата должна быть меньше " + post.MaxSalary, "Salary");
+            Department department = await Database.Departments.FindByIdAsync(item.DepartmentId ?? 0);
+            if (department == null)
+                throw new ValidationException("Отдел не найден", "");
         }
 
         // Обновление информации о сотруднике
@@ -80,16 +88,36 @@ namespace DiplomMSSQLApp.BLL.Services {
             if (employee == null)
                 throw new ValidationException("Сотрудник не найден", "");
             InitializeMapper();
-            return Mapper.Map<Employee, EmployeeDTO>(employee);
+            EmployeeDTO eDto = Mapper.Map<Employee, EmployeeDTO>(employee);
+            return eDto;
+        }
+
+        private void InitializeMapper() {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<Employee, EmployeeDTO>();
+                cfg.CreateMap<BusinessTrip, BaseBusinessTripDTO>();
+                cfg.CreateMap<Department, DepartmentDTO>()
+                    .ForMember(d => d.Employees, opt => opt.Ignore());
+                cfg.CreateMap<Post, PostDTO>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
+            });
+        }
+
+        // Получение списка всех сотрудников
+        public override async Task<IEnumerable<EmployeeDTO>> GetAllAsync() {
+            IEnumerable<Employee> employees = await Database.Employees.GetAsync();
+            InitializeMapper();
+            IEnumerable<EmployeeDTO> collection = Mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeDTO>>(employees);
+            return collection;
         }
 
         // Получение списка сотрудников по фильтру
         public override IEnumerable<EmployeeDTO> Get(EmployeeFilter filter) {
             Func<Employee, bool> predicate = CreatePredicate(filter);
             CreateMessageAboutFilterParametersUsed(filter);
-            IEnumerable<Employee> sortedCollection = FilterAndSortEmployees(filter, predicate);
+            IEnumerable<Employee> filteredSortedCollection = FilterAndSortEmployees(filter, predicate);
             InitializeMapper();
-            List<EmployeeDTO> collection = Mapper.Map<IEnumerable<Employee>, List<EmployeeDTO>>(sortedCollection);
+            IEnumerable<EmployeeDTO> collection = Mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeDTO>>(filteredSortedCollection);
             return collection;
         }
 
@@ -200,7 +228,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         private IEnumerable<Employee> FilterAndSortEmployees(EmployeeFilter filter, Func<Employee, bool> predicate) {
-            IEnumerable<Employee> sortedCollection;
+            IEnumerable<Employee> filteredSortedCollection;
             // Параметры сортировки
             string sortField = filter.SortField ?? "Default";
             string order = filter.SortOrder ?? "Asc";
@@ -209,22 +237,22 @@ namespace DiplomMSSQLApp.BLL.Services {
             IComparer<double?> doubleNullableComparer = Comparer<double?>.Create((x, y) => order.Equals("Asc") ? (x ?? 0).CompareTo(y ?? 0) : (y ?? 0).CompareTo(x ?? 0));
             IComparer<DateTime> dateTimeComparer = Comparer<DateTime>.Create((x, y) => order.Equals("Asc") ? x.CompareTo(y) : y.CompareTo(x));
             switch (sortField) {
-                case "LastName": sortedCollection = SortByLastName(predicate, stringComparer); break;
-                case "Email": sortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Email, stringComparer); break;
-                case "HireDate": sortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.HireDate, dateTimeComparer); break;
-                case "Salary": sortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Salary, doubleNullableComparer); break;
-                case "Bonus": sortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Bonus, doubleNullableComparer); break;
-                case "PostTitle": sortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Post.Title, stringComparer); break;
-                case "DepartmentName": sortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Department.DepartmentName, stringComparer); break;
-                default: sortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.LastName); break;
+                case "LastName": filteredSortedCollection = SortByLastName(predicate, stringComparer); break;
+                case "Email": filteredSortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Email, stringComparer); break;
+                case "HireDate": filteredSortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.HireDate, dateTimeComparer); break;
+                case "Salary": filteredSortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Salary, doubleNullableComparer); break;
+                case "Bonus": filteredSortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Bonus, doubleNullableComparer); break;
+                case "PostTitle": filteredSortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Post.Title, stringComparer); break;
+                case "DepartmentName": filteredSortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.Department.DepartmentName, stringComparer); break;
+                default: filteredSortedCollection = Database.Employees.Get(predicate).OrderBy(e => e.LastName); break;
             }
-            return sortedCollection;
+            return filteredSortedCollection;
         }
 
         private IEnumerable<Employee> SortByLastName(Func<Employee, bool> predicate, IComparer<string> stringComparer) {
-            IEnumerable<Employee> sortedCollection = SortByLastNameWithTimeMeasurement(predicate, stringComparer);
+            IEnumerable<Employee> filteredSortedCollection = SortByLastNameWithTimeMeasurement(predicate, stringComparer);
             WriteMessageAndElapsedTimeInFile();
-            return sortedCollection;
+            return filteredSortedCollection;
         }
 
         private IEnumerable<Employee> SortByLastNameWithTimeMeasurement(Func<Employee, bool> predicate, IComparer<string> stringComparer) {
@@ -239,43 +267,28 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         private void WriteMessageAndElapsedTimeInFile() {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Используемые параметры фильтра: ");
+            sb.Append(MessageAboutFilterParametersUsed);
+            sb.Append("Время: ");
+            sb.Append(ElapsedTime);
             using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
-                sw.WriteLine("Используемые параметры фильтра: " + MessageAboutFilterParametersUsed + "Время: " + ElapsedTime);
+                sw.WriteLine(sb.ToString());
             }
         }
 
-        // Получение списка всех сотрудников
-        public override async Task<IEnumerable<EmployeeDTO>> GetAllAsync() {
-            IEnumerable<Employee> employees = await Database.Employees.GetAsync();
-            InitializeMapper();
-            IEnumerable<EmployeeDTO> collection = Mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeDTO>>(employees);
-            return collection;
+        // Удаление сотрудника
+        public override async Task DeleteAsync(int id) {
+            Employee employee = await Database.Employees.FindByIdAsync(id);
+            if (employee == null) return;
+            Database.Employees.Remove(employee);
+            await Database.SaveAsync();
         }
 
-        // Валидация модели
-        private async Task ValidationEmployeeAsync(EmployeeDTO item) {
-            if (item.LastName == null)
-                throw new ValidationException("Требуется ввести фамилию", "LastName");
-            if (item.FirstName == null)
-                throw new ValidationException("Требуется ввести имя", "FirstName");
-            if (item.Email != null) {
-                try {
-                    MailAddress m = new MailAddress(item.Email);
-                }
-                catch (FormatException) {
-                    throw new ValidationException("Некорректный email", "Email");
-                }
-            }
-            Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
-            if (post == null)
-                throw new ValidationException("Должность не найдена", "");
-            if (item.Salary != null && post?.MinSalary != null && item.Salary < post.MinSalary)
-                throw new ValidationException("Зарплата должна быть больше " + post.MinSalary, "Salary");
-            if (item.Salary != null && post?.MaxSalary != null && item.Salary > post.MaxSalary)
-                throw new ValidationException("Зарплата должна быть меньше " + post.MaxSalary, "Salary");
-            Department department = await Database.Departments.FindByIdAsync(item.DepartmentId ?? 0);
-            if (department == null)
-                throw new ValidationException("Отдел не найден", "");
+        // Удаление всех сотрудников
+        public override async Task DeleteAllAsync() {
+            await Database.Employees.RemoveAllAsync();
+            await Database.SaveAsync();
         }
 
         // Тест добавления сотрудников
@@ -443,15 +456,8 @@ namespace DiplomMSSQLApp.BLL.Services {
             }
         }
 
-        private void InitializeMapper() {
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<Employee, EmployeeDTO>();
-                cfg.CreateMap<BusinessTrip, BaseBusinessTripDTO>();
-                cfg.CreateMap<Department, DepartmentDTO>()
-                    .ForMember(d => d.Employees, opt => opt.Ignore());
-                cfg.CreateMap<Post, PostDTO>()
-                    .ForMember(p => p.Employees, opt => opt.Ignore());
-            });
+        public override void Dispose() {
+            Database.Dispose();
         }
     }
 }

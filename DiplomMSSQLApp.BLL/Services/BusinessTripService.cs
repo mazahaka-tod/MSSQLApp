@@ -40,8 +40,13 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         private void InitializeMapperDTO() {
-            Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTrip>()
-                                        .ForMember(bt => bt.Employees, opt => opt.Ignore()));
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<BusinessTripDTO, BusinessTrip>();
+                cfg.CreateMap<EmployeeDTO, Employee>()
+                   .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                   .ForMember(e => e.Department, opt => opt.Ignore())
+                   .ForMember(e => e.Post, opt => opt.Ignore());
+            });
         }
 
         private async Task AddEmployeesOnBusinessTripAsync(BusinessTrip bt, int[] ids) {
