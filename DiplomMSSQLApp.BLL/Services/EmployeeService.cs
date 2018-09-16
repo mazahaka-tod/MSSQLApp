@@ -239,7 +239,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         private void WriteMessageAndElapsedTimeInFile() {
-            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, System.Text.Encoding.UTF8)) {
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine("Используемые параметры фильтра: " + MessageAboutFilterParametersUsed + "Время: " + ElapsedTime);
             }
         }
@@ -292,8 +292,8 @@ namespace DiplomMSSQLApp.BLL.Services {
             string[] firstNames = { "James", "Alex", "Ben", "Daniel", "Tom", "Ryan", "Sam", "Lewis", "Joe", "David", "Harry", "George", "Jamie", "Dan", "Matt", "Robert" };
             string[] emails = { "@mail.ru", "@yandex.ru", "@gmail.com" };
             double[] bonuses = { 0.05, 0.1, 0.15, 0.2 };
-            Post firstPost = Database.Posts.GetFirst() ?? new Post();
-            Department firstDepartment = Database.Departments.GetFirst() ?? new Department();
+            Post firstPost = Database.Posts.GetFirst() ?? new Post { Id = 1, Title = "unknown" };
+            Department firstDepartment = Database.Departments.GetFirst() ?? new Department { Id = 1, DepartmentName = "unknown" };
             for (int i = 0; i < num; i++) {
                 Employee employee = new Employee {
                     LastName = lastNames[i % lastNames.Length],

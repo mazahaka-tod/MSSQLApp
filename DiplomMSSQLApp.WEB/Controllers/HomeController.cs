@@ -201,12 +201,22 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Получение списка отделов
         private async Task<SelectList> GetSelectListDepartmentsAsync() {
             IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
+            if (departments.Count() == 0) {
+                DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
+                await departmentService.CreateAsync(btDto);
+                departments = new List<DepartmentDTO> { btDto };
+            }
             return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
         }
 
         // Получение списка должностей
         private async Task<SelectList> GetSelectListPostsAsync() {
             IEnumerable<PostDTO> posts = await postService.GetAllAsync();
+            if (posts.Count() == 0) {
+                PostDTO pDto = new PostDTO { Id = 1, Title = "unknown" };
+                await postService.CreateAsync(pDto);
+                posts = new List<PostDTO> { pDto };
+            }
             return new SelectList(posts.OrderBy(p => p.Title), "Id", "Title");
         }
 
