@@ -7,19 +7,25 @@
 
 <h2>Список сотрудников</h2>
 <hr />
-<p>
-    <details>
-        <summary><span style="font-size:large"><b><ins>С хорошим настроением лучше работается</ins></b></span></summary>
-        <img src=@Url.Content("~/Content/Animations/TheBest.gif") alt="" />
+
+<div>
+    <div id="animationToggle" class="btn btn-default">
+        С хорошим настроением лучше работается (Показать / Скрыть)
+    </div>
+    <div id="animation" style="display:none;">
+        <img src=@Url.Content("~/Content/Animations/TheBest.gif") alt="TheBest" style="margin:10px;" />
         <div>Лучший:)</div>
-    </details>
-</p>
+    </div>
+</div>
+
 <hr />
-<p>
-    <details>
-        <summary><span style="font-size:large"><b><ins>Поиск по фильтру</ins></b></span></summary>
-        @using (Html.BeginForm("Index", "Home"))
-        {
+
+<div>
+    <div id="filterToggle" class="btn btn-default">
+        Поиск по фильтру (Показать / Скрыть)
+    </div>
+    <div id="filter" style="display:none;">
+        @using (Html.BeginForm("Index", "Home")) {
             <table>
                 <tr>
                     <td>
@@ -32,6 +38,7 @@
                                     @Html.TextBox("LastName", null, new { @class = "form-control" })
                                 </span>
                                 @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "LastName" }, new AjaxOptions { UpdateTargetId = "lastname", InsertionMode = InsertionMode.InsertAfter })
+                                <a>Добавить поле</a>
                                 <br />
                                 @Html.CheckBox("IsMatchAnyLastName", new { style = "margin-bottom: 12px" })
                                 @Html.Label("IsMatchAnyLastName", "Минимум одно соответствие")
@@ -159,106 +166,109 @@
                 </tr>
             </table>
         }
-    </details>
-</p>
+    </div>
+</div>
+
 <hr />
-<details>
-    <summary><span style="font-size:large"><b><ins>Тесты производительности</ins></b></span></summary>
-    <p>
-        @using (Html.BeginForm("TestCreate", "Home"))
-        {
-            <div class="form-horizontal">
-                <h4>@Html.Label("Test", "Тест добавления сотрудников")</h4>
 
-                <div class="form-group">
-                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <input type="number" value=10 name="num" class="form-control" />
+<div>
+    <div id="performanceTestsToggle" class="btn btn-default">
+        Тесты производительности (Показать / Скрыть)
+    </div>
+    <div id="performanceTests" style="display:none;">
+        <p>
+            @using (Html.BeginForm("TestCreate", "Home")) {
+                <div class="form-horizontal">
+                    <h4>@Html.Label("Test", "Тест добавления сотрудников")</h4>
+
+                    <div class="form-group">
+                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <input type="number" value=10 name="num" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Добавить" class="btn btn-default" />
+                        </div>
                     </div>
                 </div>
+            }
+        </p>
+        <hr />
+        <p>
+            @using (Html.BeginForm("TestRead", "Home")) {
+                <div class="form-horizontal">
+                    <h4>@Html.Label("Test", "Тест выборки сотрудников")</h4>
 
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Добавить" class="btn btn-default" />
+                    <div class="form-group">
+                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <input type="number" value=10 name="num" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Salary", "Salary >= ", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <input type="number" value=50000 name="salary" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Выбрать" class="btn btn-default" />
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    </p>
-    <hr />
-    <p>
-        @using (Html.BeginForm("TestRead", "Home"))
-        {
-            <div class="form-horizontal">
-                <h4>@Html.Label("Test", "Тест выборки сотрудников")</h4>
+            }
+        </p>
+        <hr />
+        <p>
+            @using (Html.BeginForm("TestUpdate", "Home")) {
+                <div class="form-horizontal">
+                    <h4>@Html.Label("Test", "Тест обновления сотрудников")</h4>
 
-                <div class="form-group">
-                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <input type="number" value=10 name="num" class="form-control" />
+                    <div class="form-group">
+                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <input type="number" value=10 name="num" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Обновить" class="btn btn-default" />
+                        </div>
                     </div>
                 </div>
+            }
+        </p>
+        <hr />
+        <p>
+            @using (Html.BeginForm("TestDelete", "Home")) {
+                <div class="form-horizontal">
+                    <h4>@Html.Label("Test", "Тест удаления сотрудников")</h4>
 
-                <div class="form-group">
-                    @Html.Label("Salary", "Salary >= ", htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <input type="number" value=50000 name="salary" class="form-control" />
+                    <div class="form-group">
+                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <input type="number" value=10 name="num" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Удалить" class="btn btn-default" />
+                        </div>
                     </div>
                 </div>
+            }
+        </p>
+    </div>
+</div>
 
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Выбрать" class="btn btn-default" />
-                    </div>
-                </div>
-            </div>
-        }
-    </p>
-    <hr />
-    <p>
-        @using (Html.BeginForm("TestUpdate", "Home"))
-        {
-            <div class="form-horizontal">
-                <h4>@Html.Label("Test", "Тест обновления сотрудников")</h4>
-
-                <div class="form-group">
-                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <input type="number" value=10 name="num" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Обновить" class="btn btn-default" />
-                    </div>
-                </div>
-            </div>
-        }
-    </p>
-    <hr />
-    <p>
-        @using (Html.BeginForm("TestDelete", "Home"))
-        {
-            <div class="form-horizontal">
-                <h4>@Html.Label("Test", "Тест удаления сотрудников")</h4>
-
-                <div class="form-group">
-                    @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <input type="number" value=10 name="num" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Удалить" class="btn btn-default" />
-                    </div>
-                </div>
-            </div>
-        }
-    </p>
-</details>
 <hr />
 <p>
     @Html.ActionLink("Добавить сотрудника", "Create", null, new { @class = "btn btn-default" })
@@ -403,7 +413,6 @@
 </div>
 
 @section scripts {
-    @Scripts.Render("~/scripts/jquery.unobtrusive-ajax.min.js")
     <script>
     // Устанавлеваем checkbox, textbox и dropdownlist на форме поиска
     $(document).ready(function() {
@@ -467,5 +476,17 @@
         $('select#SortField option[value="@Model.Filter.SortField"]').prop('selected', true);
         $('select#SortOrder option[value="@Model.Filter.SortOrder"]').prop('selected', true);
     });
+    </script>
+
+    <script>
+        $('#animationToggle').click(function () {
+            $('#animation').toggle("slow");
+        });
+        $('#filterToggle').click(function () {
+            $('#filter').toggle("slow");
+        });
+        $('#performanceTestsToggle').click(function () {
+            $('#performanceTests').toggle("slow");
+        });
     </script>
 }

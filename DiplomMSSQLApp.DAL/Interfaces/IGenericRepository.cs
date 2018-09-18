@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.DAL.Interfaces
-{
-    public interface IGenericRepository<TEntity> where TEntity : class
-    {
+namespace DiplomMSSQLApp.DAL.Interfaces {
+    public interface IGenericRepository<TEntity> where TEntity : class {
         void Create(TEntity item);                                      // Добавление элемента
         void Create(IEnumerable<TEntity> items);                        // Добавление последовательности элементов
         Task<TEntity> FindByIdAsync(int id);                            // Поиск по id

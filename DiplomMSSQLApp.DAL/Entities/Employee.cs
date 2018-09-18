@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DiplomMSSQLApp.DAL.Entities
-{
-    public class Employee
-    {
+namespace DiplomMSSQLApp.DAL.Entities {
+    public class Employee {
         public int Id { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
@@ -20,8 +18,7 @@ namespace DiplomMSSQLApp.DAL.Entities
         public Department Department { get; set; }
         public virtual ICollection<BusinessTrip> BusinessTrips { get; set; }
 
-        public Employee()
-        {
+        public Employee() {
             BusinessTrips = new List<BusinessTrip>();
         }
     }

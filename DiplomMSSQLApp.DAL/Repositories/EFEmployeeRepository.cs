@@ -5,37 +5,30 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.DAL.Repositories
-{
-    public class EFEmployeeRepository : EFGenericRepository<Employee>
-    {
+namespace DiplomMSSQLApp.DAL.Repositories {
+    public class EFEmployeeRepository : EFGenericRepository<Employee> {
         private DbSet<Employee> _dbSet;
 
-        public EFEmployeeRepository(DbContext context) : base(context)
-        {
+        public EFEmployeeRepository(DbContext context) : base(context) {
             _dbSet = context.Set<Employee>();
         }
 
-        public override async Task<Employee> FindByIdAsync(int id)
-        {
+        public override async Task<Employee> FindByIdAsync(int id) {
             return await _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public override IEnumerable<Employee> Get(int salary)
-        {
+        public override IEnumerable<Employee> Get(int salary) {
             return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary >= salary).ToList();
         }
 
-        public override IEnumerable<Employee> Get(bool flag)
-        {
+        public override IEnumerable<Employee> Get(bool flag) {
             if (flag)
                 return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary > 50000).ToList();
             else
                 return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(e => e.Salary <= 50000).ToList();
         }
 
-        public override IEnumerable<Employee> Get(Func<Employee, bool> predicate)
-        {
+        public override IEnumerable<Employee> Get(Func<Employee, bool> predicate) {
             return _dbSet.Include(e => e.Department).Include(e => e.Post).Where(predicate).ToList();
         }
 
@@ -43,9 +36,8 @@ namespace DiplomMSSQLApp.DAL.Repositories
             return await _dbSet.Include(e => e.Department).Include(e => e.Post).ToListAsync();
         }
 
-        public override Employee GetFirst()
-        {
-            return _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefault(e => e.Salary < 50000);
+        public override Employee GetFirst() {
+            return _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefault();
         }
     }
 }

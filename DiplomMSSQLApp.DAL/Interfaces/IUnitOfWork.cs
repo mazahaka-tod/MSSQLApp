@@ -2,10 +2,8 @@
 using System;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.DAL.Interfaces
-{
-    public interface IUnitOfWork : IDisposable
-    {
+namespace DiplomMSSQLApp.DAL.Interfaces {
+    public interface IUnitOfWork : IDisposable {
         IGenericRepository<BusinessTrip> BusinessTrips { get; }
         IGenericRepository<Department> Departments { get; }
         IGenericRepository<Employee> Employees { get; }
