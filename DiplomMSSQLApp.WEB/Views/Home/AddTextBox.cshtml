@@ -1,4 +1,7 @@
 ﻿@{
     string name = ViewBag.Name;
+    string maxlen = "5";    // Максимальная длина для премии
 }
-@Html.TextBox(name, null, new { @class = "form-control", style = "margin-top: 6px" })
+@if (name == "LastName") { maxlen = "15"; }     @*Максимальная длина для фамилии*@
+@Html.TextBox(name, null, new { @class = "form-control", style = "margin-top: 6px", maxlength = maxlen })
+<span style="color:red;"></span>

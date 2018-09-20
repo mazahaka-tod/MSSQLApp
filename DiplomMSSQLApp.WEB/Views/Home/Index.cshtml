@@ -31,89 +31,100 @@
                     <td>
                         <dl class="dl-horizontal">
                             <dt>
-                                @Html.Label("LastName", "Фамилия")
+                                @Html.LabelFor(m => m.Filter.LastName, "Фамилия")
                             </dt>
                             <dd>
-                                <span id="lastname">
-                                    @Html.TextBox("LastName", null, new { @class = "form-control" })
+                                <span id="lname">
+                                    @Html.TextBoxFor(m => m.Filter.LastName, null, new { @class = "form-control", maxlength = "15" })
+                                    <span style="color:red;"></span>
                                 </span>
-                                @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "LastName" }, new AjaxOptions { UpdateTargetId = "lastname", InsertionMode = InsertionMode.InsertAfter })
-                                <a>Добавить поле</a>
-                                <br />
-                                @Html.CheckBox("IsMatchAnyLastName", new { style = "margin-bottom: 12px" })
-                                @Html.Label("IsMatchAnyLastName", "Минимум одно соответствие")
+                                <div>
+                                    @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "LastName" }, new AjaxOptions { UpdateTargetId = "lname", InsertionMode = InsertionMode.InsertAfter })
+                                </div>
+                                @Html.CheckBoxFor(m => m.Filter.IsMatchAnyLastName, new { style = "margin-bottom: 12px" })
+                                @Html.LabelFor(m => m.Filter.IsMatchAnyLastName, "Минимум одно соответствие")
                             </dd>
 
                             <dt>
-                                @Html.Label("Email", "Email")
+                                @Html.LabelFor(m => m.Filter.Email, "Email", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
-                                @Html.TextBox("Email", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.TextBoxFor(m => m.Filter.Email, null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "15" })
+                                <span style="color:red;"></span>
                             </dd>
 
                             <dt>
                                 @Html.Label("Phone", "Телефон")
                             </dt>
                             <dd>
-                                @Html.CheckBox("IsPhoneNumber", new { style = "margin-bottom: 12px" })
-                                @Html.Label("IsPhoneNumber", "Есть телефон")
+                                @Html.CheckBoxFor(m => m.Filter.IsPhoneNumber, new { style = "margin-bottom: 12px" })
+                                @Html.LabelFor(m => m.Filter.IsPhoneNumber, "Есть телефон")
                             </dd>
 
                             <dt>
-                                @Html.Label("HireDate", "Дата найма на работу:")
+                                @Html.LabelFor(m => m.Filter.HireDate, "Дата найма на работу", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
-                                @Html.TextBox("HireDate", null, new { @class = "form-control", style = "margin-bottom: 12px", placeholder = "yyyy-mm-dd" })
+                                @Html.TextBoxFor(m => m.Filter.HireDate, null, new { @class = "form-control", style = "margin-top: 12px", placeholder = "yyyy-mm-dd", maxlength = "11" })
+                                <span style="color:red;"></span>
                             </dd>
 
                             <dt>
-                                @Html.Label("MinSalary", "Зарплата от ")
+                                @Html.LabelFor(m => m.Filter.MinSalary, "Зарплата от ", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
-                                @Html.TextBox("MinSalary", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.TextBoxFor(m => m.Filter.MinSalary, null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "9" })
+                                <span style="color:red;"></span>
                             </dd>
 
                             <dt>
-                                @Html.Label("MaxSalary", " до ")
+                                @Html.LabelFor(m => m.Filter.MaxSalary, " до ", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
-                                @Html.TextBox("MaxSalary", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.TextBoxFor(m => m.Filter.MaxSalary, null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "9" })
+                                <span style="color:red;"></span>
                             </dd>
 
                             <dt>
-                                @Html.Label("Bonus", "Премия")
+                                @Html.LabelFor(m => m.Filter.Bonus, "Премия", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
-                                <span id="bonus">@Html.TextBox("Bonus", null, new { @class = "form-control" })</span>
-                                @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "Bonus" }, new AjaxOptions { UpdateTargetId = "bonus", InsertionMode = InsertionMode.InsertAfter })
-                                <br />
-                                @Html.CheckBox("IsBonus", new { style = "margin-bottom: 12px" })
-                                @Html.Label("IsBonus", "Есть премия")
+                                <span id="bns">
+                                    @Html.TextBoxFor(m => m.Filter.Bonus, null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "5" })
+                                    <span style="color:red;"></span>
+                                </span>
+                                <div>
+                                    @Ajax.ActionLink("Добавить поле", "AddTextBox", new { name = "Bonus" }, new AjaxOptions { UpdateTargetId = "bns", InsertionMode = InsertionMode.InsertAfter })
+                                </div>
+                                @Html.CheckBoxFor(m => m.Filter.IsBonus, new { style = "margin-bottom: 12px" })
+                                @Html.LabelFor(m => m.Filter.IsBonus, "Есть премия")
                             </dd>
 
                             <dt>
-                                @Html.Label("PostTitle", "Должность")
+                                @Html.LabelFor(m => m.Filter.PostTitle, "Должность", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
-                                @Html.TextBox("PostTitle", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.TextBoxFor(m => m.Filter.PostTitle, null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "12" })
+                                <span style="color:red;"></span>
                             </dd>
 
                             <dt>
-                                @Html.Label("DepartmentName", "Название отдела")
+                                @Html.LabelFor(m => m.Filter.DepartmentName, "Название отдела", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
-                                @Html.TextBox("DepartmentName", null, new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.TextBoxFor(m => m.Filter.DepartmentName, null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "12" })
+                                <span style="color:red;"></span>
                             </dd>
                         </dl>
                     </td>
-                    <td>
+                    <td valign="top">
                         <dl class="dl-horizontal">
                             <dt>
                                 @Html.Label("Sort", "Сортировка")
                             </dt>
                             <dd>
-                                @Html.DropDownList("SortField", new SelectList(new[] { new { label = "По фамилии сотрудника", value = "LastName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
-                                @Html.DropDownList("SortOrder", new SelectList(new[] { new { label = "По возрастанию", value = "Asc" }, new { label = "По убыванию", value = "Desc" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownListFor(m => m.Filter.SortField, new SelectList(new[] { new { label = "По фамилии сотрудника", value = "LastName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownListFor(m => m.Filter.SortOrder, new SelectList(new[] { new { label = "По возрастанию", value = "Asc" }, new { label = "По убыванию", value = "Desc" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
                             </dd>
 
                             <dt>
@@ -121,39 +132,39 @@
                             </dt>
                             <dd>
                                 <input type="checkbox" id="Columns0" name="Columns" value="0" checked>
-                                @Html.Label("Columns", "Фамилия сотрудника")
+                                @Html.Label("Columns0", "Фамилия сотрудника")
                                 <br />
                                 <input type="checkbox" id="Columns1" name="Columns" value="1" checked>
-                                @Html.Label("Columns", "Имя сотрудника")
+                                @Html.Label("Columns1", "Имя сотрудника")
                                 <br />
                                 <input type="checkbox" id="Columns2" name="Columns" value="2" checked>
-                                @Html.Label("Columns", "Email")
+                                @Html.Label("Columns2", "Email")
                                 <br />
                                 <input type="checkbox" id="Columns3" name="Columns" value="3" checked>
-                                @Html.Label("Columns", "Телефон")
+                                @Html.Label("Columns3", "Телефон")
                                 <br />
                                 <input type="checkbox" id="Columns4" name="Columns" value="4" checked>
-                                @Html.Label("Columns", "Дата приема на работу")
+                                @Html.Label("Columns4", "Дата приема на работу")
                                 <br />
                                 <input type="checkbox" id="Columns5" name="Columns" value="5" checked>
-                                @Html.Label("Columns", "Зарплата")
+                                @Html.Label("Columns5", "Зарплата")
                                 <br />
                                 <input type="checkbox" id="Columns6" name="Columns" value="6" checked>
-                                @Html.Label("Columns", "Премия")
+                                @Html.Label("Columns6", "Премия")
                                 <br />
                                 <input type="checkbox" id="Columns7" name="Columns" value="7" checked>
-                                @Html.Label("Columns", "Должность")
+                                @Html.Label("Columns7", "Должность")
                                 <br />
                                 <input type="checkbox" id="Columns8" name="Columns" value="8" checked>
-                                @Html.Label("Columns", "Название отдела")
+                                @Html.Label("Columns8", "Название отдела")
                             </dd>
 
                             <dt>
                                 @Html.Label("AntiFilter", "Несоответствующие фильтру")
                             </dt>
                             <dd>
-                                @Html.CheckBox("IsAntiFilter", new { style = "margin-bottom: 12px" })
-                                @Html.Label("IsAntiFilter", "Да")
+                                @Html.CheckBoxFor(m => m.Filter.IsAntiFilter, new { style = "margin-bottom: 12px" })
+                                @Html.LabelFor(m => m.Filter.IsAntiFilter, "Да")
                             </dd>
 
                             <dt>
@@ -276,60 +287,50 @@
     @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
 </p>
 
-@if (Model.Employees.Count() > 0)
-{
+@if (Model.Employees.Count() > 0) {
     <table class="table table-striped table-hover">
         <tr>
-            @if (Model.Filter.Columns.Contains("0"))
-            {
+            @if (Model.Filter.Columns.Contains("0")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).LastName)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("1"))
-            {
+            @if (Model.Filter.Columns.Contains("1")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).FirstName)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("2"))
-            {
+            @if (Model.Filter.Columns.Contains("2")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Email)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("3"))
-            {
+            @if (Model.Filter.Columns.Contains("3")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).PhoneNumber)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("4"))
-            {
+            @if (Model.Filter.Columns.Contains("4")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).HireDate)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("5"))
-            {
+            @if (Model.Filter.Columns.Contains("5")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Salary)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("6"))
-            {
+            @if (Model.Filter.Columns.Contains("6")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Bonus)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("7"))
-            {
+            @if (Model.Filter.Columns.Contains("7")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Post.Title)
                 </th>
             }
-            @if (Model.Filter.Columns.Contains("8"))
-            {
+            @if (Model.Filter.Columns.Contains("8")) {
                 <th>
                     @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Department.DepartmentName)
                 </th>
@@ -337,59 +338,49 @@
             <th></th>
         </tr>
 
-        @foreach (var item in Model.Employees)
-        {
+        @foreach (var item in Model.Employees) {
             <tr>
-                @if (Model.Filter.Columns.Contains("0"))
-                {
+                @if (Model.Filter.Columns.Contains("0")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.LastName)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("1"))
-                {
+                @if (Model.Filter.Columns.Contains("1")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.FirstName)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("2"))
-                {
+                @if (Model.Filter.Columns.Contains("2")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.Email)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("3"))
-                {
+                @if (Model.Filter.Columns.Contains("3")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.PhoneNumber)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("4"))
-                {
+                @if (Model.Filter.Columns.Contains("4")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.HireDate)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("5"))
-                {
+                @if (Model.Filter.Columns.Contains("5")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.Salary)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("6"))
-                {
+                @if (Model.Filter.Columns.Contains("6")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.Bonus)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("7"))
-                {
+                @if (Model.Filter.Columns.Contains("7")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.Post.Title)
                     </td>
                 }
-                @if (Model.Filter.Columns.Contains("8"))
-                {
+                @if (Model.Filter.Columns.Contains("8")) {
                     <td>
                         @Html.DisplayFor(modelItem => item.Department.DepartmentName)
                     </td>
@@ -433,7 +424,7 @@
         @{ f = Model.Filter.Columns.Contains("7") ? "true" : "false"; }
         $('#Columns7').prop('checked', @f);
         @{ f = Model.Filter.Columns.Contains("8") ? "true" : "false"; }
-        $('#Columns8').prop('checked', @f);
+        $('#Columns8').prop('checked', @f );
 
         $('#IsMatchAnyLastName').prop('checked', @Model.Filter.IsMatchAnyLastName.ToString().ToLower());
         $('#IsPhoneNumber').prop('checked', @Model.Filter.IsPhoneNumber.ToString().ToLower());
@@ -473,20 +464,32 @@
             @:$('#DepartmentName').prop('value', "@Model.Filter.DepartmentName");
         }
 
-        $('select#SortField option[value="@Model.Filter.SortField"]').prop('selected', true);
-        $('select#SortOrder option[value="@Model.Filter.SortOrder"]').prop('selected', true);
+        $('#SortField option[value="@Model.Filter.SortField"]').prop('selected', true);
+        $('#SortOrder option[value="@Model.Filter.SortOrder"]').prop('selected', true);
     });
     </script>
 
     <script>
         $('#animationToggle').click(function () {
-            $('#animation').toggle("slow");
+            $('#animation').slideToggle("slow");
         });
         $('#filterToggle').click(function () {
-            $('#filter').toggle("slow");
+            $('#filter').slideToggle("slow");
         });
         $('#performanceTestsToggle').click(function () {
-            $('#performanceTests').toggle("slow");
+            $('#performanceTests').slideToggle("slow");
         });
+    </script>
+
+    <script>
+        var handler = function (event) {
+            if ($(this).val().length >= $(this).attr('maxlength'))
+                $(this).next('span').text("Максимально разрешенная длина");
+            else
+                $(this).next('span').text("");
+        };
+        $('#lname').on('input', 'input', handler);
+        $('#bns').on('input', 'input', handler);
+        $('input[type="text"]').on('input', handler);
     </script>
 }
