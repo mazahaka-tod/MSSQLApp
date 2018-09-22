@@ -142,15 +142,15 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Запись информации о должностях в файл
         [ActionName("ExportJson")]
         public async Task<ActionResult> ExportJsonAsync() {
-            string path = Server.MapPath("~/Results/Post/Posts.json");
-            System.IO.File.Delete(path);
+            string fullPath = CreateDirectoryToFile("Posts.json");
+            System.IO.File.Delete(fullPath);
             IEnumerable<PostDTO> pDto = await postService.GetAllAsync();
             var posts = pDto.Select(p => new {
                 p.Title,
                 p.MinSalary,
                 p.MaxSalary
             }).ToArray();
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8)) {
+            using (StreamWriter sw = new StreamWriter(fullPath, true, System.Text.Encoding.UTF8)) {
                 sw.WriteLine("{\"Posts\":[");
                 int postsLength = posts.Length;
                 for (int i = 1; i < postsLength; i++) {
@@ -162,36 +162,44 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return RedirectToAction("Index");
         }
 
+        private string CreateDirectoryToFile(string filename) {
+            string dir = Server.MapPath("~/Results/Post/");
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            string fullPath = dir + filename;
+            return fullPath;
+        }
+
         // Тест добавления сотрудников
         [ActionName("TestCreate")]
         public async Task<ActionResult> TestCreateAsync(int num) {
-            string path = Server.MapPath("~/Results/Post/Create.txt");
-            await postService.TestCreateAsync(num, path);
+            string fullPath = CreateDirectoryToFile("Create.txt");
+            await postService.TestCreateAsync(num, fullPath);
             return RedirectToAction("Index");
         }
 
         // Тест выборки сотрудников
         [ActionName("TestRead")]
         public async Task<ActionResult> TestReadAsync(int num, int salary) {
-            string path = Server.MapPath("~/Results/Post/Read.txt");
-            await postService.TestReadAsync(num, path, salary);
+            string fullPath = CreateDirectoryToFile("Read.txt");
+            await postService.TestReadAsync(num, fullPath, salary);
             return RedirectToAction("Index");
         }
 
         // Тест обновления сотрудников
         [ActionName("TestUpdate")]
         public async Task<ActionResult> TestUpdateAsync(int num) {
-            string path = Server.MapPath("~/Results/Post/Update.txt");
-            await postService.TestUpdateAsync(num, path);
+            string fullPath = CreateDirectoryToFile("Update.txt");
+            await postService.TestUpdateAsync(num, fullPath);
             return RedirectToAction("Index");
         }
 
         // Тест удаления сотрудников
         [ActionName("TestDelete")]
         public async Task<ActionResult> TestDeleteAsync(int num) {
-            string path = Server.MapPath("~/Results/Post/Delete.txt");
+            string fullPath = CreateDirectoryToFile("Delete.txt");
             try {
-                await postService.TestDeleteAsync(num, path);
+                await postService.TestDeleteAsync(num, fullPath);
             }
             catch (Exception) {
                 return View("CustomError", (object)"Нельзя удалить должность, пока в ней работает хотя бы один сотрудник.");

@@ -24,11 +24,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         public ActionResult Index(EmployeeFilter filter, string filterAsJsonString, int page = 1) {
-            // Условие истинно, когда пользователь использует paging,
-            // в этом случае передается строка str, а фильтр EmployeeFilter filter нет,
-            // поэтому производим декодирование строки в объект EmployeeFilter и присваиваем его фильтру filter
-            if (filterAsJsonString != null) filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
-            (employeeService as EmployeeService).PathToFileForTests = Server.MapPath("~/Results/Employee/Filter.txt");
+            // При использовании функции Paging передается строка filterAsJsonString, а аргумент EmployeeFilter filter == null,
+            // поэтому производим декодирование строки filterAsJsonString в объект EmployeeFilter и присваиваем его переменной filter
+            if (filterAsJsonString != null)
+                filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
+            string fullPath = CreateDirectoryToFile("Filter.txt");
+            (employeeService as EmployeeService).PathToFileForTests = fullPath;
             IEnumerable<EmployeeDTO> eDto = employeeService.Get(filter);
             eDto = employeeService.GetPage(eDto, page);     // Paging
             Mapper.Initialize(cfg => {
@@ -41,6 +42,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             });
             IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
             return View(new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo });
+        }
+
+        private string CreateDirectoryToFile(string filename) {
+            string dir = Server.MapPath("~/Results/Employee/");
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            string fullPath = dir + filename;
+            return fullPath;
         }
 
         // Добавление нового сотрудника
@@ -174,8 +183,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Запись информации о сотрудниках в файл
         [ActionName("ExportJson")]
         public async Task<ActionResult> ExportJsonAsync() {
-            string path = Server.MapPath("~/Results/Employee/Employees.json");
-            System.IO.File.Delete(path);
+            string fullPath = CreateDirectoryToFile("Employees.json");
+            System.IO.File.Delete(fullPath);
             IEnumerable<EmployeeDTO> eDto = await employeeService.GetAllAsync();
             var employees = eDto.Select(e => new {
                 e.LastName,
@@ -190,7 +199,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 Department = e.Department.DepartmentName,
                 BusinessTrips = e.BusinessTrips.Select(bt => bt.Name)
             }).ToArray();
-            using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8)) {
+            using (StreamWriter sw = new StreamWriter(fullPath, true, System.Text.Encoding.UTF8)) {
                 sw.WriteLine("{\"Employees\":[");
                 int employeesLength = employees.Length;
                 for (int i = 1; i < employeesLength; i++) {
@@ -205,32 +214,32 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Тест добавления сотрудников
         [ActionName("TestCreate")]
         public async Task<ActionResult> TestCreateAsync(int num) {
-            string path = Server.MapPath("~/Results/Employee/Create.txt");
-            await employeeService.TestCreateAsync(num, path);
+            string fullPath = CreateDirectoryToFile("Create.txt");
+            await employeeService.TestCreateAsync(num, fullPath);
             return RedirectToAction("Index");
         }
 
         // Тест выборки сотрудников
         [ActionName("TestRead")]
         public async Task<ActionResult> TestReadAsync(int num, int salary) {
-            string path = Server.MapPath("~/Results/Employee/Read.txt");
-            await employeeService.TestReadAsync(num, path, salary);
+            string fullPath = CreateDirectoryToFile("Read.txt");
+            await employeeService.TestReadAsync(num, fullPath, salary);
             return RedirectToAction("Index");
         }
 
         // Тест обновления сотрудников
         [ActionName("TestUpdate")]
         public async Task<ActionResult> TestUpdateAsync(int num) {
-            string path = Server.MapPath("~/Results/Employee/Update.txt");
-            await employeeService.TestUpdateAsync(num, path);
+            string fullPath = CreateDirectoryToFile("Update.txt");
+            await employeeService.TestUpdateAsync(num, fullPath);
             return RedirectToAction("Index");
         }
 
         // Тест удаления сотрудников
         [ActionName("TestDelete")]
         public async Task<ActionResult> TestDeleteAsync(int num) {
-            string path = Server.MapPath("~/Results/Employee/Delete.txt");
-            await employeeService.TestDeleteAsync(num, path);
+            string fullPath = CreateDirectoryToFile("Delete.txt");
+            await employeeService.TestDeleteAsync(num, fullPath);
             return RedirectToAction("Index");
         }
 
@@ -240,12 +249,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         public ActionResult Contact() {
             return View();
-        }
-
-        // Частичное представление добавляет текстовое поле
-        public ActionResult AddTextBox(string name) {
-            ViewBag.Name = name;
-            return PartialView();
         }
 
         protected override void Dispose(bool disposing) {
