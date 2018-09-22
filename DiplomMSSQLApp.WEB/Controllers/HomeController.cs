@@ -23,11 +23,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             postService = ps;
         }
 
-        public ActionResult Index(EmployeeFilter filter, string str, int page = 1) {
+        public ActionResult Index(EmployeeFilter filter, string filterAsJsonString, int page = 1) {
             // Условие истинно, когда пользователь использует paging,
             // в этом случае передается строка str, а фильтр EmployeeFilter filter нет,
             // поэтому производим декодирование строки в объект EmployeeFilter и присваиваем его фильтру filter
-            if (str != null) filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(str);
+            if (filterAsJsonString != null) filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
             (employeeService as EmployeeService).PathToFileForTests = Server.MapPath("~/Results/Employee/Filter.txt");
             IEnumerable<EmployeeDTO> eDto = employeeService.Get(filter);
             eDto = employeeService.GetPage(eDto, page);     // Paging
