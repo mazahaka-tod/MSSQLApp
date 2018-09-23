@@ -2,6 +2,7 @@
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
+using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
+    [HandleError]
     public class PostController : Controller {
         private IService<EmployeeDTO> employeeService;
         private IService<PostDTO> postService;
@@ -174,7 +176,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestCreate")]
         public async Task<ActionResult> TestCreateAsync(int num) {
             string fullPath = CreateDirectoryToFile("Create.txt");
-            await postService.TestCreateAsync(num, fullPath);
+            (postService as PostService).PathToFileForTests = fullPath;
+            await postService.TestCreateAsync(num);
             return RedirectToAction("Index");
         }
 
@@ -182,7 +185,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestRead")]
         public async Task<ActionResult> TestReadAsync(int num, int salary) {
             string fullPath = CreateDirectoryToFile("Read.txt");
-            await postService.TestReadAsync(num, fullPath, salary);
+            (postService as PostService).PathToFileForTests = fullPath;
+            await postService.TestReadAsync(num, salary);
             return RedirectToAction("Index");
         }
 
@@ -190,7 +194,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestUpdate")]
         public async Task<ActionResult> TestUpdateAsync(int num) {
             string fullPath = CreateDirectoryToFile("Update.txt");
-            await postService.TestUpdateAsync(num, fullPath);
+            (postService as PostService).PathToFileForTests = fullPath;
+            await postService.TestUpdateAsync(num);
             return RedirectToAction("Index");
         }
 
@@ -198,8 +203,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestDelete")]
         public async Task<ActionResult> TestDeleteAsync(int num) {
             string fullPath = CreateDirectoryToFile("Delete.txt");
+            (postService as PostService).PathToFileForTests = fullPath;
             try {
-                await postService.TestDeleteAsync(num, fullPath);
+                await postService.TestDeleteAsync(num);
             }
             catch (Exception) {
                 return View("CustomError", (object)"Нельзя удалить должность, пока в ней работает хотя бы один сотрудник.");

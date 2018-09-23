@@ -292,10 +292,10 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Тест добавления сотрудников
-        public override async Task TestCreateAsync(int num, string path) {
+        public override async Task TestCreateAsync(int num) {
             IEnumerable<Employee> employees = CreateEmployeesCollectionForTest(num);
-            string elapsedTime = await RunTestCreateAsync(employees);
-            WriteResultTestCreateInFile(num, elapsedTime, path);
+            await RunTestCreateAsync(employees);
+            WriteResultTestCreateInFile(num);
         }
 
         private IEnumerable<Employee> CreateEmployeesCollectionForTest(int num) {
@@ -327,37 +327,36 @@ namespace DiplomMSSQLApp.BLL.Services {
             return employees;
         }
 
-        private async Task<string> RunTestCreateAsync(IEnumerable<Employee> employees) {
+        private async Task RunTestCreateAsync(IEnumerable<Employee> employees) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             Database.Employees.Create(employees);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestCreateInFile(int num, string elapsedTime, string path) {
+        private void WriteResultTestCreateInFile(int num) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество добавленных сотрудников: ");
             sb.Append(num);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }
 
         // Тест выборки сотрудников
-        public override async Task TestReadAsync(int num, string path, int salary) {
+        public override async Task TestReadAsync(int num, int salary) {
             int employeesCount = (await Database.Employees.GetAsync()).Count();
             int resultCount = Database.Employees.Get(salary).Count();
-            string elapsedTime = RunTestRead(num, salary);
-            WriteResultTestReadInFile(employeesCount,  resultCount, num, salary, elapsedTime, path);
+            RunTestRead(num, salary);
+            WriteResultTestReadInFile(employeesCount,  resultCount, num, salary);
         }
 
-        private string RunTestRead(int num, int salary) {
+        private void RunTestRead(int num, int salary) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             for (int i = 0; i < num; i++) {
@@ -365,11 +364,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             }
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestReadInFile(int employeesCount, int resultCount, int num, int salary, string elapsedTime, string path) {
+        private void WriteResultTestReadInFile(int employeesCount, int resultCount, int num, int salary) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Общее количество сотрудников: ");
             sb.Append(employeesCount);
@@ -380,21 +378,21 @@ namespace DiplomMSSQLApp.BLL.Services {
             sb.Append("; Условие выборки: Salary >= ");
             sb.Append(salary);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }
 
         // Тест обновления сотрудников
-        public override async Task TestUpdateAsync(int num, string path) {
+        public override async Task TestUpdateAsync(int num) {
             Employee[] employees = (await Database.Employees.GetAsync()).Take(num).ToArray();
             int employeesLength = employees.Length;
-            string elapsedTime = await RunTestUpdateAsync(employees);
-            WriteResultTestUpdateInFile(employeesLength, elapsedTime, path);
+            await RunTestUpdateAsync(employees);
+            WriteResultTestUpdateInFile(employeesLength);
         }
 
-        private async Task<string> RunTestUpdateAsync(Employee[] employees) {
+        private async Task RunTestUpdateAsync(Employee[] employees) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             for (int i = 0; i < employees.Length; i++) {
@@ -411,47 +409,45 @@ namespace DiplomMSSQLApp.BLL.Services {
             }
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestUpdateInFile(int employeesLength, string elapsedTime, string path) {
+        private void WriteResultTestUpdateInFile(int employeesLength) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество обновленных сотрудников: ");
             sb.Append(employeesLength);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }
 
         // Тест удаления сотрудников
-        public override async Task TestDeleteAsync(int num, string path) {
+        public override async Task TestDeleteAsync(int num) {
             IEnumerable<Employee> employees = (await Database.Employees.GetAsync()).Take(num);
             int employeesCount = employees.Count();
-            string elapsedTime = await RunTestDeleteAsync(employees);
-            WriteResultTestDeleteInFile(employeesCount, elapsedTime, path);
+            await RunTestDeleteAsync(employees);
+            WriteResultTestDeleteInFile(employeesCount);
         }
 
-        private async Task<string> RunTestDeleteAsync(IEnumerable<Employee> employees) {
+        private async Task RunTestDeleteAsync(IEnumerable<Employee> employees) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             Database.Employees.RemoveSeries(employees);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestDeleteInFile(int employeesCount, string elapsedTime, string path) {
+        private void WriteResultTestDeleteInFile(int employeesCount) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество удаленных сотрудников: ");
             sb.Append(employeesCount);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }

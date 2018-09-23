@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace DiplomMSSQLApp.BLL.Services {
     public class PostService : BaseService<PostDTO> {
         public IUnitOfWork Database { get; set; }
+        public string PathToFileForTests { get; set; }
 
         public PostService(IUnitOfWork uow) {
             Database = uow;
@@ -101,10 +102,10 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Тест добавления должностей
-        public override async Task TestCreateAsync(int num, string path) {
+        public override async Task TestCreateAsync(int num) {
             IEnumerable<Post> posts = CreatePostsCollectionForTest(num);
             string elapsedTime = await RunTestCreateAsync(posts);
-            WriteResultTestCreateInFile(num, elapsedTime, path);
+            WriteResultTestCreateInFile(num, elapsedTime, PathToFileForTests);
         }
 
         private IEnumerable<Post> CreatePostsCollectionForTest(int num) {
@@ -146,11 +147,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Тест выборки должностей
-        public override async Task TestReadAsync(int num, string path, int salary) {
+        public override async Task TestReadAsync(int num, int salary) {
             int postsCount = (await Database.Posts.GetAsync()).Count();
             int resultCount = Database.Posts.Get(salary).Count();
             string elapsedTime = RunTestRead(num, salary);
-            WriteResultTestReadInFile(postsCount, resultCount, num, salary, elapsedTime, path);
+            WriteResultTestReadInFile(postsCount, resultCount, num, salary, elapsedTime, PathToFileForTests);
         }
 
         private string RunTestRead(int num, int salary) {
@@ -183,11 +184,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Тест обновления должностей
-        public override async Task TestUpdateAsync(int num, string path) {
+        public override async Task TestUpdateAsync(int num) {
             Post[] posts = (await Database.Posts.GetAsync()).Take(num).ToArray();
             int postsLength = posts.Length;
             string elapsedTime = await RunTestUpdateAsync(posts);
-            WriteResultTestUpdateInFile(postsLength, elapsedTime, path);
+            WriteResultTestUpdateInFile(postsLength, elapsedTime, PathToFileForTests);
         }
 
         private async Task<string> RunTestUpdateAsync(Post[] posts) {
@@ -218,11 +219,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Тест удаления должностей
-        public override async Task TestDeleteAsync(int num, string path) {
+        public override async Task TestDeleteAsync(int num) {
             IEnumerable<Post> posts = (await Database.Posts.GetAsync()).Take(num);
             int postsCount = posts.Count();
             string elapsedTime = await RunTestDeleteAsync(posts);
-            WriteResultTestDeleteInFile(postsCount, elapsedTime, path);
+            WriteResultTestDeleteInFile(postsCount, elapsedTime, PathToFileForTests);
         }
 
         private async Task<string> RunTestDeleteAsync(IEnumerable<Post> posts) {

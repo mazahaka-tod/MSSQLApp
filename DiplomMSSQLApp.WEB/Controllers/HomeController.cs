@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
+    [HandleError]
     public class HomeController : Controller {
         private IService<EmployeeDTO> employeeService;
         private IService<DepartmentDTO> departmentService;
@@ -215,7 +216,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestCreate")]
         public async Task<ActionResult> TestCreateAsync(int num) {
             string fullPath = CreateDirectoryToFile("Create.txt");
-            await employeeService.TestCreateAsync(num, fullPath);
+            (employeeService as EmployeeService).PathToFileForTests = fullPath;
+            await employeeService.TestCreateAsync(num);
             return RedirectToAction("Index");
         }
 
@@ -223,7 +225,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestRead")]
         public async Task<ActionResult> TestReadAsync(int num, int salary) {
             string fullPath = CreateDirectoryToFile("Read.txt");
-            await employeeService.TestReadAsync(num, fullPath, salary);
+            (employeeService as EmployeeService).PathToFileForTests = fullPath;
+            await employeeService.TestReadAsync(num, salary);
             return RedirectToAction("Index");
         }
 
@@ -231,7 +234,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestUpdate")]
         public async Task<ActionResult> TestUpdateAsync(int num) {
             string fullPath = CreateDirectoryToFile("Update.txt");
-            await employeeService.TestUpdateAsync(num, fullPath);
+            (employeeService as EmployeeService).PathToFileForTests = fullPath;
+            await employeeService.TestUpdateAsync(num);
             return RedirectToAction("Index");
         }
 
@@ -239,10 +243,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestDelete")]
         public async Task<ActionResult> TestDeleteAsync(int num) {
             string fullPath = CreateDirectoryToFile("Delete.txt");
-            await employeeService.TestDeleteAsync(num, fullPath);
+            (employeeService as EmployeeService).PathToFileForTests = fullPath;
+            await employeeService.TestDeleteAsync(num);
             return RedirectToAction("Index");
         }
-
+        
         public ActionResult About() {
             return View();
         }

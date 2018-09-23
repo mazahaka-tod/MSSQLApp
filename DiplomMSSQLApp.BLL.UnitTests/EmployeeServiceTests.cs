@@ -6,7 +6,10 @@ using DiplomMSSQLApp.DAL.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.UnitTests
@@ -541,7 +544,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, false, null, false, null, null, null, null, true, null, null)]          // IsBonus
         [TestCase(null, false, null, false, null, null, null, null, false, "Manager", null)]    // PostTitle
         [TestCase(null, false, null, false, null, null, null, null, false, null, "Management")] // DepartmentName
-        public void OneFilterParameterIsSet_ReturnsFilteredArray(string ln, bool im, string em, 
+        public void Get_OneFilterParameterIsSet_ReturnsFilteredArray(string ln, bool im, string em, 
             bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
         {
             EmployeeFilter filter = new EmployeeFilter {
@@ -622,7 +625,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, false, null, false, null, null, null, null, true, null, null)]          // IsBonus
         [TestCase(null, false, null, false, null, null, null, null, false, "Manager", null)]    // PostTitle
         [TestCase(null, false, null, false, null, null, null, null, false, null, "Management")] // DepartmentName
-        public void OneFilterParameterAndIsAntiFilterIsSet_ReturnsFilteredArray(string ln, bool im, string em,
+        public void Get_OneFilterParameterAndIsAntiFilterIsSet_ReturnsFilteredArray(string ln, bool im, string em,
             bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
         {
             EmployeeFilter filter = new EmployeeFilter {
@@ -704,7 +707,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, null, false, null, false, null, null, 15000, 0.1, false, null, null)]           // MaxSalary, Bonus
         [TestCase(null, null, false, null, false, null, null, null, null, true, "Manager", null)]       // IsBonus, PostTitle
         [TestCase(null, null, false, null, false, null, null, null, null, true, null, "Management")]    // IsBonus, DepartmentName
-        public void TwoFilterParametersAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
+        public void Get_TwoFilterParametersAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
             bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
         {
             EmployeeFilter filter = new EmployeeFilter {
@@ -783,7 +786,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, null, false, null, false, null, null, 15000, 0.1, false, null, null)]           // MaxSalary, Bonus
         [TestCase(null, null, false, null, false, null, null, null, null, true, "Manager", null)]       // IsBonus, PostTitle
         [TestCase(null, null, false, null, false, null, null, null, null, true, null, "Management")]    // IsBonus, DepartmentName
-        public void TwoFilterParametersAndIsAntiFilterAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
+        public void Get_TwoFilterParametersAndIsAntiFilterAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
             bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
         {
             EmployeeFilter filter = new EmployeeFilter {
@@ -859,13 +862,14 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [TestCase(null)]
+        [TestCase("LastName")]
         [TestCase("Email")]
         [TestCase("HireDate")]
         [TestCase("Salary")]
         [TestCase("Bonus")]
         [TestCase("PostTitle")]
         [TestCase("DepartmentName")]
-        public void AscSortIsSet_ReturnsSortedArray(string field)
+        public void Get_AscSortIsSet_ReturnsSortedArray(string field)
         {
             EmployeeFilter filter = new EmployeeFilter {
                 SortField = field,
@@ -918,6 +922,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
             EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
@@ -932,13 +937,14 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Sidorov", result[3].LastName);
         }
 
+        [TestCase("LastName")]
         [TestCase("Email")]
         [TestCase("HireDate")]
         [TestCase("Salary")]
         [TestCase("Bonus")]
         [TestCase("PostTitle")]
         [TestCase("DepartmentName")]
-        public void DescSortIsSet_ReturnsSortedArray(string field)
+        public void Get_DescSortIsSet_ReturnsSortedArray(string field)
         {
             EmployeeFilter filter = new EmployeeFilter {
                 SortField = field,
@@ -991,6 +997,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
             EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
@@ -1003,6 +1010,287 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Petrov", result[1].LastName);
             Assert.AreEqual("Panin", result[2].LastName);
             Assert.AreEqual("Ivanov", result[3].LastName);
+        }
+
+        [Test]
+        public void Get_SortFieldPropertyIsEqualToLastName_CallsGetMethodOnce() {
+            EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+
+            employeeService.Get(filter);
+
+            mock.Verify(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()), Times.Once());
+        }
+
+        [Test]
+        public void Get_SortFieldPropertyIsEqualToLastName_CreatesResultFile() {
+            EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+
+            employeeService.Get(filter);
+
+            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+        }
+
+        [Test]
+        public void Get_SortFieldPropertyIsEqualToLastName_TestTimeIsWrittenToElapsedTimeProperty() {
+            EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+
+            employeeService.Get(filter);
+
+            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
+        [Test]
+        public void Get_AllFilterParameterIsSet_CreatesMessageAboutFilterParametersUsedProperty() {
+            EmployeeFilter filter = new EmployeeFilter {
+                LastName = new string[] { "W", null, "", "Z" },
+                Email = "mail.ru",
+                IsPhoneNumber = true,
+                HireDate = "2018-09-01",
+                MinSalary = 20000,
+                MaxSalary = 50000,
+                Bonus = new double?[] { 0.1, null, 0.2 },
+                IsBonus = true,
+                PostTitle = "Manager",
+                DepartmentName = "Management",
+                IsAntiFilter = true
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            employeeService.Get(filter);
+
+            Assert.AreEqual("Фамилия = W; Фамилия = Z; Email = mail.ru; Есть телефон; Дата приема на работу = 2018-09-01; " +
+                "Зарплата >= 20000; Зарплата <= 50000; Премия = 0,1; Премия = 0,2; Есть премия; Должность = Manager; " +
+                "Название отдела = Management; Используется отрицание; ", employeeService.MessageAboutFilterParametersUsed);
+        }
+
+        [Test]
+        public void Get_NoneFilterParameterIsSet_CreatesMessageAboutFilterParametersUsedProperty() {
+            EmployeeFilter filter = new EmployeeFilter { };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            employeeService.Get(filter);
+
+            Assert.AreEqual("Фильтр не задан; ", employeeService.MessageAboutFilterParametersUsed);
+        }
+
+        /// <summary>
+        /// // TestCreateAsync method
+        /// </summary>
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_CallsCreateMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetFirst());
+            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+
+            await employeeService.TestCreateAsync(1);
+
+            mock.Verify(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_CallsSaveAsyncMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetFirst());
+            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+
+            await employeeService.TestCreateAsync(1);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetFirst());
+            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+
+            await employeeService.TestCreateAsync(1);
+
+            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetFirst());
+            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+
+            await employeeService.TestCreateAsync(1);
+
+            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
+        /// <summary>
+        /// // TestReadAsync method
+        /// </summary>
+        [Test]
+        public async Task TestReadAsync_ParameterIsThree_CallsGetMethodFourTimes() {
+            int num = 3;
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
+
+            await employeeService.TestReadAsync(num, 0);
+
+            mock.Verify(m => m.Employees.Get(It.IsAny<int>()), Times.Exactly(4));
+        }
+
+        [Test]
+        public async Task TestReadAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
+
+            await employeeService.TestReadAsync(1, 0);
+
+            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestReadAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
+
+            await employeeService.TestReadAsync(1, 0);
+
+            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
+        /// <summary>
+        /// // TestUpdateAsync method
+        /// </summary>
+        [Test]
+        public async Task TestUpdateAsync_ParameterIsOne_CallsUpdateMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { new Employee(), new Employee() });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+
+            await employeeService.TestUpdateAsync(1);
+
+            mock.Verify(m => m.Employees.Update(It.IsAny<Employee>()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestUpdateAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { new Employee(), new Employee() });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+
+            await employeeService.TestUpdateAsync(1);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestUpdateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+
+            await employeeService.TestUpdateAsync(1);
+
+            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestUpdateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+
+            await employeeService.TestUpdateAsync(1);
+
+            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
+        /// <summary>
+        /// // TestDeleteAsync method
+        /// </summary>
+        [Test]
+        public async Task TestDeleteAsync_ParameterIsOne_CallsUpdateMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+
+            await employeeService.TestDeleteAsync(1);
+
+            mock.Verify(m => m.Employees.RemoveSeries(It.IsAny<IEnumerable<Employee>>()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestDeleteAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+
+            await employeeService.TestDeleteAsync(1);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestDeleteAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+
+            await employeeService.TestDeleteAsync(1);
+
+            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestDeleteAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+
+            await employeeService.TestDeleteAsync(1);
+
+            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
     }
 }

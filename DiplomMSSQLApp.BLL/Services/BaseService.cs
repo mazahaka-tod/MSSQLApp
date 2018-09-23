@@ -17,10 +17,10 @@ namespace DiplomMSSQLApp.BLL.Services {
         public abstract Task<T> FindByIdAsync(int? id);
         public abstract IEnumerable<T> Get(EmployeeFilter filter);
         public abstract Task<IEnumerable<T>> GetAllAsync();
-        public abstract Task TestCreateAsync(int num, string path);
-        public abstract Task TestReadAsync(int num, string path, int val);
-        public abstract Task TestUpdateAsync(int num, string path);
-        public abstract Task TestDeleteAsync(int num, string path);
+        public abstract Task TestCreateAsync(int num);
+        public abstract Task TestReadAsync(int num, int salary);
+        public abstract Task TestUpdateAsync(int num);
+        public abstract Task TestDeleteAsync(int num);
         // Paging
         public IEnumerable<T> GetPage(IEnumerable<T> col, int page) {
             PageInfo = new PageInfo { PageNumber = page, PageSize = NumberOfObjectsPerPage, TotalItems = col.Count() };

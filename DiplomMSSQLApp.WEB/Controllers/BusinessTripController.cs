@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
+    [HandleError]
     public class BusinessTripController : Controller {
         private IService<BusinessTripDTO> businessTripService;
         private IService<EmployeeDTO> employeeService;

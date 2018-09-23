@@ -17,9 +17,9 @@ namespace DiplomMSSQLApp.BLL.Interfaces
         IEnumerable<TEntity> Get(EmployeeFilter filter);
         Task<IEnumerable<TEntity> > GetAllAsync();
         IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page);
-        Task TestCreateAsync(int num, string path);
-        Task TestReadAsync(int num, string path, int val);
-        Task TestUpdateAsync(int num, string path);
-        Task TestDeleteAsync(int num, string path);
+        Task TestCreateAsync(int num);
+        Task TestReadAsync(int num, int salary);
+        Task TestUpdateAsync(int num);
+        Task TestDeleteAsync(int num);
     }
 }

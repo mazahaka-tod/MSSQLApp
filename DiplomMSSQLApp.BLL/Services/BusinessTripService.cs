@@ -131,19 +131,19 @@ namespace DiplomMSSQLApp.BLL.Services {
             throw new System.NotImplementedException();
         }
 
-        public override Task TestCreateAsync(int num, string path) {
+        public override Task TestCreateAsync(int num) {
             throw new System.NotImplementedException();
         }
 
-        public override Task TestReadAsync(int num, string path, int val) {
+        public override Task TestReadAsync(int num, int salary) {
             throw new System.NotImplementedException();
         }
 
-        public override Task TestUpdateAsync(int num, string path) {
+        public override Task TestUpdateAsync(int num) {
             throw new System.NotImplementedException();
         }
 
-        public override Task TestDeleteAsync(int num, string path) {
+        public override Task TestDeleteAsync(int num) {
             throw new System.NotImplementedException();
         }
     }
