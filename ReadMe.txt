@@ -1,5 +1,13 @@
-Проект не имеет какой-либо практической ценности. Разрабатывается с целью изучения фреймворка ASP.NET MVC 5.
-Используемая СУБД: MS SQL Server. ER-диаграмму базы данных можно посмотреть в папке решения в файле 'ER-диаграмма БД.jpg'.
-Основная часть кода написана для работы с таблицей Employees.
-Основные функции, реализованные в проекте: CRUD-операции, фильтр для выборки сотрудников из БД, анализ производительности CRUD-операций (результаты тестов записываются в папку /DiplomMSSQLApp.WEB/Results), постраничный вывод, валидация данных, модульное тестирование.
-Используемые пакеты: Entity Framework, AutoMapper, Ninject, Bootstrap, jQuery, Newtonsoft.Json, NUnit, Moq.
+The project is intended to be used by the human resources department.
+The project is under active development.
+ER-diagram of the database can be viewed in the solution folder in the file 'ER-diagram DB.jpg'.
+The main functions implemented in the project:
+- CRUD operations;
+- a filter for retrieving employees from the database;
+- analysis of the performance of CRUD operations;
+- paging;
+- data validation;
+- unit testing.
+Used Framework: ASP.NET MVC 5.
+Used DBMS: MS SQL Server.
+Used packages: Entity Framework, AutoMapper, Ninject, Bootstrap, jQuery, Newtonsoft.Json, NUnit, Moq.

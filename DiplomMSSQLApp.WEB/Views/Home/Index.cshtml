@@ -25,7 +25,7 @@
         Поиск по фильтру <i>(Показать)</i>
     </div>
     <div id="filter" style="display:none;">
-        @using (Html.BeginForm("Index", "Home")) {
+        @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { id = "filterform" })) {
             <table>
                 <tr>
                     <td>
@@ -40,6 +40,7 @@
                                 </span>
                                 <div>
                                     <a id="addlastname">Добавить поле</a>
+                                    <a id="removelastname" style="display:none;">Удалить поле</a>
                                 </div>
                                 @Html.CheckBoxFor(m => m.Filter.IsMatchAnyLastName, new { style = "margin-bottom: 12px" })
                                 @Html.LabelFor(m => m.Filter.IsMatchAnyLastName, "Любое соответствие (Логическое ИЛИ)")
@@ -95,6 +96,7 @@
                                 </span>
                                 <div>
                                     <a id="addbonus">Добавить поле</a>
+                                    <a id="removebonus" style="display:none;">Удалить поле</a>
                                 </div>
                                 @Html.CheckBoxFor(m => m.Filter.IsBonus, new { style = "margin-bottom: 12px" })
                                 @Html.LabelFor(m => m.Filter.IsBonus, "Есть премия")
@@ -171,7 +173,7 @@
                             </dt>
                             <dd>
                                 <input type="submit" value="Найти" class="btn btn-primary" />
-                                <div id="reset" class="btn btn-default">Сброс</div>
+                                <a id="reset" class="btn btn-default">Сброс</a>
                             </dd>
                         </dl>
                     </td>
@@ -406,146 +408,205 @@
 
 @section scripts {
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Добавляет на форму фильтра текстовое поле Фамилия
-        $('#addlastname').on('click', function(event) {
+        $('#addlastname').on('click', function (event) {
             event.preventDefault();
             var countLastName = $('#lname input').length;
-            if (countLastName < 5)
-                $('#lname').append('<input class="form-control" style="margin-top:6px;" id="Filter_LastName_' + countLastName + '_" name="Filter.LastName[' + countLastName + ']" type="text" maxlength="15" value="" /><span style="color:red;"></span>')
+            if (countLastName < 5) {
+                $('input:first', '#lname').clone().attr({
+                    style: 'margin-top:6px;',
+                    id: 'Filter_LastName_' + countLastName + '_',
+                    name: 'Filter.LastName[' + countLastName + ']'
+                }).val('').appendTo('#lname');
+                $('span:first', '#lname').clone().appendTo('#lname');
+            }
+            if (countLastName === 1)
+                $('#removelastname').css('display', 'block');
+            if (countLastName === 4)
+                $('#addlastname').css('display', 'none');
+        });
+
+        // Удаляет на форме фильтра текстовое поле Фамилия
+        $('#removelastname').on('click', function (event) {
+            event.preventDefault();
+            var countLastName = $('#lname input').length;
+            if (countLastName > 1)
+                $('#lname span:last, #lname input:last').remove();
+            if (countLastName === 2)
+                $('#removelastname').css('display', 'none');
+            if (countLastName === 5)
+                $('#addlastname').css('display', 'block');
         });
 
         // Добавляет на форму фильтра текстовое поле Премия
-        $('#addbonus').on('click', function(event) {
+        $('#addbonus').on('click', function (event) {
             event.preventDefault();
             var countBonus = $('#bns input').length;
-            if (countBonus < 5)
-                $('#bns').append('<input class="form-control" style="margin-top:6px;" id="Filter_Bonus[' + countBonus +']" name="Filter.Bonus[' + countBonus +']" type="number" min="0" max="1" step="0.01" value="" /><span style="color:red;"></span>')
+            if (countBonus < 5) {
+                $('input:first', '#bns').clone().attr({
+                    style: 'margin-top:6px;',
+                    id: 'Filter_Bonus_' + countBonus + '_',
+                    name: 'Filter.Bonus[' + countBonus + ']'
+                }).val('').appendTo('#bns');
+                $('span:first', '#bns').clone().appendTo('#bns');
+            }
+            if (countBonus === 1)
+                $('#removebonus').css('display', 'block');
+            if (countBonus === 4)
+                $('#addbonus').css('display', 'none');
+        });
+
+        // Удаляет на форме фильтра текстовое поле Премия
+        $('#removebonus').on('click', function (event) {
+            event.preventDefault();
+            var countBonus = $('#bns input').length;
+            if (countBonus > 1)
+                $('#bns span:last, #bns input:last').remove();
+            if (countBonus === 2)
+                $('#removebonus').css('display', 'none');
+            if (countBonus === 5)
+                $('#addbonus').css('display', 'block');
         });
 
         // Устанавливает checkbox на форме фильтра
-        var columns = '@String.Concat(Model.Filter.Columns)';
-        $('#Filter_Columns0').prop('checked', columns.includes('0'));
-        $('#Filter_Columns1').prop('checked', columns.includes('1'));
-        $('#Filter_Columns2').prop('checked', columns.includes('2'));
-        $('#Filter_Columns3').prop('checked', columns.includes('3'));
-        $('#Filter_Columns4').prop('checked', columns.includes('4'));
-        $('#Filter_Columns5').prop('checked', columns.includes('5'));
-        $('#Filter_Columns6').prop('checked', columns.includes('6'));
-        $('#Filter_Columns7').prop('checked', columns.includes('7'));
-        $('#Filter_Columns8').prop('checked', columns.includes('8'));
+        var columns = ('@String.Concat(Model.Filter.Columns)').split('');
+        $('input[name="Filter.Columns"]').val(columns);
 
-        // Устанавливает значения в поля Фамилии на форме фильтра
+        // Устанавливает значения в полей Фамилия на форме фильтра
         @if (Model.Filter.LastName != null) {
             string[] lastnames = Model.Filter.LastName.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             if (lastnames.Length > 0) {
-                @:$('#Filter_LastName_0_').prop('value', '@lastnames[0]');
+                @:$('#Filter_LastName_0_').val('@lastnames[0]');
                 for (int i = 1; i < lastnames.Length; i++) {
-                    @:$('#lname').append('<input class="form-control" style="margin-top:6px;" id="Filter_LastName_'+ @i +'_" name="Filter.LastName['+ @i +']" type="text" maxlength="15" value="@lastnames[i]" /><span style="color:red;"></span>')
+                    @:$('input:first', '#lname').clone().attr({ style: 'margin-top:6px;', id: 'Filter_LastName_' + @i + '_', name: 'Filter.LastName[' + @i + ']' }).val('@lastnames[i]').appendTo('#lname');
+                    @:$('span:first', '#lname').clone().appendTo('#lname');
+                }
+                if (lastnames.Length == 5) {
+                    @:$('#addlastname').css('display', 'none');
+                }
+                if (lastnames.Length > 1) {
+                    @:$('#removelastname').css('display', 'block');
                 }
             }
         }
 
-        // Устанавливает значения в поля Премии на форме фильтра
+        // Устанавливает значения в полей Премия на форме фильтра
         @if (Model.Filter.Bonus != null) {
             double?[] bonuses = Model.Filter.Bonus.Where(x => x.HasValue).ToArray();
             if (bonuses.Length > 0) {
-                @:$('#Filter_Bonus_0_').prop('value', '@bonuses[0]');
+                @:$('#Filter_Bonus_0_').val('@bonuses[0]');
                 for (int i = 1; i < bonuses.Length; i++) {
-                    @:$('#bns').append('<input class="form-control" style="margin-top:6px;" id="Filter_Bonus_' + @i +'_" name="Filter.Bonus['+ @i +']" type="number" min="0" max="1" step="0.01" value="@bonuses[i]" /><span style="color:red;"></span>')
+                    @:$('input:first', '#bns').clone().attr({ style: 'margin-top:6px;', id: 'Filter_Bonus_' + @i + '_', name: 'Filter.Bonus[' + @i + ']' }).val('@bonuses[i]').appendTo('#bns');
+				    @:$('span:first', '#bns').clone().appendTo('#bns');
+                }
+                if (bonuses.Length == 5) {
+                    @:$('#addbonus').css('display', 'none');
+                }
+                if (bonuses.Length > 1) {
+                    @:$('#removebonus').css('display', 'block');
                 }
             }
         }
 
         // Ограничивает количество символов в текстовых полях фильтра
-        var handlerMaxLength = function(event) {
-            if ($(this).val().length >= $(this).attr('maxlength')) {
-                $(this).next('span').text("Слишком длинное значение");
-                var $input = $(this);
-                setTimeout(function() { $input.next('span').text("") }, 2000);
+        $('#filterform').on('input', 'input[type="text"]', function (event) {
+            $this = $(this);
+            if ($this.val().length >= $this.attr('maxlength')) {
+                $this.next('span').text('Слишком длинное значение');
+                setTimeout(function () {
+                    $this.next('span').text('');
+                }, 2000);
             }
-        };
-        $('#lname').on('input', 'input', handlerMaxLength);
-        $('input[type="text"]').on('input', handlerMaxLength);
+        });
 
-        // Ограничивает ввод цифр в полях Фамилии, Должности и Названии отдела
-        var handlerOnlyLetters = function(key) {
-            if (key.charCode > 47 && key.charCode < 58) {
-                $(this).next('span').text("Цифры недопустимы");
-                var $input = $(this);
-                setTimeout(function() { $input.next('span').text("") }, 2000);
+        // Запрещает ввод цифр в полях Фамилия, Должность и Название отдела
+        var handlerOnlyLetters = function (event) {
+            var $this = $(this);
+            if (event.charCode > 47 && event.charCode < 58) {
+                $this.next('span').text('Цифры недопустимы');
+                setTimeout(function () {
+                    $this.next('span').text('');
+                }, 2000);
                 return false;
             }
         };
         $('#lname').on('keypress', 'input', handlerOnlyLetters);
-        $('#Filter_PostTitle').add('#Filter_DepartmentName').on('keypress', handlerOnlyLetters);
+        $('#Filter_PostTitle, #Filter_DepartmentName').on('keypress', handlerOnlyLetters);
 
         // Ограничивает диапазон значений в полях Зарплаты
-        $('#Filter_MinSalary').add('#Filter_MaxSalary').on('keypress', function(key) {
-            if ($(this).val() < 0 || $(this).val() > 9999999 || $(this).val().length > 7) {
-                $(this).next('span').text("Допустимый диапазон [0; 9999999]");
-                var $input = $(this);
-                setTimeout(function() { $input.next('span').text("") }, 2000);
+        $('#Filter_MinSalary, #Filter_MaxSalary').on('keyup', function (event) {
+            $this = $(this);
+            if ($this.val() < 0 || $this.val() > 9999999 || $this.val().length > 10) {
+                $this.next('span').text('Допустимый диапазон [0; 9999999]');
+                setTimeout(function () {
+                    $this.val('9999999');
+                    $this.next('span').text('');
+                }, 2000);
                 return false;
             }
         });
 
         // Ограничивает диапазон значений в поле Премия
-        $('#bns').on('keypress', 'input', function(key) {
-            if ($(this).val() < 0 || $(this).val() > 1 || $(this).val().length > 4) {
-                $(this).next('span').text("Допустимый диапазон [0.00; 1.00]");
-                var $input = $(this);
-                setTimeout(function () { $input.next('span').text("") }, 2000);
+        $('#bns').on('keyup', 'input', function (event) {
+            $this = $(this);
+            if ($this.val() < 0 || $this.val() > 1 || $this.val().length > 4) {
+                $this.next('span').text('Допустимый диапазон [0.00; 1.00]');
+                setTimeout(function () {
+                    $this.val('1');
+                    $this.next('span').text('');
+                }, 2000);
                 return false;
             }
         });
 
         // Показывает или скрывает блок с анимацией
-        $('#animationToggle').on('click', function() {
-            $('#animation').slideToggle("slow");
-            if ($(this).html().trim() == "С хорошим настроением лучше работается <i>(Показать)</i>")
-                $(this).html("С хорошим настроением лучше работается <i>(Скрыть)</i>")
+        $('#animationToggle').on('click', function (event) {
+            var $this = $(this);
+            $('#animation').slideToggle('slow');
+            if ($this.html().trim() == 'С хорошим настроением лучше работается <i>(Показать)</i>')
+                $this.html('С хорошим настроением лучше работается <i>(Скрыть)</i>');
             else
-                $(this).html("С хорошим настроением лучше работается <i>(Показать)</i>")
+                $this.html('С хорошим настроением лучше работается <i>(Показать)</i>');
         });
 
         // Показывает или скрывает блок с фильтром
-        $('#filterToggle').on('click', function() {
-            $('#filter').slideToggle("slow");
-            if ($(this).html().trim() == "Поиск по фильтру <i>(Показать)</i>")
-                $(this).html("Поиск по фильтру <i>(Скрыть)</i>")
+        $('#filterToggle').on('click', function (event) {
+            var $this = $(this);
+            $('#filter').slideToggle('slow');
+            if ($this.html().trim() == 'Поиск по фильтру <i>(Показать)</i>')
+                $this.html('Поиск по фильтру <i>(Скрыть)</i>');
             else
-                $(this).html("Поиск по фильтру <i>(Показать)</i>")
+                $this.html('Поиск по фильтру <i>(Показать)</i>');
         });
 
         // Показывает или скрывает блок с тестами
-        $('#performanceTestsToggle').on('click', function() {
-            $('#performanceTests').slideToggle("slow");
-            if ($(this).html().trim() == "Тесты производительности <i>(Показать)</i>")
-                $(this).html("Тесты производительности <i>(Скрыть)</i>")
+        $('#performanceTestsToggle').on('click', function (event) {
+            var $this = $(this);
+            $('#performanceTests').slideToggle('slow');
+            if ($this.html().trim() == 'Тесты производительности <i>(Показать)</i>')
+                $this.html('Тесты производительности <i>(Скрыть)</i>');
             else
-                $(this).html("Тесты производительности <i>(Показать)</i>")
+                $this.html('Тесты производительности <i>(Показать)</i>');
         });
 
         // Сбрасывает параметры фильтра в дефолт
-        $('#reset').on('click', function() {
-            // Сбрасывает checkbox на форме фильтра
-            $('input[type="checkbox"]').prop('checked', false);
-            $('input[name="Filter.Columns"]').prop('checked', true);
-
-            // Сбрасывает textbox на форме фильтра
-            $('#lname').html('<input class="form-control"  id="Filter_LastName_0_" name="Filter.LastName[0]" type="text" maxlength="15" value="" /><span style="color:red;"></span>')
-            $('#Filter_Email').prop('value', '');
-            $('#Filter_HireDate').prop('value', '');
-            $('#Filter_MinSalary').prop('value', '');
-            $('#Filter_MaxSalary').prop('value', '');
-            $('#bns').html('<input class="form-control" style="margin-top:12px;" id="Filter_Bonus_0_" name="Filter.Bonus[0]" type="number" min="0" max="1" step="0.01" value="" /><span style="color:red;"></span>')
-            $('#Filter_PostTitle').prop('value', '');
-            $('#Filter_DepartmentName').prop('value', '');
-
-            // Сбрасывает dropdownlist на форме фильтра
-            $('#Filter_SortField option[value="LastName"]').prop('selected', true);
-            $('#Filter_SortOrder option[value="Asc"]').prop('selected', true);
+        $('#reset').on('click', function (event) {
+            event.preventDefault();
+            // Сбрасывает input[checkbox] на форме фильтра
+            $('input[type="checkbox"]', '#filterform').prop('checked', false);
+            $('input[name="Filter.Columns"]', '#filterform').prop('checked', true);
+            // Сбрасывает input[text,number,date] на форме фильтра
+            $(':nth-child(n+3)', '#lname').remove();
+            $(':nth-child(n+3)', '#bns').remove();
+            $('input', '#filterform').not('[type="submit"]').val('');
+            // Сбрасывает select на форме фильтра
+            $('option:first', '#filterform select').prop('selected', true);
+            // Сбрасывает отображение ссылок
+            $('#addlastname').css('display', 'block');
+            $('#addbonus').css('display', 'block');
+            $('#removelastname').css('display', 'none');
+            $('#removebonus').css('display', 'none');
         });
     })
 </script>
