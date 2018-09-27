@@ -563,31 +563,25 @@
         // Показывает или скрывает блок с анимацией
         $('#animationToggle').on('click', function (event) {
             var $this = $(this);
-            $('#animation').slideToggle('slow');
-            if ($this.html().trim() == 'С хорошим настроением лучше работается <i>(Показать)</i>')
-                $this.html('С хорошим настроением лучше работается <i>(Скрыть)</i>');
-            else
-                $this.html('С хорошим настроением лучше работается <i>(Показать)</i>');
+            $('#animation').slideToggle('slow', function () {
+                $this.html('С хорошим настроением лучше работается <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+            });
         });
 
         // Показывает или скрывает блок с фильтром
         $('#filterToggle').on('click', function (event) {
             var $this = $(this);
-            $('#filter').slideToggle('slow');
-            if ($this.html().trim() == 'Поиск по фильтру <i>(Показать)</i>')
-                $this.html('Поиск по фильтру <i>(Скрыть)</i>');
-            else
-                $this.html('Поиск по фильтру <i>(Показать)</i>');
+            $('#filter').slideToggle('slow', function () {
+                $this.html('Поиск по фильтру <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+            });
         });
 
         // Показывает или скрывает блок с тестами
         $('#performanceTestsToggle').on('click', function (event) {
             var $this = $(this);
-            $('#performanceTests').slideToggle('slow');
-            if ($this.html().trim() == 'Тесты производительности <i>(Показать)</i>')
-                $this.html('Тесты производительности <i>(Скрыть)</i>');
-            else
-                $this.html('Тесты производительности <i>(Показать)</i>');
+            $('#performanceTests').slideToggle('slow', function () {
+                $this.html('Тесты производительности <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+            });
         });
 
         // Сбрасывает параметры фильтра в дефолт
@@ -597,16 +591,13 @@
             $('input[type="checkbox"]', '#filterform').prop('checked', false);
             $('input[name="Filter.Columns"]', '#filterform').prop('checked', true);
             // Сбрасывает input[text,number,date] на форме фильтра
-            $(':nth-child(n+3)', '#lname').remove();
-            $(':nth-child(n+3)', '#bns').remove();
+            $(':nth-child(n+3)', '#lname, #bns').remove();
             $('input', '#filterform').not('[type="submit"]').val('');
             // Сбрасывает select на форме фильтра
             $('option:first', '#filterform select').prop('selected', true);
             // Сбрасывает отображение ссылок
-            $('#addlastname').css('display', 'block');
-            $('#addbonus').css('display', 'block');
-            $('#removelastname').css('display', 'none');
-            $('#removebonus').css('display', 'none');
+            $('#addlastname, #addbonus').css('display', 'block');
+            $('#removelastname, #removebonus').css('display', 'none');
         });
     })
 </script>

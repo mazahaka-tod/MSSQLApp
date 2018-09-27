@@ -5,7 +5,10 @@ using DiplomMSSQLApp.DAL.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.UnitTests
@@ -353,5 +356,203 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Manager", result[1].Title);
             Assert.AreEqual("Agent", result[2].Title);
         }
+
+
+        /// <summary>
+        /// // TestCreateAsync method
+        /// </summary>
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_CallsCreateMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Create(It.IsAny<IEnumerable<Post>>()));
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Create.txt";
+
+            await postService.TestCreateAsync(1);
+
+            mock.Verify(m => m.Posts.Create(It.IsAny<IEnumerable<Post>>()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_CallsSaveAsyncMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Create(It.IsAny<IEnumerable<Post>>()));
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Create.txt";
+
+            await postService.TestCreateAsync(1);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Create(It.IsAny<IEnumerable<Post>>()));
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Create.txt";
+
+            await postService.TestCreateAsync(1);
+
+            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestCreateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Create(It.IsAny<IEnumerable<Post>>()));
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Create.txt";
+
+            await postService.TestCreateAsync(1);
+
+            Assert.IsTrue(Regex.IsMatch(postService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
+        /// <summary>
+        /// // TestReadAsync method
+        /// </summary>
+        [Test]
+        public async Task TestReadAsync_ParameterIsThree_CallsGetMethodFourTimes() {
+            int num = 3;
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            mock.Setup(m => m.Posts.Get(It.IsAny<int>())).Returns(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Read.txt";
+
+            await postService.TestReadAsync(num, 0);
+
+            mock.Verify(m => m.Posts.Get(It.IsAny<int>()), Times.Exactly(4));
+        }
+
+        [Test]
+        public async Task TestReadAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            mock.Setup(m => m.Posts.Get(It.IsAny<int>())).Returns(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Read.txt";
+
+            await postService.TestReadAsync(1, 0);
+
+            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestReadAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            mock.Setup(m => m.Posts.Get(It.IsAny<int>())).Returns(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Read.txt";
+
+            await postService.TestReadAsync(1, 0);
+
+            Assert.IsTrue(Regex.IsMatch(postService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
+        /// <summary>
+        /// // TestUpdateAsync method
+        /// </summary>
+        [Test]
+        public async Task TestUpdateAsync_ParameterIsOne_CallsUpdateMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { new Post(), new Post() });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Update.txt";
+
+            await postService.TestUpdateAsync(1);
+
+            mock.Verify(m => m.Posts.Update(It.IsAny<Post>()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestUpdateAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { new Post(), new Post() });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Update.txt";
+
+            await postService.TestUpdateAsync(1);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestUpdateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Update.txt";
+
+            await postService.TestUpdateAsync(1);
+
+            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestUpdateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Update.txt";
+
+            await postService.TestUpdateAsync(1);
+
+            Assert.IsTrue(Regex.IsMatch(postService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
+        /// <summary>
+        /// // TestDeleteAsync method
+        /// </summary>
+        [Test]
+        public async Task TestDeleteAsync_ParameterIsOne_CallsUpdateMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Delete.txt";
+
+            await postService.TestDeleteAsync(1);
+
+            mock.Verify(m => m.Posts.RemoveSeries(It.IsAny<IEnumerable<Post>>()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestDeleteAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Delete.txt";
+
+            await postService.TestDeleteAsync(1);
+
+            mock.Verify((m => m.SaveAsync()), Times.Once());
+        }
+
+        [Test]
+        public async Task TestDeleteAsync_CallsWithGoodParameter_CreatesResultFile() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Delete.txt";
+
+            await postService.TestDeleteAsync(1);
+
+            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+        }
+
+        [Test]
+        public async Task TestDeleteAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
+            PostService postService = GetNewService(mock.Object);
+            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Delete.txt";
+
+            await postService.TestDeleteAsync(1);
+
+            Assert.IsTrue(Regex.IsMatch(postService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+        }
+
     }
 }

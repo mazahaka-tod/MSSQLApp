@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace DiplomMSSQLApp.BLL.Services {
     public class PostService : BaseService<PostDTO> {
         public IUnitOfWork Database { get; set; }
+        public string ElapsedTime { get; set; }
         public string PathToFileForTests { get; set; }
 
         public PostService(IUnitOfWork uow) {
@@ -104,8 +105,8 @@ namespace DiplomMSSQLApp.BLL.Services {
         // Тест добавления должностей
         public override async Task TestCreateAsync(int num) {
             IEnumerable<Post> posts = CreatePostsCollectionForTest(num);
-            string elapsedTime = await RunTestCreateAsync(posts);
-            WriteResultTestCreateInFile(num, elapsedTime, PathToFileForTests);
+            await RunTestCreateAsync(posts);
+            WriteResultTestCreateInFile(num);
         }
 
         private IEnumerable<Post> CreatePostsCollectionForTest(int num) {
@@ -124,24 +125,23 @@ namespace DiplomMSSQLApp.BLL.Services {
             return posts;
         }
 
-        private async Task<string> RunTestCreateAsync(IEnumerable<Post> posts) {
+        private async Task RunTestCreateAsync(IEnumerable<Post> posts) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             Database.Posts.Create(posts);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestCreateInFile(int num, string elapsedTime, string path) {
+        private void WriteResultTestCreateInFile(int num) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество добавленных должностей: ");
             sb.Append(num);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }
@@ -150,11 +150,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task TestReadAsync(int num, int salary) {
             int postsCount = (await Database.Posts.GetAsync()).Count();
             int resultCount = Database.Posts.Get(salary).Count();
-            string elapsedTime = RunTestRead(num, salary);
-            WriteResultTestReadInFile(postsCount, resultCount, num, salary, elapsedTime, PathToFileForTests);
+            RunTestRead(num, salary);
+            WriteResultTestReadInFile(postsCount, resultCount, num, salary);
         }
 
-        private string RunTestRead(int num, int salary) {
+        private void RunTestRead(int num, int salary) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             for (int i = 0; i < num; i++) {
@@ -162,11 +162,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             }
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestReadInFile(int postsCount, int resultCount, int num, int salary, string elapsedTime, string path) {
+        private void WriteResultTestReadInFile(int postsCount, int resultCount, int num, int salary) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Общее количество должностей: ");
             sb.Append(postsCount);
@@ -177,8 +176,8 @@ namespace DiplomMSSQLApp.BLL.Services {
             sb.Append("; Условие выборки: Salary >= ");
             sb.Append(salary);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }
@@ -187,11 +186,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task TestUpdateAsync(int num) {
             Post[] posts = (await Database.Posts.GetAsync()).Take(num).ToArray();
             int postsLength = posts.Length;
-            string elapsedTime = await RunTestUpdateAsync(posts);
-            WriteResultTestUpdateInFile(postsLength, elapsedTime, PathToFileForTests);
+            await RunTestUpdateAsync(posts);
+            WriteResultTestUpdateInFile(postsLength);
         }
 
-        private async Task<string> RunTestUpdateAsync(Post[] posts) {
+        private async Task RunTestUpdateAsync(Post[] posts) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             for (int i = 0; i < posts.Length; i++) {
@@ -203,17 +202,16 @@ namespace DiplomMSSQLApp.BLL.Services {
             }
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestUpdateInFile(int postsLength, string elapsedTime, string path) {
+        private void WriteResultTestUpdateInFile(int postsLength) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество обновленных должностей: ");
             sb.Append(postsLength);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }
@@ -222,28 +220,27 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task TestDeleteAsync(int num) {
             IEnumerable<Post> posts = (await Database.Posts.GetAsync()).Take(num);
             int postsCount = posts.Count();
-            string elapsedTime = await RunTestDeleteAsync(posts);
-            WriteResultTestDeleteInFile(postsCount, elapsedTime, PathToFileForTests);
+            await RunTestDeleteAsync(posts);
+            WriteResultTestDeleteInFile(postsCount);
         }
 
-        private async Task<string> RunTestDeleteAsync(IEnumerable<Post> posts) {
+        private async Task RunTestDeleteAsync(IEnumerable<Post> posts) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             Database.Posts.RemoveSeries(posts);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
-            return elapsedTime;
+            ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestDeleteInFile(int postsCount, string elapsedTime, string path) {
+        private void WriteResultTestDeleteInFile(int postsCount) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество удаленных должностей: ");
             sb.Append(postsCount);
             sb.Append("; Время: ");
-            sb.Append(elapsedTime);
-            using (StreamWriter sw = new StreamWriter(path, true, Encoding.UTF8)) {
+            sb.Append(ElapsedTime);
+            using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
                 sw.WriteLine(sb.ToString());
             }
         }
