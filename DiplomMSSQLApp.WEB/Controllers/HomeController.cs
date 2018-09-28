@@ -42,7 +42,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(p => p.Employees, opt => opt.Ignore());
             });
             IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
-            return View(new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo });
+            return View("Index", new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo });
         }
 
         private string CreateDirectoryToFile(string filename) {
