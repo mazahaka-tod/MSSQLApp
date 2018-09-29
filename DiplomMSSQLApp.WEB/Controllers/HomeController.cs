@@ -58,7 +58,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> CreateAsync() {
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
-            return View();
+            return View("Create");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
         public async Task<ActionResult> CreateAsync(EmployeeViewModel e) {
@@ -72,7 +72,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             }
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
-            return View(e);
+            return View("Create", e);
         }
 
         private async Task<SelectList> GetSelectListDepartmentsAsync() {
