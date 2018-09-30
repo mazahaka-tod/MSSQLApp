@@ -592,7 +592,7 @@
             $('input[name="Filter.Columns"]', '#filterform').prop('checked', true);
             // Сбрасывает input[text,number,date] на форме фильтра
             $(':nth-child(n+3)', '#lname, #bns').remove();
-            $('input', '#filterform').not('[type="submit"]').val('');
+            $('input[type="text"], input[type="number"], input[type="date"]', '#filterform').val('');
             // Сбрасывает select на форме фильтра
             $('option:first', '#filterform select').prop('selected', true);
             // Сбрасывает отображение ссылок

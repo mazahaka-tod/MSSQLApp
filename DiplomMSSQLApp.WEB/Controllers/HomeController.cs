@@ -113,7 +113,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> EditAsync(int? id) {
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Edit");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
         public async Task<ActionResult> EditAsync(EmployeeViewModel e) {
@@ -127,14 +127,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             }
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
-            return View(e);
+            return View("Edit", e);
         }
 
-        private async Task<ActionResult> GetViewAsync(int? id) {
+        private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
                 EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
                 EmployeeViewModel e = MapDTOWithViewModel(eDto);
-                return View(e);
+                return View(viewName, e);
             }
             catch (ValidationException ex) {
                 return View("CustomError", (object)ex.Message);
@@ -157,13 +157,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Подробная информация о сотруднике
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Details");
         }
 
         // Удаление сотрудника
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
         public async Task<ActionResult> DeleteConfirmedAsync(int id) {
@@ -173,7 +173,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         // Удаление всех сотрудников
         public ActionResult DeleteAll() {
-            return View();
+            return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllAsync() {
@@ -249,11 +249,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
         
         public ActionResult About() {
-            return View();
+            return View("About");
         }
 
         public ActionResult Contact() {
-            return View();
+            return View("Contact");
         }
 
         protected override void Dispose(bool disposing) {
