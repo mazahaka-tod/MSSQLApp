@@ -27,14 +27,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
                                         .ForMember(d => d.Employees, opt => opt.Ignore()));
             IEnumerable<DepartmentViewModel> departments = Mapper.Map<IEnumerable<DepartmentDTO>, IEnumerable<DepartmentViewModel>>(dDto);
-            return View(new DepartmentListViewModel { Departments = departments, PageInfo = departmentService.PageInfo });
+            return View("Index", new DepartmentListViewModel { Departments = departments, PageInfo = departmentService.PageInfo });
         }
 
         // Добавление нового отдела
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View();
+            return View("Create");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
         public async Task<ActionResult> CreateAsync(DepartmentViewModel d) {
@@ -47,7 +47,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View(d);
+            return View("Create", d);
         }
 
         private async Task<SelectList> GetSelectListEmployeesAsync() {
@@ -75,7 +75,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Edit");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
         public async Task<ActionResult> EditAsync(DepartmentViewModel d) {
@@ -88,14 +88,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View(d);
+            return View("Edit", d);
         }
 
-        private async Task<ActionResult> GetViewAsync(int? id) {
+        private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
                 DepartmentDTO dDto = await departmentService.FindByIdAsync(id);
                 DepartmentViewModel d = MapDTOWithViewModel(dDto);
-                return View(d);
+                return View(viewName, d);
             }
             catch (ValidationException ex) {
                 return View("CustomError", (object)ex.Message);
@@ -117,13 +117,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Подробная информация об отделе
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Details");
         }
 
         // Удаление отдела
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
         public async Task<ActionResult> DeleteConfirmedAsync(int id) {
@@ -138,7 +138,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         // Удаление всех отделов
         public ActionResult DeleteAll() {
-            return View();
+            return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllAsync() {
