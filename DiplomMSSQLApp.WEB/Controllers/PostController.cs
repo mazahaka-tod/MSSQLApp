@@ -31,12 +31,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, PostViewModel>()
                                         .ForMember(p => p.Employees, opt => opt.Ignore()));
             IEnumerable<PostViewModel> posts = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
-            return View(new PostListViewModel { Posts = posts, PageInfo = postService.PageInfo });
+            return View("Index", new PostListViewModel { Posts = posts, PageInfo = postService.PageInfo });
         }
 
         // Добавление новой должности
         public ActionResult Create() {
-            return View();
+            return View("Create");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
         public async Task<ActionResult> CreateAsync(PostViewModel p) {
@@ -48,7 +48,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            return View(p);
+            return View("Create", p);
         }
 
         private PostDTO MapViewModelWithDTO(PostViewModel p) {
@@ -66,7 +66,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Обновление информации о должности
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Edit");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
         public async Task<ActionResult> EditAsync(PostViewModel p) {
@@ -78,14 +78,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            return View(p);
+            return View("Edit", p);
         }
 
-        private async Task<ActionResult> GetViewAsync(int? id) {
+        private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
                 PostDTO pDto = await postService.FindByIdAsync(id);
                 PostViewModel p = MapDTOWithViewModel(pDto);
-                return View(p);
+                return View(viewName, p);
             }
             catch (ValidationException ex) {
                 return View("CustomError", (object)ex.Message);
@@ -107,13 +107,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Подробная информация о должности
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Details");
         }
 
         // Удаление должности
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
         public async Task<ActionResult> DeleteConfirmedAsync(int id) {
@@ -128,7 +128,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         // Удаление всех должностей
         public ActionResult DeleteAll() {
-            return View();
+            return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllAsync() {
