@@ -27,14 +27,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
                                         .ForMember(bt => bt.Employees, opt => opt.Ignore()));
             IEnumerable<BusinessTripViewModel> businessTrips = Mapper.Map<IEnumerable<BusinessTripDTO>, IEnumerable<BusinessTripViewModel>>(btDto);
-            return View(new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = businessTripService.PageInfo });
+            return View("Index", new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = businessTripService.PageInfo });
         }
 
         // Добавление новой командировки
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View();
+            return View("Create");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
         public async Task<ActionResult> CreateAsync(BusinessTripViewModel bt, int[] ids) {
@@ -47,7 +47,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View(bt);
+            return View("Create", bt);
         }
 
         private async Task<SelectList> GetSelectListEmployeesAsync() {
@@ -75,7 +75,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Edit");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
         public async Task<ActionResult> EditAsync(BusinessTripViewModel bt, int[] ids) {
@@ -88,14 +88,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View(bt);
+            return View("Edit", bt);
         }
 
-        private async Task<ActionResult> GetViewAsync(int? id) {
+        private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
                 BusinessTripDTO btDto = await businessTripService.FindByIdAsync(id);
                 BusinessTripViewModel bt = MapDTOWithViewModel(btDto);
-                return View(bt);
+                return View(viewName, bt);
             }
             catch (ValidationException ex) {
                 return View("CustomError", (object)ex.Message);
@@ -117,13 +117,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Подробная информация о командировке
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Details");
         }
 
         // Удаление командировки
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(int? id) {
-            return await GetViewAsync(id);
+            return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
         public async Task<ActionResult> DeleteConfirmedAsync(int id) {
@@ -133,7 +133,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         // Удаление всех командировок
         public ActionResult DeleteAll() {
-            return View();
+            return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllAsync() {

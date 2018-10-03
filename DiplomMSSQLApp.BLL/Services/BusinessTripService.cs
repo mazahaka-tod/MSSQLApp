@@ -19,7 +19,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         public BusinessTripService() { }
 
         // Добавление новой командировки (с валидацией)
-        public async Task CreateAsync(BusinessTripDTO btDto, int[] ids) {
+        public virtual async Task CreateAsync(BusinessTripDTO btDto, int[] ids) {
             ValidationBusinessTrip(btDto);
             InitializeMapperDTO();
             BusinessTrip bt = Mapper.Map<BusinessTripDTO, BusinessTrip>(btDto);
@@ -58,7 +58,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Обновление информации о командировке
-        public async Task EditAsync(BusinessTripDTO btDto, int[] ids) {
+        public virtual async Task EditAsync(BusinessTripDTO btDto, int[] ids) {
             ValidationBusinessTrip(btDto);
             BusinessTrip bt = await Database.BusinessTrips.FindByIdAsync(btDto.Id);
             if (bt == null) return;
