@@ -13,6 +13,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace DiplomMSSQLApp.BLL.Services {
     public class EmployeeService : BaseService<EmployeeDTO> {
@@ -289,6 +290,33 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task DeleteAllAsync() {
             await Database.Employees.RemoveAllAsync();
             await Database.SaveAsync();
+        }
+
+        // Запись информации о должностях в файл
+        public virtual async Task ExportJsonAsync(string fullPath) {
+            IEnumerable<Employee> employees = await Database.Employees.GetAsync();
+            var transformEmployees = employees.Select(e => new {
+                e.LastName,
+                e.FirstName,
+                e.Email,
+                e.PhoneNumber,
+                e.Address,
+                HireDate = e.HireDate.ToShortDateString(),
+                e.Salary,
+                e.Bonus,
+                Post = e.Post.Title,
+                Department = e.Department.DepartmentName,
+                BusinessTrips = e.BusinessTrips.Select(bt => bt.Name)
+            }).ToArray();
+            using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
+                sw.WriteLine("{\"Employees\":[");
+                int employeesLength = transformEmployees.Length;
+                for (int i = 1; i < employeesLength; i++) {
+                    sw.Write(new JavaScriptSerializer().Serialize(transformEmployees[i]));
+                    if (i != employeesLength - 1) sw.WriteLine(",");
+                }
+                sw.WriteLine("]}");
+            }
         }
 
         // Тест добавления сотрудников

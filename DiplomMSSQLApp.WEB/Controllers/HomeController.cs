@@ -186,29 +186,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> ExportJsonAsync() {
             string fullPath = CreateDirectoryToFile("Employees.json");
             System.IO.File.Delete(fullPath);
-            IEnumerable<EmployeeDTO> eDto = await employeeService.GetAllAsync();
-            var employees = eDto.Select(e => new {
-                e.LastName,
-                e.FirstName,
-                e.Email,
-                e.PhoneNumber,
-                e.Address,
-                HireDate = e.HireDate.ToShortDateString(),
-                e.Salary,
-                e.Bonus,
-                Post = e.Post.Title,
-                Department = e.Department.DepartmentName,
-                BusinessTrips = e.BusinessTrips.Select(bt => bt.Name)
-            }).ToArray();
-            using (StreamWriter sw = new StreamWriter(fullPath, true, System.Text.Encoding.UTF8)) {
-                sw.WriteLine("{\"Employees\":[");
-                int employeesLength = employees.Length;
-                for (int i = 1; i < employeesLength; i++) {
-                    sw.Write(System.Web.Helpers.Json.Encode(employees[i]));
-                    if (i != employeesLength-1) sw.WriteLine(",");
-                }
-                sw.WriteLine("]}");
-            }
+            await (employeeService as EmployeeService).ExportJsonAsync(fullPath);
             return RedirectToAction("Index");
         }
 

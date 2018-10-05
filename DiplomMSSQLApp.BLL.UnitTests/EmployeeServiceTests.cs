@@ -1090,6 +1090,22 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         /// <summary>
+        /// // ExportJsonAsync method
+        /// </summary>
+        [Test]
+        public async Task ExportJsonAsync_CreatesJsonFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Employees.json";
+            File.Delete(fullPath);
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            EmployeeService employeeService = GetNewService(mock.Object);
+
+            await employeeService.ExportJsonAsync(fullPath);
+
+            Assert.IsTrue(File.Exists(fullPath));
+        }
+
+        /// <summary>
         /// // TestCreateAsync method
         /// </summary>
         [Test]
@@ -1122,16 +1138,18 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestCreateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Posts.GetFirst());
             mock.Setup(m => m.Departments.GetFirst());
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
             EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+            employeeService.PathToFileForTests = fullPath;
 
             await employeeService.TestCreateAsync(1);
 
-            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]
@@ -1167,15 +1185,17 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestReadAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
             mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
             EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
+            employeeService.PathToFileForTests = fullPath;
 
             await employeeService.TestReadAsync(1, 0);
 
-            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]
@@ -1220,14 +1240,16 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestUpdateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
             EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+            employeeService.PathToFileForTests = fullPath;
 
             await employeeService.TestUpdateAsync(1);
 
-            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]
@@ -1271,14 +1293,16 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestDeleteAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
             EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+            employeeService.PathToFileForTests = fullPath;
 
             await employeeService.TestDeleteAsync(1);
 
-            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]

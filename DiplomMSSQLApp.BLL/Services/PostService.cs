@@ -104,7 +104,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Запись информации о должностях в файл
-        public async Task ExportJsonAsync(string fullPath) {
+        public virtual async Task ExportJsonAsync(string fullPath) {
             IEnumerable<Post> posts = await Database.Posts.GetAsync();
             var transformPosts = posts.Select(p => new {
                 p.Title,

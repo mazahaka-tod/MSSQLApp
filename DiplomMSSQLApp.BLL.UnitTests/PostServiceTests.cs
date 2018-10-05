@@ -357,6 +357,21 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Agent", result[2].Title);
         }
 
+        /// <summary>
+        /// // ExportJsonAsync method
+        /// </summary>
+        [Test]
+        public async Task ExportJsonAsync_CreatesJsonFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Post/Posts.json";
+            File.Delete(fullPath);
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { new Post() { Title = "1" } });
+            PostService postService = GetNewService(mock.Object);
+
+            await postService.ExportJsonAsync(fullPath);
+
+            Assert.IsTrue(File.Exists(fullPath));
+        }
 
         /// <summary>
         /// // TestCreateAsync method
@@ -387,14 +402,16 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestCreateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Post/Create.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Posts.Create(It.IsAny<IEnumerable<Post>>()));
             PostService postService = GetNewService(mock.Object);
-            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Create.txt";
+            postService.PathToFileForTests = fullPath;
 
             await postService.TestCreateAsync(1);
 
-            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]
@@ -428,15 +445,17 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestReadAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Post/Read.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
             mock.Setup(m => m.Posts.Get(It.IsAny<int>())).Returns(new Post[] { });
             PostService postService = GetNewService(mock.Object);
-            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Read.txt";
+            postService.PathToFileForTests = fullPath;
 
             await postService.TestReadAsync(1, 0);
 
-            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]
@@ -481,14 +500,16 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestUpdateAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Post/Update.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
             PostService postService = GetNewService(mock.Object);
-            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Update.txt";
+            postService.PathToFileForTests = fullPath;
 
             await postService.TestUpdateAsync(1);
 
-            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]
@@ -532,14 +553,16 @@ namespace DiplomMSSQLApp.BLL.UnitTests
 
         [Test]
         public async Task TestDeleteAsync_CallsWithGoodParameter_CreatesResultFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Post/Delete.txt";
+            File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Posts.GetAsync()).ReturnsAsync(new Post[] { });
             PostService postService = GetNewService(mock.Object);
-            postService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Post/Delete.txt";
+            postService.PathToFileForTests = fullPath;
 
             await postService.TestDeleteAsync(1);
 
-            Assert.IsTrue(File.Exists(postService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(fullPath));
         }
 
         [Test]

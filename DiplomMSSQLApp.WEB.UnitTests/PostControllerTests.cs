@@ -428,17 +428,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
-        
-        [Test]
-        public async Task ExportJsonAsync_CreatesJsonFile() {
-            Mock<PostService> mock = new Mock<PostService>();
-            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.ExportJsonAsync()) as RedirectToRouteResult;
-
-            Assert.IsTrue(File.Exists("./DiplomMSSQLApp.WEB/Results/Post/Posts.json"));
-        }
-        
         /// <summary>
         /// // TestCreateAsync method
         /// </summary>
