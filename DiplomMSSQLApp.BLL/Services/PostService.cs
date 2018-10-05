@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace DiplomMSSQLApp.BLL.Services {
     public class PostService : BaseService<PostDTO> {
@@ -100,6 +101,25 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task DeleteAllAsync() {
             await Database.Posts.RemoveAllAsync();
             await Database.SaveAsync();
+        }
+
+        // Запись информации о должностях в файл
+        public async Task ExportJsonAsync(string fullPath) {
+            IEnumerable<Post> posts = await Database.Posts.GetAsync();
+            var transformPosts = posts.Select(p => new {
+                p.Title,
+                p.MinSalary,
+                p.MaxSalary
+            }).ToArray();
+            using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
+                sw.WriteLine("{\"Posts\":[");
+                int postsLength = transformPosts.Length;
+                for (int i = 1; i < postsLength; i++) {
+                    sw.Write(new JavaScriptSerializer().Serialize(transformPosts[i]));
+                    if (i != postsLength - 1) sw.WriteLine(",");
+                }
+                sw.WriteLine("]}");
+            }
         }
 
         // Тест добавления должностей
