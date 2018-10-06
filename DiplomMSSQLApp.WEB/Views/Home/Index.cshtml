@@ -1,5 +1,4 @@
-﻿@using DiplomMSSQLApp.WEB.Helpers
-@model DiplomMSSQLApp.WEB.Models.EmployeeListViewModel
+﻿@model DiplomMSSQLApp.WEB.Models.EmployeeListViewModel
 
 @{
     ViewBag.Title = "Список сотрудников";
@@ -25,7 +24,7 @@
         Поиск по фильтру <i>(Показать)</i>
     </div>
     <div id="filter" style="display:none;">
-        @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { id = "filterform" })) {
+        @using (Ajax.BeginForm(null, null, new AjaxOptions { UpdateTargetId = "employeesTable", Url = Url.Action("Index") }, new { id = "filterform" })) {
             <table>
                 <tr>
                     <td>
@@ -290,125 +289,26 @@
     @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
 </p>
 
-@if (Model.Employees.Count() > 0) {
-    <table class="table table-striped table-hover">
-        <tr>
-            @if (Model.Filter.Columns.Contains("0")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).LastName)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("1")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).FirstName)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("2")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Email)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("3")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).PhoneNumber)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("4")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).HireDate)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("5")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Salary)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("6")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Bonus)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("7")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Post.Title)
-                </th>
-            }
-            @if (Model.Filter.Columns.Contains("8")) {
-                <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Department.DepartmentName)
-                </th>
-            }
-            <th></th>
-        </tr>
-
-        @foreach (var item in Model.Employees) {
-            <tr>
-                @if (Model.Filter.Columns.Contains("0")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.LastName)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("1")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.FirstName)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("2")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("3")) {
-                    <td width="130px">
-                        @Html.DisplayFor(modelItem => item.PhoneNumber)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("4")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.HireDate)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("5")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Salary)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("6")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Bonus)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("7")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Post.Title)
-                    </td>
-                }
-                @if (Model.Filter.Columns.Contains("8")) {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Department.DepartmentName)
-                    </td>
-                }
-                <td width="150px">
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                </td>
-            </tr>
-        }
-    </table>
-}
-
-<p>
-    @Html.Label("Count", "Количество сотрудников: " + Model.PageInfo.TotalItems)
-</p>
-
-<div class="btn-group">
-    @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { filterAsJsonString = Html.Raw(Json.Encode(Model.Filter)), page = x }))
+<div id="employeesTable">
+    @Html.Partial("GetEmployeesData", Model)
 </div>
 
 @section scripts {
 <script>
     $(document).ready(function () {
+        // ajax paging
+        $(document).on("click", "#contentPager a[href]", function () {
+            $.ajax({
+                url: $(this).attr("href"),
+                type: 'GET',
+                cache: false,
+                success: function (result) {
+                    $('#employeesTable').html(result);
+                }
+            });
+            return false;
+        });
+
         // Добавляет на форму фильтра текстовое поле Фамилия
         $('#addlastname').on('click', function (event) {
             event.preventDefault();

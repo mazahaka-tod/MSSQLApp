@@ -249,6 +249,7 @@
     <Content Include="Views\Department\DeleteAll.cshtml" />
     <Content Include="Views\Post\DeleteAll.cshtml" />
     <Content Include="Views\Shared\CustomError.cshtml" />
+    <Content Include="Views\Home\GetEmployeesData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

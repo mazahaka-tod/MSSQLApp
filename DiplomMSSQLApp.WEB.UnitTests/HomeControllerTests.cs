@@ -7,9 +7,7 @@ using DiplomMSSQLApp.WEB.Controllers;
 using DiplomMSSQLApp.WEB.Models;
 using Moq;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -23,15 +21,24 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             return new HomeController(es, ds, ps);
         }
 
-        protected HomeController GetNewHomeControllerWithControllerContext(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
-            return new HomeController(es, ds, ps) { ControllerContext = MockingServerMapPathMethod() };
+        protected HomeController GetNewHomeControllerWithControllerContext(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps, string XRequestedWith = "") {
+            return new HomeController(es, ds, ps) { ControllerContext = MockingControllerContext(XRequestedWith) };
         }
 
-        protected ControllerContext MockingServerMapPathMethod() {
+        protected ControllerContext MockingControllerContext(string XRequestedWith) {
+            // mocking Server.MapPath method
             Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
             serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/Employee/");
+            // mocking Request.Headers["X-Requested-With"]
+            Mock<HttpRequestBase> requestMock = new Mock<HttpRequestBase>();
+            requestMock.SetupGet(x => x.Headers).Returns(new System.Net.WebHeaderCollection {
+                {"X-Requested-With", XRequestedWith}
+            });
+
             Mock<HttpContextBase> httpCtxStub = new Mock<HttpContextBase>();
-            httpCtxStub.Setup(m => m.Server).Returns(serverMock.Object);
+            httpCtxStub.SetupGet(m => m.Server).Returns(serverMock.Object);
+            httpCtxStub.SetupGet(m => m.Request).Returns(requestMock.Object);
+
             ControllerContext controllerCtx = new ControllerContext {
                 HttpContext = httpCtxStub.Object
             };
@@ -49,6 +56,16 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             ViewResult result = controller.Index(null, null) as ViewResult;
 
             Assert.AreEqual("Index", result.ViewName);
+        }
+
+        [Test]
+        public void Index_AsksForGetEmployeesDataPartialView() {
+            Mock<EmployeeService> mock = new Mock<EmployeeService>();
+            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null, "XMLHttpRequest");
+
+            PartialViewResult result = controller.Index(null, null) as PartialViewResult;
+
+            Assert.AreEqual("GetEmployeesData", result.ViewName);
         }
 
         [Test]
