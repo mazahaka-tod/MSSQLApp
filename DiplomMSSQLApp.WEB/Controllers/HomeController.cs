@@ -5,6 +5,7 @@ using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
+using NLog;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ using System.Web.Mvc;
 namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     public class HomeController : Controller {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private IService<EmployeeDTO> employeeService;
         private IService<DepartmentDTO> departmentService;
         private IService<PostDTO> postService;
@@ -25,6 +27,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         public ActionResult Index(EmployeeFilter filter, string filterAsJsonString, int page = 1) {
+            logger.Info("Called action");
             // При использовании функции Paging передается строка filterAsJsonString, а аргумент EmployeeFilter filter == null,
             // поэтому производим декодирование строки filterAsJsonString в объект EmployeeFilter и присваиваем его переменной filter
             if (filterAsJsonString != null)
@@ -44,8 +47,10 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
             EmployeeListViewModel model = new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
+                logger.Info("Executed async request");
                 return PartialView("GetEmployeesData", model);
             }
+            logger.Info("Executed sync request");
             return View("Index", model);
         }
 

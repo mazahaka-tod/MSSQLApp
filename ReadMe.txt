@@ -10,4 +10,4 @@ The main functions implemented in the project:
 - unit testing.
 Used Framework: ASP.NET MVC 5.
 Used DBMS: MS SQL Server.
-Used packages: Entity Framework, AutoMapper, Ninject, Bootstrap, jQuery, Newtonsoft.Json, NUnit, Moq.
+Used packages: Entity Framework, AutoMapper, Ninject, Bootstrap, jQuery, NLog, NUnit, Moq.

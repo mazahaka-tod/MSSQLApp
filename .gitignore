@@ -2,6 +2,7 @@
 bin
 obj
 App_Data
+Logs
 Results
 *.suo
 *.user
