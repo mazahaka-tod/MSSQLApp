@@ -84,7 +84,7 @@
   <ItemGroup>
     <Compile Include="BusinessTripControllerTests.cs" />
     <Compile Include="DepartmentControllerTests.cs" />
-    <Compile Include="HomeControllerTests.cs" />
+    <Compile Include="EmployeeControllerTests.cs" />
     <Compile Include="OrganizationControllerTests.cs" />
     <Compile Include="PostControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

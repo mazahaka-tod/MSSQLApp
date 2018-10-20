@@ -14,13 +14,13 @@ using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
-    public class HomeController : Controller {
+    public class EmployeeController : Controller {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private IService<EmployeeDTO> employeeService;
         private IService<DepartmentDTO> departmentService;
         private IService<PostDTO> postService;
 
-        public HomeController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
+        public EmployeeController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
             employeeService = es;
             departmentService = ds;
             postService = ps;

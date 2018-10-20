@@ -190,7 +190,7 @@
     </div>
     <div id="performanceTests" style="display:none;">
         <p>
-            @using (Html.BeginForm("TestCreate", "Home")) {
+            @using (Html.BeginForm("TestCreate", "Employee")) {
                 <div class="form-horizontal">
                     <h4>@Html.Label("Test", "Тест добавления сотрудников")</h4>
 
@@ -211,7 +211,7 @@
         </p>
         <hr />
         <p>
-            @using (Html.BeginForm("TestRead", "Home")) {
+            @using (Html.BeginForm("TestRead", "Employee")) {
                 <div class="form-horizontal">
                     <h4>@Html.Label("Test", "Тест выборки сотрудников")</h4>
 
@@ -239,7 +239,7 @@
         </p>
         <hr />
         <p>
-            @using (Html.BeginForm("TestUpdate", "Home")) {
+            @using (Html.BeginForm("TestUpdate", "Employee")) {
                 <div class="form-horizontal">
                     <h4>@Html.Label("Test", "Тест обновления сотрудников")</h4>
 
@@ -260,7 +260,7 @@
         </p>
         <hr />
         <p>
-            @using (Html.BeginForm("TestDelete", "Home")) {
+            @using (Html.BeginForm("TestDelete", "Employee")) {
                 <div class="form-horizontal">
                     <h4>@Html.Label("Test", "Тест удаления сотрудников")</h4>
 

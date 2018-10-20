@@ -162,7 +162,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\BusinessTripController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\OrganizationController.cs" />
     <Compile Include="Controllers\PostController.cs" />
     <Compile Include="Global.asax.cs">
@@ -239,10 +239,10 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Home\Create.cshtml" />
+    <Content Include="Views\Employee\About.cshtml" />
+    <Content Include="Views\Employee\Contact.cshtml" />
+    <Content Include="Views\Employee\Index.cshtml" />
+    <Content Include="Views\Employee\Create.cshtml" />
     <Content Include="Views\Post\Create.cshtml" />
     <Content Include="Views\Post\Delete.cshtml" />
     <Content Include="Views\Post\Edit.cshtml" />
@@ -257,17 +257,17 @@
     <Content Include="Views\Department\Delete.cshtml" />
     <Content Include="Views\Department\Edit.cshtml" />
     <Content Include="Views\Department\Index.cshtml" />
-    <Content Include="Views\Home\Delete.cshtml" />
-    <Content Include="Views\Home\Details.cshtml" />
-    <Content Include="Views\Home\Edit.cshtml" />
+    <Content Include="Views\Employee\Delete.cshtml" />
+    <Content Include="Views\Employee\Details.cshtml" />
+    <Content Include="Views\Employee\Edit.cshtml" />
     <Content Include="Views\Department\Details.cshtml" />
     <Content Include="Views\Post\Details.cshtml" />
-    <Content Include="Views\Home\DeleteAll.cshtml" />
+    <Content Include="Views\Employee\DeleteAll.cshtml" />
     <Content Include="Views\BusinessTrip\DeleteAll.cshtml" />
     <Content Include="Views\Department\DeleteAll.cshtml" />
     <Content Include="Views\Post\DeleteAll.cshtml" />
     <Content Include="Views\Shared\CustomError.cshtml" />
-    <Content Include="Views\Home\GetEmployeesData.cshtml" />
+    <Content Include="Views\Employee\GetEmployeesData.cshtml" />
     <Content Include="Views\Organization\Index.cshtml" />
     <Content Include="Views\Organization\Edit.cshtml" />
   </ItemGroup>
@@ -280,7 +280,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
-    <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DiplomMSSQLApp.BLL\DiplomMSSQLApp.BLL.csproj">

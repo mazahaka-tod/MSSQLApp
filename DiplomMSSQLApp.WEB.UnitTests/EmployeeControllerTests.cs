@@ -16,13 +16,13 @@ using System.Web.Mvc;
 namespace DiplomMSSQLApp.WEB.UnitTests
 {
     [TestFixture]
-    public class HomeControllerTests {
-        protected HomeController GetNewHomeController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
-            return new HomeController(es, ds, ps);
+    public class EmployeeControllerTests {
+        protected EmployeeController GetNewEmployeeController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
+            return new EmployeeController(es, ds, ps);
         }
 
-        protected HomeController GetNewHomeControllerWithControllerContext(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps, string XRequestedWith = "") {
-            return new HomeController(es, ds, ps) { ControllerContext = MockingControllerContext(XRequestedWith) };
+        protected EmployeeController GetNewEmployeeControllerWithControllerContext(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps, string XRequestedWith = "") {
+            return new EmployeeController(es, ds, ps) { ControllerContext = MockingControllerContext(XRequestedWith) };
         }
 
         protected ControllerContext MockingControllerContext(string XRequestedWith) {
@@ -51,7 +51,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public void Index_AsksForIndexView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -61,7 +61,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public void Index_AsksForGetEmployeesDataPartialView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null, "XMLHttpRequest");
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null, "XMLHttpRequest");
 
             PartialViewResult result = controller.Index(null, null) as PartialViewResult;
 
@@ -80,7 +80,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                     Bonus = 0.1
                 }
             });
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -96,7 +96,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public void Index_RetrievesFilterPropertyFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(filter: new EmployeeFilter() {
                 Email = "Brown@mail.ru",
@@ -117,7 +117,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public void Index_SetFilterAsJsonString_RetrievesFilterPropertyFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(filter: null, filterAsJsonString: "{ \"MinSalary\":10000, \"MaxSalary\":20000 }") as ViewResult;
 
@@ -130,7 +130,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         public void Index_RetrievesPageInfoPropertyFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -149,7 +149,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync()) as ViewResult;
 
@@ -164,7 +164,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                 new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
             });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync()) as ViewResult;
 
@@ -179,7 +179,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync()) as ViewResult;
 
@@ -196,7 +196,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
                 new PostDTO() { Id = 2, Title = "Programmer" }
             });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync()) as ViewResult;
 
@@ -211,7 +211,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync()) as ViewResult;
 
@@ -226,7 +226,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task CreateAsync_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.CreateAsync(null)) as RedirectToRouteResult;
 
@@ -239,7 +239,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
@@ -252,7 +252,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync(new EmployeeViewModel {
                 Id = 2,
@@ -275,7 +275,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                 new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
             });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
@@ -291,7 +291,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
@@ -309,7 +309,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
                 new PostDTO() { Id = 2, Title = "Programmer" }
             });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
@@ -325,7 +325,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
@@ -342,7 +342,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -359,7 +359,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             });
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -375,7 +375,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -388,7 +388,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -404,7 +404,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                 new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
             });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -419,7 +419,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(emock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -436,7 +436,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
                 new PostDTO() { Id = 2, Title = "Programmer" }
             });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -451,7 +451,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
@@ -466,7 +466,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task EditAsync_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.EditAsync(new EmployeeViewModel())) as RedirectToRouteResult;
 
@@ -479,7 +479,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
 
@@ -492,7 +492,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(new EmployeeViewModel {
                 Id = 2,
@@ -515,7 +515,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                 new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
             });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
 
@@ -531,7 +531,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
             Mock<PostService> pmock = new Mock<PostService>();
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
 
@@ -549,7 +549,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
                 new PostDTO() { Id = 2, Title = "Programmer" }
             });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
 
@@ -565,7 +565,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            HomeController controller = GetNewHomeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
             ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
 
@@ -580,7 +580,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task DetailsAsync_ModelStateIsValid_AsksForDetailsView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
 
@@ -595,7 +595,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                 LastName = "Brown",
                 Email = "Brown@mail.ru"
             });
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
 
@@ -609,7 +609,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         public async Task DetailsAsync_ModelStateIsNotValid_AsksForCustomErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
 
@@ -620,7 +620,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         public async Task DetailsAsync_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
 
@@ -634,7 +634,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task DeleteAsync_Get_ModelStateIsValid_AsksForDeleteView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
 
@@ -649,7 +649,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                 LastName = "Brown",
                 Email = "Brown@mail.ru"
             });
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
 
@@ -663,7 +663,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         public async Task DeleteAsync_Get_ModelStateIsNotValid_AsksForCustomErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
 
@@ -674,7 +674,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         public async Task DeleteAsync_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
 
@@ -688,7 +688,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task DeleteAsync_Post_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.DeleteConfirmedAsync(1)) as RedirectToRouteResult;
 
@@ -701,7 +701,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public void DeleteAll_Get_AsksForDeleteAllView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = controller.DeleteAll() as ViewResult;
 
@@ -714,7 +714,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task DeleteAll_Post_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.DeleteAllAsync()) as RedirectToRouteResult;
 
@@ -727,7 +727,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task ExportJsonAsync_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.ExportJsonAsync()) as RedirectToRouteResult;
 
@@ -740,7 +740,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task TestCreateAsync_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.TestCreateAsync(1)) as RedirectToRouteResult;
 
@@ -753,7 +753,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task TestReadAsync_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.TestReadAsync(1, 0)) as RedirectToRouteResult;
 
@@ -766,7 +766,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task TestUpdateAsync_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.TestUpdateAsync(1)) as RedirectToRouteResult;
 
@@ -779,7 +779,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task TestDeleteAsync_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeControllerWithControllerContext(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.TestDeleteAsync(1)) as RedirectToRouteResult;
 
@@ -792,7 +792,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public void About_AsksForAboutView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = controller.About() as ViewResult;
 
@@ -805,7 +805,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public void Contact_AsksForContactView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            HomeController controller = GetNewHomeController(mock.Object, null, null);
+            EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
             ViewResult result = controller.Contact() as ViewResult;
 
