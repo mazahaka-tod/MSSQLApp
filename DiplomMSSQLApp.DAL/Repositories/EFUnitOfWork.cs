@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace DiplomMSSQLApp.DAL.Repositories {
     public class EFUnitOfWork : IUnitOfWork {
         private HRContext db;
-        private EFGenericRepository<BusinessTrip> businessTripRepository;
-        private EFGenericRepository<Department> departmentRepository;
-        private EFEmployeeRepository employeeRepository;
-        private EFPostRepository postRepository;
+        private EFGenericRepository<BusinessTrip> _businessTripRepository;
+        private EFGenericRepository<Department> _departmentRepository;
+        private EFEmployeeRepository _employeeRepository;
+        private EFGenericRepository<Organization> _organizationRepository;
+        private EFPostRepository _postRepository;
 
         public EFUnitOfWork(string connectionString) {
             db = new HRContext(connectionString);
@@ -18,33 +19,41 @@ namespace DiplomMSSQLApp.DAL.Repositories {
 
         public IGenericRepository<BusinessTrip> BusinessTrips {
             get {
-                if (businessTripRepository == null)
-                    businessTripRepository = new EFGenericRepository<BusinessTrip>(db);
-                return businessTripRepository;
+                if (_businessTripRepository == null)
+                    _businessTripRepository = new EFGenericRepository<BusinessTrip>(db);
+                return _businessTripRepository;
             }
         }
 
         public IGenericRepository<Department> Departments {
             get {
-                if (departmentRepository == null)
-                    departmentRepository = new EFGenericRepository<Department>(db);
-                return departmentRepository;
+                if (_departmentRepository == null)
+                    _departmentRepository = new EFGenericRepository<Department>(db);
+                return _departmentRepository;
             }
         }
 
         public IGenericRepository<Employee> Employees {
             get {
-                if (employeeRepository == null)
-                    employeeRepository = new EFEmployeeRepository(db);
-                return employeeRepository;
+                if (_employeeRepository == null)
+                    _employeeRepository = new EFEmployeeRepository(db);
+                return _employeeRepository;
+            }
+        }
+
+        public IGenericRepository<Organization> Organizations {
+            get {
+                if (_organizationRepository == null)
+                    _organizationRepository = new EFGenericRepository<Organization>(db);
+                return _organizationRepository;
             }
         }
 
         public IGenericRepository<Post> Posts {
             get {
-                if (postRepository == null)
-                    postRepository = new EFPostRepository(db);
-                return postRepository;
+                if (_postRepository == null)
+                    _postRepository = new EFPostRepository(db);
+                return _postRepository;
             }
         }
 

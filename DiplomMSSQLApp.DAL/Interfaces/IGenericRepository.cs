@@ -11,7 +11,7 @@ namespace DiplomMSSQLApp.DAL.Interfaces {
         IEnumerable<TEntity> Get(int salary);                           // Получение элементов по условию
         IEnumerable<TEntity> Get(bool flag);                            // Получение элементов по условию
         IEnumerable<TEntity> Get(Func<TEntity, bool> predicate);        // Получение элементов, удовлетворяющих предикату
-        TEntity GetFirst();                                             // Получение первого элемента
+        Task<TEntity> GetFirstAsync();                                  // Получение первого элемента
         void Remove(TEntity item);                                      // Удаление элемента
         void RemoveSeries(IEnumerable<TEntity> items);                  // Удаление последовательности элементов
         Task RemoveAllAsync();                                          // Удаление всех элементов

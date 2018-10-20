@@ -36,8 +36,8 @@ namespace DiplomMSSQLApp.DAL.Repositories {
             return _dbSet.Where(predicate).ToList();
         }
         // Получение первого элемента
-        public virtual TEntity GetFirst() {
-            return _dbSet.FirstOrDefault();
+        public virtual async Task<TEntity> GetFirstAsync() {
+            return await _dbSet.FirstOrDefaultAsync();
         }
         // Удаление элемента
         public void Remove(TEntity item) {

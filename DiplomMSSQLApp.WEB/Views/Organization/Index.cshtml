@@ -1,0 +1,64 @@
+﻿@model DiplomMSSQLApp.WEB.Models.OrganizationViewModel
+
+@{
+    ViewBag.Title = "Информация об организации";
+}
+
+<h2>Информация об организации</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LegalAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LegalAddress)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ActualAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ActualAddress)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Fax)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Fax)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Изменить", "Edit", new { id = Model.Id }, new { @class = "btn btn-default" })
+</p>

@@ -17,6 +17,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         public abstract Task<T> FindByIdAsync(int? id);
         public abstract IEnumerable<T> Get(EmployeeFilter filter);
         public abstract Task<IEnumerable<T>> GetAllAsync();
+        public abstract Task<T> GetFirstAsync();
         public abstract Task TestCreateAsync(int num);
         public abstract Task TestReadAsync(int num, int salary);
         public abstract Task TestUpdateAsync(int num);

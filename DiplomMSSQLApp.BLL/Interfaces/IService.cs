@@ -16,6 +16,7 @@ namespace DiplomMSSQLApp.BLL.Interfaces
         Task<TEntity> FindByIdAsync(int? id);
         IEnumerable<TEntity> Get(EmployeeFilter filter);
         Task<IEnumerable<TEntity> > GetAllAsync();
+        Task<TEntity> GetFirstAsync();
         IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page);
         Task TestCreateAsync(int num);
         Task TestReadAsync(int num, int salary);

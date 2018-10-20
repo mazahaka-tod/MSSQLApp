@@ -146,5 +146,9 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override Task TestDeleteAsync(int num) {
             throw new System.NotImplementedException();
         }
+
+        public override Task<BusinessTripDTO> GetFirstAsync() {
+            throw new System.NotImplementedException();
+        }
     }
 }

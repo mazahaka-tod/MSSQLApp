@@ -273,5 +273,9 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override IEnumerable<PostDTO> Get(EmployeeFilter f) {
             throw new NotImplementedException();
         }
+
+        public override Task<PostDTO> GetFirstAsync() {
+            throw new NotImplementedException();
+        }
     }
 }

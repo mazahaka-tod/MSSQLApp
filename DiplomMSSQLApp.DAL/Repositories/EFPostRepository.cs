@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.DAL.Repositories {
     public class EFPostRepository : EFGenericRepository<Post> {
@@ -22,8 +23,8 @@ namespace DiplomMSSQLApp.DAL.Repositories {
                 return _dbSet.Where(p => p.MaxSalary <= 50000).ToList();
         }
 
-        public override Post GetFirst() {
-            return _dbSet.FirstOrDefault();
+        public override async Task<Post> GetFirstAsync() {
+            return await _dbSet.FirstOrDefaultAsync();
         }
     }
 }

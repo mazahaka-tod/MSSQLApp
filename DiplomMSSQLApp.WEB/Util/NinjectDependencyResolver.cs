@@ -29,6 +29,7 @@ namespace DiplomMSSQLApp.WEB.Util
             kernel.Bind<IService<BusinessTripDTO>>().To<BusinessTripService>();
             kernel.Bind<IService<DepartmentDTO>>().To<DepartmentService>();
             kernel.Bind<IService<EmployeeDTO>>().To<EmployeeService>();
+            kernel.Bind<IService<OrganizationDTO>>().To<OrganizationService>();
             kernel.Bind<IService<PostDTO>>().To<PostService>();
         }
     }

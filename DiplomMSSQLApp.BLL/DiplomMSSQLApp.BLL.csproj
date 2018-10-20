@@ -57,6 +57,7 @@
     <Compile Include="DTO\BusinessTripDTO.cs" />
     <Compile Include="DTO\DepartmentDTO.cs" />
     <Compile Include="DTO\EmployeeDTO.cs" />
+    <Compile Include="DTO\OrganizationDTO.cs" />
     <Compile Include="DTO\PostDTO.cs" />
     <Compile Include="Infrastructure\ServiceModule.cs" />
     <Compile Include="Infrastructure\ValidationException.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Services\BusinessTripService.cs" />
     <Compile Include="Services\DepartmentService.cs" />
     <Compile Include="Services\EmployeeService.cs" />
+    <Compile Include="Services\OrganizationService.cs" />
     <Compile Include="Services\PostService.cs" />
   </ItemGroup>
   <ItemGroup>

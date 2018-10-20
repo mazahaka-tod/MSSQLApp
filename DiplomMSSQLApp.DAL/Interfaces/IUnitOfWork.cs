@@ -7,6 +7,7 @@ namespace DiplomMSSQLApp.DAL.Interfaces {
         IGenericRepository<BusinessTrip> BusinessTrips { get; }
         IGenericRepository<Department> Departments { get; }
         IGenericRepository<Employee> Employees { get; }
+        IGenericRepository<Organization> Organizations { get; }
         IGenericRepository<Post> Posts { get; }
         Task SaveAsync();
     }

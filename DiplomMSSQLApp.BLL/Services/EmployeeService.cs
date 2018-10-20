@@ -321,20 +321,20 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Тест добавления сотрудников
         public override async Task TestCreateAsync(int num) {
-            IEnumerable<Employee> employees = CreateEmployeesCollectionForTest(num);
+            IEnumerable<Employee> employees = await CreateEmployeesCollectionForTestAsync(num);
             await RunTestCreateAsync(employees);
             WriteResultTestCreateInFile(num);
         }
 
-        private IEnumerable<Employee> CreateEmployeesCollectionForTest(int num) {
+        private async Task<IEnumerable<Employee>> CreateEmployeesCollectionForTestAsync(int num) {
             List<Employee> employees = new List<Employee>();
             string[] lastNames = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson",
                 "White", "Harris", "Martin", "Thompson", "Wood", "Lewis", "Scott", "Cooper", "King", "Green", "Walker", "Edwards", "Turner", "Morgan", "Baker", "Hill" };
             string[] firstNames = { "James", "Alex", "Ben", "Daniel", "Tom", "Ryan", "Sam", "Lewis", "Joe", "David", "Harry", "George", "Jamie", "Dan", "Matt", "Robert" };
             string[] emails = { "@mail.ru", "@yandex.ru", "@gmail.com" };
             double[] bonuses = { 0.05, 0.1, 0.15, 0.2 };
-            Post firstPost = Database.Posts.GetFirst() ?? new Post { Id = 1, Title = "unknown" };
-            Department firstDepartment = Database.Departments.GetFirst() ?? new Department { Id = 1, DepartmentName = "unknown" };
+            Post firstPost = (await Database.Posts.GetFirstAsync()) ?? new Post { Id = 1, Title = "unknown" };
+            Department firstDepartment = (await Database.Departments.GetFirstAsync()) ?? new Department { Id = 1, DepartmentName = "unknown" };
             for (int i = 0; i < num; i++) {
                 Employee employee = new Employee {
                     LastName = lastNames[i % lastNames.Length],
@@ -482,6 +482,10 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         public override void Dispose() {
             Database.Dispose();
+        }
+
+        public override Task<EmployeeDTO> GetFirstAsync() {
+            throw new NotImplementedException();
         }
     }
 }

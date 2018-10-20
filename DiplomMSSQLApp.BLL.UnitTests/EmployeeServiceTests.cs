@@ -1111,8 +1111,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [Test]
         public async Task TestCreateAsync_CallsWithGoodParameter_CallsCreateMethodOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirst());
-            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
+            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
             EmployeeService employeeService = GetNewService(mock.Object);
             employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
@@ -1125,8 +1125,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [Test]
         public async Task TestCreateAsync_CallsWithGoodParameter_CallsSaveAsyncMethodOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirst());
-            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
+            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
             EmployeeService employeeService = GetNewService(mock.Object);
             employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
@@ -1141,8 +1141,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirst());
-            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
+            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
             EmployeeService employeeService = GetNewService(mock.Object);
             employeeService.PathToFileForTests = fullPath;
@@ -1155,8 +1155,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [Test]
         public async Task TestCreateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirst());
-            mock.Setup(m => m.Departments.GetFirst());
+            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
+            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
             EmployeeService employeeService = GetNewService(mock.Object);
             employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";

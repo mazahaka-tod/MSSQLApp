@@ -36,8 +36,8 @@ namespace DiplomMSSQLApp.DAL.Repositories {
             return await _dbSet.Include(e => e.Department).Include(e => e.Post).ToListAsync();
         }
 
-        public override Employee GetFirst() {
-            return _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefault();
+        public override async Task<Employee> GetFirstAsync() {
+            return await _dbSet.Include(e => e.Department).Include(e => e.Post).FirstOrDefaultAsync();
         }
     }
 }
