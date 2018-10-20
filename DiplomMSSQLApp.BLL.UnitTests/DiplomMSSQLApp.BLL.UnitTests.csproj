@@ -64,6 +64,7 @@
     <Compile Include="BusinessTripServiceTests.cs" />
     <Compile Include="DepartmentServiceTests.cs" />
     <Compile Include="EmployeeServiceTests.cs" />
+    <Compile Include="OrganizationServiceTests.cs" />
     <Compile Include="PostServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
