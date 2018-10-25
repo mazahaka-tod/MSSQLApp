@@ -48,8 +48,18 @@ namespace DiplomMSSQLApp.BLL.Services {
         private void ValidationPost(PostDTO pDto) {
             if (pDto.Title == null)
                 throw new ValidationException("Требуется ввести название должности", "Title");
-            if (pDto.MinSalary != null && pDto.MaxSalary != null && pDto.MinSalary > pDto.MaxSalary)
-                throw new ValidationException("Минимальная зарплата не может быть больше максимальной", "MinSalary");
+            if (pDto.NumberOfUnits == null)
+                throw new ValidationException("Требуется ввести количество штатных единиц", "NumberOfUnits");
+            if (pDto.NumberOfUnits < 0 || pDto.NumberOfUnits > 10000)
+                throw new ValidationException("Значение должно быть в диапазоне [0, 10000]", "NumberOfUnits");
+            if (pDto.Salary == null)
+                throw new ValidationException("Требуется ввести оклад", "Salary");
+            if (pDto.Salary < 0 || pDto.Salary > 1000000)
+                throw new ValidationException("Оклад должен быть в диапазоне [0, 1000000]", "Salary");
+            if (pDto.Premium == null)
+                throw new ValidationException("Требуется ввести надбавку", "Premium");
+            if (pDto.Premium < 0 || pDto.Premium > 100000)
+                throw new ValidationException("Надбавка должна быть в диапазоне [0, 100000]", "Premium");
         }
 
         // Обновление информации о должности
@@ -74,6 +84,8 @@ namespace DiplomMSSQLApp.BLL.Services {
         private void InitializeMapper() {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Post, PostDTO>();
+                cfg.CreateMap<Department, DepartmentDTO>()
+                    .ForMember(d => d.Employees, opt => opt.Ignore());
                 cfg.CreateMap<Employee, EmployeeDTO>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Department, opt => opt.Ignore())
@@ -108,8 +120,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             IEnumerable<Post> posts = await Database.Posts.GetAsync();
             var transformPosts = posts.Select(p => new {
                 p.Title,
-                p.MinSalary,
-                p.MaxSalary
+                p.NumberOfUnits,
+                p.Salary,
+                p.Premium,
+                p.Department?.DepartmentName
             }).ToArray();
             using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
                 sw.WriteLine("{\"Posts\":[");
@@ -137,8 +151,9 @@ namespace DiplomMSSQLApp.BLL.Services {
             for (int i = 0; i < num; i++) {
                 Post post = new Post {
                     Title = titles[i % titles.Length],
-                    MinSalary = Convert.ToInt32(10000 + Math.Round(new Random(i).NextDouble() * 100) * 400),
-                    MaxSalary = Convert.ToInt32(50000 + Math.Round(new Random(i).NextDouble() * 100) * 400)
+                    NumberOfUnits = Convert.ToInt32(1 + Math.Round(new Random(i).NextDouble() * 100)),
+                    Salary = Convert.ToInt32(50000 + Math.Round(new Random(i).NextDouble() * 100) * 400),
+                    Premium = Convert.ToInt32(10000 + Math.Round(new Random(i).NextDouble() * 100) * 400)
                 };
                 posts.Add(post);
             }
@@ -215,8 +230,9 @@ namespace DiplomMSSQLApp.BLL.Services {
             stopWatch.Start();
             for (int i = 0; i < posts.Length; i++) {
                 posts[i].Title = "Programmer";
-                posts[i].MinSalary = 50000;
-                posts[i].MaxSalary = 190000;
+                posts[i].NumberOfUnits = 10;
+                posts[i].Salary = 100000;
+                posts[i].Premium = 10000;
                 Database.Posts.Update(posts[i]);
                 await Database.SaveAsync();
             }

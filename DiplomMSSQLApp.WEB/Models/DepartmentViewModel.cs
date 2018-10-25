@@ -5,6 +5,7 @@ namespace DiplomMSSQLApp.WEB.Models
 {
     public class DepartmentViewModel
     {
+        [Display(Name = "Код отдела")]
         public int Id { get; set; }
         [Required(ErrorMessage = "Требуется ввести название отдела")]
         [Display(Name = "Название отдела")]

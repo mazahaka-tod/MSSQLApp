@@ -7,6 +7,7 @@ using DiplomMSSQLApp.WEB.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -23,18 +24,25 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             departmentService = ds;
         }
 
-        [ActionName("Index")]
-        public async Task<ActionResult> IndexAsync(int page = 1) {
+        public async Task<ActionResult> Index(int page = 1) {
             IEnumerable<PostDTO> pDto = await postService.GetAllAsync();
+            ViewBag.TotalNumberOfUnits = pDto.Sum(p => p.NumberOfUnits);
+            ViewBag.TotalSalary = pDto.Sum(p => p.TotalSalary);
             pDto = postService.GetPage(pDto, page);     // Paging
-            Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, PostViewModel>()
-                                        .ForMember(p => p.Employees, opt => opt.Ignore()));
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<PostDTO, PostViewModel>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
+                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
+                    .ForMember(d => d.Employees, opt => opt.Ignore());
+            });
             IEnumerable<PostViewModel> posts = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
+
             return View("Index", new PostListViewModel { Posts = posts, PageInfo = postService.PageInfo });
         }
 
         // Добавление новой должности
-        public ActionResult Create() {
+        public async Task<ActionResult> Create() {
+            ViewBag.Departments = await GetSelectListDepartmentsAsync();
             return View("Create");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
@@ -47,7 +55,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
+            ViewBag.Departments = await GetSelectListDepartmentsAsync();
             return View("Create", p);
+        }
+
+        private async Task<SelectList> GetSelectListDepartmentsAsync() {
+            IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
+            if (departments.Count() == 0) {
+                DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
+                await departmentService.CreateAsync(btDto);
+                departments = new List<DepartmentDTO> { btDto };
+            }
+            return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
         }
 
         private PostDTO MapViewModelWithDTO(PostViewModel p) {
@@ -65,6 +84,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Обновление информации о должности
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
+            ViewBag.Departments = await GetSelectListDepartmentsAsync();
             return await GetViewAsync(id, "Edit");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
@@ -77,6 +97,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
+            ViewBag.Departments = await GetSelectListDepartmentsAsync();
             return View("Edit", p);
         }
 

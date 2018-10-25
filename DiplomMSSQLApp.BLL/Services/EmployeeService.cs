@@ -65,10 +65,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
             if (post == null)
                 throw new ValidationException("Должность не найдена", "");
-            if (item.Salary != null && post?.MinSalary != null && item.Salary < post.MinSalary)
-                throw new ValidationException("Зарплата должна быть больше " + post.MinSalary, "Salary");
-            if (item.Salary != null && post?.MaxSalary != null && item.Salary > post.MaxSalary)
-                throw new ValidationException("Зарплата должна быть меньше " + post.MaxSalary, "Salary");
+            //if (item.Salary != null && post?.MinSalary != null && item.Salary < post.MinSalary)
+            //    throw new ValidationException("Зарплата должна быть больше " + post.MinSalary, "Salary");
+            //if (item.Salary != null && post?.MaxSalary != null && item.Salary > post.MaxSalary)
+            //    throw new ValidationException("Зарплата должна быть меньше " + post.MaxSalary, "Salary");
             Department department = await Database.Departments.FindByIdAsync(item.DepartmentId ?? 0);
             if (department == null)
                 throw new ValidationException("Отдел не найден", "");

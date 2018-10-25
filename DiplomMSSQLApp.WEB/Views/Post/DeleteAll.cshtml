@@ -7,16 +7,12 @@
 <h3>Вы уверены, что хотите удалить все должности?</h3>
 <div>
     <hr />
-    @using (Html.BeginForm())
-    {
+    @using (Html.BeginForm()) {
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Удалить" class="btn btn-default" />
+            <input type="submit" value="Удалить" class="btn btn-primary" />
+            @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
         </div>
     }
-</div>
-<br />
-<div>
-    @Html.ActionLink("Back to List", "Index")
 </div>

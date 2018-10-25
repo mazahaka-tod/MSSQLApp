@@ -8,9 +8,11 @@ namespace DiplomMSSQLApp.DAL.Entities {
         public int? OrganizationId { get; set; }
         public Organization Organization { get; set; }
         public virtual ICollection<Employee> Employees { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
         
         public Department() {
             Employees = new List<Employee>();
+            Posts = new List<Post>();
         }
     }
 }

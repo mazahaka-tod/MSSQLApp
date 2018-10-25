@@ -131,7 +131,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 await departmentService.DeleteAsync(id);
             }
             catch (Exception) {
-                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем работает хотя бы один сотрудник.");
+                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем есть хотя бы одна должность или работает хотя бы один сотрудник.");
             }
             return RedirectToAction("Index");
         }
@@ -146,7 +146,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 await departmentService.DeleteAllAsync();
             }
             catch (Exception) {
-                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем работает хотя бы один сотрудник.");
+                return View("CustomError", (object)"Нельзя удалить отдел, пока в нем есть хотя бы одна должность или работает хотя бы один сотрудник.");
             }
             return RedirectToAction("Index");
         }

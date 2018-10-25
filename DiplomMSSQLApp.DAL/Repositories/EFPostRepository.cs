@@ -13,18 +13,22 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         }
 
         public override IEnumerable<Post> Get(int salary) {
-            return _dbSet.Where(p => p.MaxSalary >= salary).ToList();
+            return _dbSet.Include(p => p.Department).Where(p => p.Salary >= salary).ToList();
         }
 
         public override IEnumerable<Post> Get(bool flag) {
             if (flag)
-                return _dbSet.Where(p => p.MaxSalary > 50000).ToList();
+                return _dbSet.Include(p => p.Department).Where(p => p.Salary > 50000).ToList();
             else
-                return _dbSet.Where(p => p.MaxSalary <= 50000).ToList();
+                return _dbSet.Include(p => p.Department).Where(p => p.Salary <= 50000).ToList();
+        }
+
+        public override async Task<IEnumerable<Post>> GetAsync() {
+            return await _dbSet.Include(p => p.Department).ToListAsync();
         }
 
         public override async Task<Post> GetFirstAsync() {
-            return await _dbSet.FirstOrDefaultAsync();
+            return await _dbSet.Include(p => p.Department).FirstOrDefaultAsync();
         }
     }
 }
