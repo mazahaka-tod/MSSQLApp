@@ -186,7 +186,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task EditAsync_Get_ModelStateIsNotValid_AsksForCustomErrorView() {
+        public async Task EditAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -194,7 +194,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
-            Assert.AreEqual("CustomError", result.ViewName);
+            Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
@@ -206,8 +206,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
-            string model = result.ViewData.Model as string;
-            Assert.AreEqual("FindByIdAsync method throws Exception", model);
+            string[] model = result.ViewData.Model as string[];
+            Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         [Test]
@@ -315,14 +315,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task DetailsAsync_ModelStateIsNotValid_AsksForCustomErrorView() {
+        public async Task DetailsAsync_ModelStateIsNotValid_AsksForErrorView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
             ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
 
-            Assert.AreEqual("CustomError", result.ViewName);
+            Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
@@ -333,8 +333,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests
 
             ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
 
-            string model = result.ViewData.Model as string;
-            Assert.AreEqual("FindByIdAsync method throws Exception", model);
+            string[] model = result.ViewData.Model as string[];
+            Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>
@@ -367,14 +367,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsNotValid_AsksForCustomErrorView() {
+        public async Task DeleteAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
             ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
 
-            Assert.AreEqual("CustomError", result.ViewName);
+            Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
@@ -385,8 +385,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests
 
             ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
 
-            string model = result.ViewData.Model as string;
-            Assert.AreEqual("FindByIdAsync method throws Exception", model);
+            string[] model = result.ViewData.Model as string[];
+            Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>

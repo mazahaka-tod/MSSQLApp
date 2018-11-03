@@ -1,0 +1,32 @@
+﻿@model DiplomMSSQLApp.WEB.Models.Identity.CreateModel
+
+@{
+    ViewBag.Title = "Добавление пользователя";
+}
+
+<h2>Добавление пользователя</h2>
+<hr />
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@using (Html.BeginForm()) {
+    <div class="form-group">
+        <label>Name</label>
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        @Html.PasswordFor(model => model.Password, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Добавить</button>
+    @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
+}

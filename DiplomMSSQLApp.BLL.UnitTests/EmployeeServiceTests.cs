@@ -142,40 +142,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void CreateAsync_SalaryPropertyLessThanMinSalaryProperty_Throws()
-        {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MinSalary = 20000 });
-            EmployeeService es = GetNewService(mock.Object);
-            EmployeeDTO item = new EmployeeDTO {
-                LastName = "Petrov",
-                FirstName = "Max",
-                Salary = 10000
-            };
-
-            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
-
-            StringAssert.Contains("Зарплата должна быть больше 20000", ex.Message);
-        }
-
-        [Test]
-        public void CreateAsync_SalaryPropertyMoreThanMaxSalaryProperty_Throws()
-        {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MaxSalary = 20000 });
-            EmployeeService es = GetNewService(mock.Object);
-            EmployeeDTO item = new EmployeeDTO {
-                LastName = "Petrov",
-                FirstName = "Max",
-                Salary = 30000
-            };
-
-            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
-
-            StringAssert.Contains("Зарплата должна быть меньше 20000", ex.Message);
-        }
-
-        [Test]
         public void CreateAsync_DepartmentPropertyIsNull_Throws()
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
@@ -365,40 +331,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
 
             StringAssert.Contains("Некорректный email", ex.Message);
-        }
-
-        [Test]
-        public void EditAsync_SalaryPropertyLessThanMinSalaryProperty_Throws()
-        {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MinSalary = 20000 });
-            EmployeeService es = GetNewService(mock.Object);
-            EmployeeDTO item = new EmployeeDTO {
-                LastName = "Petrov",
-                FirstName = "Max",
-                Salary = 10000
-            };
-
-            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
-
-            StringAssert.Contains("Зарплата должна быть больше 20000", ex.Message);
-        }
-
-        [Test]
-        public void EditAsync_SalaryPropertyMoreThanMaxSalaryProperty_Throws()
-        {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { MaxSalary = 20000 });
-            EmployeeService es = GetNewService(mock.Object);
-            EmployeeDTO item = new EmployeeDTO {
-                LastName = "Petrov",
-                FirstName = "Max",
-                Salary = 30000
-            };
-
-            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
-
-            StringAssert.Contains("Зарплата должна быть меньше 20000", ex.Message);
         }
 
         [Test]

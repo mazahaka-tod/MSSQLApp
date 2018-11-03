@@ -113,28 +113,16 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void CreateAsync_MinSalaryPropertyMoreThanMaxSalaryProperty_Throws()
-        {
-            PostService ps = GetNewService();
-            PostDTO item = new PostDTO {
-                Title = "Administrator",
-                MinSalary = 20000,
-                MaxSalary = 10000
-            };
-
-            Exception ex = Assert.CatchAsync(async () => await ps.CreateAsync(item));
-
-            StringAssert.Contains("Минимальная зарплата не может быть больше максимальной", ex.Message);
-        }
-
-        [Test]
         public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe()
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Posts.Create(It.IsAny<Post>()));
             PostService ps = GetNewService(mock.Object);
             PostDTO item = new PostDTO {
-                Title = "Administrator"
+                Title = "Administrator",
+                NumberOfUnits = 1,
+                Salary = 50000,
+                Premium = 10000
             };
 
             await ps.CreateAsync(item);
@@ -149,7 +137,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Posts.Create(It.IsAny<Post>()));
             PostService ps = GetNewService(mock.Object);
             PostDTO item = new PostDTO {
-                Title = "Administrator"
+                Title = "Administrator",
+                NumberOfUnits = 1,
+                Salary = 50000,
+                Premium = 10000
             };
 
             await ps.CreateAsync(item);
@@ -252,28 +243,16 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void EditAsync_MinSalaryPropertyMoreThanMaxSalaryProperty_Throws()
-        {
-            PostService ps = GetNewService();
-            PostDTO item = new PostDTO {
-                Title = "Administrator",
-                MinSalary = 20000,
-                MaxSalary = 10000
-            };
-
-            Exception ex = Assert.CatchAsync(async () => await ps.EditAsync(item));
-
-            StringAssert.Contains("Минимальная зарплата не может быть больше максимальной", ex.Message);
-        }
-
-        [Test]
         public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Posts.Update(It.IsAny<Post>()));
             PostService ps = GetNewService(mock.Object);
             PostDTO item = new PostDTO {
-                Title = "Administrator"
+                Title = "Administrator",
+                NumberOfUnits = 1,
+                Salary = 50000,
+                Premium = 10000
             };
 
             await ps.EditAsync(item);
@@ -288,7 +267,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Posts.Update(It.IsAny<Post>()));
             PostService ps = GetNewService(mock.Object);
             PostDTO item = new PostDTO {
-                Title = "Administrator"
+                Title = "Administrator",
+                NumberOfUnits = 1,
+                Salary = 50000,
+                Premium = 10000
             };
 
             await ps.EditAsync(item);

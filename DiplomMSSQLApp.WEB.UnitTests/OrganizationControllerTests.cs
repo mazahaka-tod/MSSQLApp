@@ -75,14 +75,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsNotValid_AsksForCustomErrorView() {
+        public async Task Edit_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             OrganizationController controller = GetNewOrganizationController(mock.Object);
 
             ViewResult result = (await controller.Edit(1)) as ViewResult;
 
-            Assert.AreEqual("CustomError", result.ViewName);
+            Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
@@ -93,8 +93,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             ViewResult result = (await controller.Edit(1)) as ViewResult;
 
-            string model = result.ViewData.Model.ToString();
-            Assert.AreEqual("FindByIdAsync method throws Exception", model);
+            string[] model = result.ViewData.Model as string[];
+            Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>

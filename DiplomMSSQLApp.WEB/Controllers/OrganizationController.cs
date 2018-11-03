@@ -38,7 +38,7 @@ namespace DiplomMSSQLApp.WEB.Controllers
             }
             catch (ValidationException ex) {
                 _logger.Warn(ex.Message);
-                return View("CustomError", (object)ex.Message);
+                return View("Error", new string[] { ex.Message });
             }
         }
         [HttpPost, ValidateAntiForgeryToken]

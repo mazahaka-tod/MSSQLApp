@@ -146,7 +146,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 return View(viewName, e);
             }
             catch (ValidationException ex) {
-                return View("CustomError", (object)ex.Message);
+                return View("Error", new string[] { ex.Message });
             }
         }
 
