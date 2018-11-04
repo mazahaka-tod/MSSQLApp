@@ -2,24 +2,39 @@
 using DiplomMSSQLApp.WEB.Models.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using NLog;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
     public class AdminController : Controller {
-        private AppUserManager UserManager {
-            get { return HttpContext.GetOwinContext().GetUserManager<AppUserManager>(); }
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private AppUserManager _userManager;
+
+        public AppUserManager UserManager {
+            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<AppUserManager>(); }
+            private set { _userManager = value; }
         }
 
-        // Index
+        public AdminController() { }
+
+        public AdminController(AppUserManager userManager) {
+            UserManager = userManager;
+        }
+
+        /// <summary>
+        /// // Index method
+        /// </summary>
         public ActionResult Index() {
-            return View(UserManager.Users);
+            return View("Index", UserManager.Users);
         }
 
-        // Create
+        /// <summary>
+        /// // Create method
+        /// </summary>
         public ActionResult Create() {
-            return View();
+            return View("Create");
         }
         [HttpPost]
         public async Task<ActionResult> Create(CreateModel model) {
@@ -33,22 +48,27 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     AddErrorsFromResult(result);
                 }
             }
-            return View(model);
+            logger.Warn("ModelState is invalid");
+            return View("Create", model);
         }
 
         private void AddErrorsFromResult(IdentityResult result) {
             foreach (string error in result.Errors) {
+                logger.Warn(error);
                 ModelState.AddModelError("", error);
             }
         }
 
-        // Edit
+        /// <summary>
+        /// // Edit method
+        /// </summary>
         public async Task<ActionResult> Edit(string id) {
             AppUser user = await UserManager.FindByIdAsync(id);
             if (user != null) {
-                return View(new EditModel { Id = user.Id, Name = user.UserName, Email = user.Email });
+                return View("Edit", new EditModel { Id = user.Id, Name = user.UserName, Email = user.Email });
             }
             else {
+                logger.Warn("User not found");
                 return RedirectToAction("Index");
             }
         }
@@ -83,11 +103,15 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 }
             }
             else {
-                ModelState.AddModelError("", "Пользователь не найден");
+                logger.Warn("User not found");
+                return View("Error", new string[] { "Пользователь не найден" });
             }
-            return View(new EditModel { Id = user.Id, Name = user.UserName, Email = user.Email });
-        }
-        // Delete
+            return View("Edit", new EditModel { Id = user.Id, Name = user.UserName, Email = user.Email });
+        }
+
+        /// <summary>
+        /// // Delete method
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult> Delete(string id) {
             AppUser user = await UserManager.FindByIdAsync(id);
@@ -97,10 +121,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     return RedirectToAction("Index");
                 }
                 else {
+                    foreach (string error in result.Errors) {
+                        logger.Warn(error);
+                    }
                     return View("Error", result.Errors);
                 }
             }
             else {
+                logger.Warn("User not found");
                 return View("Error", new string[] { "Пользователь не найден" });
             }
         }
