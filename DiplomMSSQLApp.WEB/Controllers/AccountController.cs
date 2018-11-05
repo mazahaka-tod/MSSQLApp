@@ -14,13 +14,24 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [Authorize]
     public class AccountController : Controller {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private IAuthenticationManager _authManager;
+        private AppUserManager _userManager;
 
-        private IAuthenticationManager AuthManager {
-            get { return HttpContext.GetOwinContext().Authentication; }
+        public IAuthenticationManager AuthManager {
+            get { return _authManager ?? HttpContext.GetOwinContext().Authentication; }
+            set { _authManager = value; }
         }
 
-        private AppUserManager UserManager {
-            get { return HttpContext.GetOwinContext().GetUserManager<AppUserManager>(); }
+        public AppUserManager UserManager {
+            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<AppUserManager>(); }
+            set { _userManager = value; }
+        }
+
+        public AccountController() { }
+
+        public AccountController(IAuthenticationManager authManager, AppUserManager userManager) {
+            AuthManager = authManager;
+            UserManager = userManager;
         }
 
         /// <summary>
@@ -33,7 +44,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 return View("Error", new string[] { "Доступ закрыт" });
             }
             ViewBag.returnUrl = returnUrl;
-            return View();
+            return View("Login");
         }
         [HttpPost]
         [AllowAnonymous]
@@ -55,7 +66,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             }
             logger.Warn("ModelState is invalid");
             ViewBag.returnUrl = returnUrl;
-            return View(model);
+            return View("Login", model);
         }
 
         /// <summary>

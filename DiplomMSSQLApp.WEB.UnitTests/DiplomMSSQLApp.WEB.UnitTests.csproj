@@ -119,6 +119,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountControllerTests.cs" />
     <Compile Include="AdminControllerTests.cs" />
     <Compile Include="BusinessTripControllerTests.cs" />
     <Compile Include="DepartmentControllerTests.cs" />
