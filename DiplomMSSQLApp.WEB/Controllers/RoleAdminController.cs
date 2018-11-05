@@ -15,27 +15,38 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [Authorize(Roles = "Administrators")]
     public class RoleAdminController : Controller {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private AppUserManager _userManager;
+        private AppRoleManager _roleManager;
 
         private AppUserManager UserManager {
-            get { return HttpContext.GetOwinContext().GetUserManager<AppUserManager>(); }
+            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<AppUserManager>(); }
+            set { _userManager = value; }
         }
 
         private AppRoleManager RoleManager {
-            get { return HttpContext.GetOwinContext().GetUserManager<AppRoleManager>(); }
+            get { return _roleManager ?? HttpContext.GetOwinContext().GetUserManager<AppRoleManager>(); }
+            set { _roleManager = value; }
+        }
+
+        public RoleAdminController() { }
+
+        public RoleAdminController(AppUserManager userManager, AppRoleManager roleManager) {
+            UserManager = userManager;
+            RoleManager = roleManager;
         }
 
         /// <summary>
         /// // Index method
         /// </summary>
         public ActionResult Index() {
-            return View(RoleManager.Roles);
+            return View("Index", RoleManager.Roles);
         }
 
         /// <summary>
         /// // Create method
         /// </summary>
         public ActionResult Create() {
-            return View();
+            return View("Create");
         }
         [HttpPost]
         public async Task<ActionResult> Create([Required]string name) {
@@ -50,11 +61,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                         logger.Warn(error);
                         ModelState.AddModelError("", error);
                     }
-                    return View(name);
+                    return View("Create", name);
                 }
             }
             logger.Warn("ModelState is invalid");
-            return View(name);
+            return View("Create", name);
         }
 
         /// <summary>
@@ -62,10 +73,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         /// </summary>
         public async Task<ActionResult> Edit(string id) {
             AppRole role = await RoleManager.FindByIdAsync(id);
+            if (role == null) {
+                logger.Warn("Role not found");
+                return View("Error", new string[] { "Роль не найдена" });
+            }
             string[] memberIDs = role.Users.Select(x => x.UserId).ToArray();
             IEnumerable<AppUser> members = UserManager.Users.Where(x => memberIDs.Any(y => y == x.Id));
             IEnumerable<AppUser> nonMembers = UserManager.Users.Except(members);
-            return View(new RoleEditModel {
+            return View("Edit", new RoleEditModel {
                 Role = role,
                 Members = members,
                 NonMembers = nonMembers
