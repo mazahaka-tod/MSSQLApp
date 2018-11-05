@@ -1,0 +1,20 @@
+﻿@model string
+
+@{
+    ViewBag.Title = "Добавление роли";
+}
+
+<h2>Добавление роли</h2>
+<hr />
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@using (Html.BeginForm()) {
+    <div class="form-group">
+        <label>Name</label>
+        <input name="name" value="@Model" class="form-control" />
+        @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Добавить</button>
+    @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
+}

@@ -188,18 +188,22 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\BusinessTripController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\OrganizationController.cs" />
     <Compile Include="Controllers\PostController.cs" />
+    <Compile Include="Controllers\RoleAdminController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\PagingHelpers.cs" />
     <Compile Include="Infrastructure\AppIdentityDbContext.cs" />
+    <Compile Include="Infrastructure\AppRoleManager.cs" />
     <Compile Include="Infrastructure\AppUserManager.cs" />
+    <Compile Include="Infrastructure\IdentityHelpers.cs" />
     <Compile Include="Models\BaseBusinessTripViewModel.cs" />
     <Compile Include="Models\BusinessTripListViewModel.cs" />
     <Compile Include="Models\BusinessTripViewModel.cs" />
@@ -207,6 +211,7 @@
     <Compile Include="Models\DepartmentViewModel.cs" />
     <Compile Include="Models\EmployeeListViewModel.cs" />
     <Compile Include="Models\EmployeeViewModel.cs" />
+    <Compile Include="Models\Identity\AppRole.cs" />
     <Compile Include="Models\Identity\AppUser.cs" />
     <Compile Include="Models\Identity\UserViewModels.cs" />
     <Compile Include="Models\OrganizationViewModel.cs" />
@@ -307,6 +312,11 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Admin\Create.cshtml" />
     <Content Include="Views\Admin\Edit.cshtml" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\RoleAdmin\Index.cshtml" />
+    <Content Include="Views\RoleAdmin\Create.cshtml" />
+    <Content Include="Views\RoleAdmin\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

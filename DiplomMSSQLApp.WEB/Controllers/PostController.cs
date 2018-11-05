@@ -13,6 +13,7 @@ using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
+    [Authorize]
     public class PostController : Controller {
         private IService<EmployeeDTO> employeeService;
         private IService<PostDTO> postService;

@@ -14,6 +14,7 @@ using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
+    [Authorize]
     public class EmployeeController : Controller {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private IService<EmployeeDTO> employeeService;

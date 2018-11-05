@@ -11,6 +11,7 @@ using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
+    [Authorize]
     public class DepartmentController : Controller {
         private IService<EmployeeDTO> employeeService;
         private IService<DepartmentDTO> departmentService;

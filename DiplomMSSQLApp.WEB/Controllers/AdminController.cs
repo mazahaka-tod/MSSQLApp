@@ -8,6 +8,8 @@ using System.Web;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
+    [HandleError]
+    [Authorize(Roles = "Administrators")]
     public class AdminController : Controller {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private AppUserManager _userManager;
@@ -42,6 +44,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 AppUser user = new AppUser { UserName = model.Name, Email = model.Email };
                 IdentityResult result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded) {
+                    logger.Info("Succeeded");
                     return RedirectToAction("Index");
                 }
                 else {
@@ -95,6 +98,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 if ((validUser.Succeeded && validPass == null) || (validUser.Succeeded && model.Password != string.Empty && validPass.Succeeded)) {
                     IdentityResult result = await UserManager.UpdateAsync(user);
                     if (result.Succeeded) {
+                        logger.Info("Succeeded");
                         return RedirectToAction("Index");
                     }
                     else {
@@ -118,6 +122,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             if (user != null) {
                 IdentityResult result = await UserManager.DeleteAsync(user);
                 if (result.Succeeded) {
+                    logger.Info("Succeeded");
                     return RedirectToAction("Index");
                 }
                 else {

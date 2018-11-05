@@ -7,9 +7,9 @@ using NLog;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace DiplomMSSQLApp.WEB.Controllers
-{
+namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
+    [Authorize]
     public class OrganizationController : Controller
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
