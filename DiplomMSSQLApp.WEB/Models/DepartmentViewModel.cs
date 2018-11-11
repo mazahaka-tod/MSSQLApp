@@ -12,8 +12,8 @@ namespace DiplomMSSQLApp.WEB.Models
         public string DepartmentName { get; set; }
         [Display(Name = "Начальник отдела")]
         public string Manager { get; set; }
-        public int? OrganizationId { get; set; }
-        public OrganizationViewModel Organization { get; set; }
+        public int? EmployeeId { get; set; }
+        public EmployeeViewModel Employee { get; set; }
         [Display(Name = "Список сотрудников")]
         public virtual ICollection<EmployeeViewModel> Employees { get; set; }
 

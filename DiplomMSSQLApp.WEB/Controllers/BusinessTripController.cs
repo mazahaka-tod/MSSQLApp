@@ -14,11 +14,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [Authorize]
     public class BusinessTripController : Controller {
         private IService<BusinessTripDTO> businessTripService;
-        private IService<EmployeeDTO> employeeService;
+        private IService<EmployeeDTO> EmployeeService;
 
         public BusinessTripController(IService<BusinessTripDTO> bs, IService<EmployeeDTO> es) {
             businessTripService = bs;
-            employeeService = es;
+            EmployeeService = es;
         }
 
         [ActionName("Index")]
@@ -52,8 +52,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         private async Task<SelectList> GetSelectListEmployeesAsync() {
-            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
-            IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
+            IEnumerable<EmployeeDTO> Employees = await EmployeeService.GetAllAsync();
+            IEnumerable<SelectListItem> items = Employees.Select(e => new SelectListItem() {
                                                     Value = e.Id.ToString(),
                                                     Text = e.LastName + " " + e.FirstName
                                                 }).OrderBy(e => e.Text);
@@ -151,7 +151,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         protected override void Dispose(bool disposing) {
             businessTripService.Dispose();
-            employeeService.Dispose();
+            EmployeeService.Dispose();
             base.Dispose(disposing);
         }
     }

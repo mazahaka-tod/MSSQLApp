@@ -4,10 +4,14 @@ ER-diagram of the database can be viewed in the solution folder in the file 'ER-
 The main functions implemented in the project:
 - CRUD operations;
 - a filter for retrieving employees from the database;
-- analysis of the performance of CRUD operations;
+- user authentication and authorization;
 - paging;
 - data validation;
 - unit testing.
 Used Framework: ASP.NET MVC 5.
 Used DBMS: MS SQL Server.
-Used packages: Entity Framework, AutoMapper, Ninject, Bootstrap, jQuery, NLog, NUnit, Moq.
+Used packages: Entity Framework, AspNet.Identity, AutoMapper, Ninject, Bootstrap, jQuery, NLog, NUnit, Moq.
+
+P.S.
+Login: Admin
+Password: MySecret

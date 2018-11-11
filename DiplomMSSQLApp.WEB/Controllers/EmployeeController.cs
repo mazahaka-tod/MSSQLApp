@@ -17,12 +17,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [Authorize]
     public class EmployeeController : Controller {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private IService<EmployeeDTO> employeeService;
+        private IService<EmployeeDTO> EmployeeService;
         private IService<DepartmentDTO> departmentService;
         private IService<PostDTO> postService;
 
         public EmployeeController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
-            employeeService = es;
+            EmployeeService = es;
             departmentService = ds;
             postService = ps;
         }
@@ -34,9 +34,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             if (filterAsJsonString != null)
                 filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
             string fullPath = CreateDirectoryToFile("Filter.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            IEnumerable<EmployeeDTO> eDto = employeeService.Get(filter);
-            eDto = employeeService.GetPage(eDto, page);     // Paging
+            (EmployeeService as EmployeeService).PathToFileForTests = fullPath;
+            IEnumerable<EmployeeDTO> eDto = EmployeeService.Get(filter);
+            eDto = EmployeeService.GetPage(eDto, page);     // Paging
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
@@ -45,8 +45,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
             });
-            IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
-            EmployeeListViewModel model = new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo };
+            IEnumerable<EmployeeViewModel> Employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
+            EmployeeListViewModel model = new EmployeeListViewModel { Employees = Employees, Filter = filter, PageInfo = EmployeeService.PageInfo };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 logger.Info("Executed async request");
                 return PartialView("GetEmployeesData", model);
@@ -74,7 +74,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> CreateAsync(EmployeeViewModel e) {
             try {
                 var eDto = MapViewModelWithDTO(e);
-                await employeeService.CreateAsync(eDto);
+                await EmployeeService.CreateAsync(eDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
@@ -129,7 +129,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> EditAsync(EmployeeViewModel e) {
             try {
                 EmployeeDTO eDto = MapViewModelWithDTO(e);
-                await employeeService.EditAsync(eDto);
+                await EmployeeService.EditAsync(eDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
@@ -142,7 +142,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
-                EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
+                EmployeeDTO eDto = await EmployeeService.FindByIdAsync(id);
                 EmployeeViewModel e = MapDTOWithViewModel(eDto);
                 return View(viewName, e);
             }
@@ -177,7 +177,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
         public async Task<ActionResult> DeleteConfirmedAsync(int id) {
-            await employeeService.DeleteAsync(id);
+            await EmployeeService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -187,7 +187,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllAsync() {
-            await employeeService.DeleteAllAsync();
+            await EmployeeService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 
@@ -196,7 +196,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> ExportJsonAsync() {
             string fullPath = CreateDirectoryToFile("Employees.json");
             System.IO.File.Delete(fullPath);
-            await (employeeService as EmployeeService).ExportJsonAsync(fullPath);
+            await (EmployeeService as EmployeeService).ExportJsonAsync(fullPath);
             return RedirectToAction("Index");
         }
 
@@ -204,8 +204,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestCreate")]
         public async Task<ActionResult> TestCreateAsync(int num) {
             string fullPath = CreateDirectoryToFile("Create.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestCreateAsync(num);
+            (EmployeeService as EmployeeService).PathToFileForTests = fullPath;
+            await EmployeeService.TestCreateAsync(num);
             return RedirectToAction("Index");
         }
 
@@ -213,8 +213,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestRead")]
         public async Task<ActionResult> TestReadAsync(int num, int salary) {
             string fullPath = CreateDirectoryToFile("Read.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestReadAsync(num, salary);
+            (EmployeeService as EmployeeService).PathToFileForTests = fullPath;
+            await EmployeeService.TestReadAsync(num, salary);
             return RedirectToAction("Index");
         }
 
@@ -222,8 +222,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestUpdate")]
         public async Task<ActionResult> TestUpdateAsync(int num) {
             string fullPath = CreateDirectoryToFile("Update.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestUpdateAsync(num);
+            (EmployeeService as EmployeeService).PathToFileForTests = fullPath;
+            await EmployeeService.TestUpdateAsync(num);
             return RedirectToAction("Index");
         }
 
@@ -231,8 +231,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [ActionName("TestDelete")]
         public async Task<ActionResult> TestDeleteAsync(int num) {
             string fullPath = CreateDirectoryToFile("Delete.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestDeleteAsync(num);
+            (EmployeeService as EmployeeService).PathToFileForTests = fullPath;
+            await EmployeeService.TestDeleteAsync(num);
             return RedirectToAction("Index");
         }
         
@@ -245,7 +245,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         protected override void Dispose(bool disposing) {
-            employeeService.Dispose();
+            EmployeeService.Dispose();
             postService.Dispose();
             departmentService.Dispose();
             base.Dispose(disposing);

@@ -24,7 +24,7 @@
         Поиск по фильтру <i>(Показать)</i>
     </div>
     <div id="filter" style="display:none;">
-        @using (Ajax.BeginForm(null, null, new AjaxOptions { UpdateTargetId = "employeesTable", Url = Url.Action("Index") }, new { id = "filterform" })) {
+        @using (Ajax.BeginForm(null, null, new AjaxOptions { UpdateTargetId = "EmployeesTable", Url = Url.Action("Index") }, new { id = "filterform" })) {
             <table>
                 <tr>
                     <td>
@@ -289,7 +289,7 @@
     @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
 </p>
 
-<div id="employeesTable">
+<div id="EmployeesTable">
     @Html.Partial("GetEmployeesData", Model)
 </div>
 
@@ -303,7 +303,7 @@
                 type: 'GET',
                 cache: false,
                 success: function (result) {
-                    $('#employeesTable').html(result);
+                    $('#EmployeesTable').html(result);
                 }
             });
             return false;

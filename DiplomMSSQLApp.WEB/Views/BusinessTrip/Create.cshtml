@@ -55,8 +55,8 @@
             </div>
         </div>
 
-        <div class="employees">
-            <div class="employee0">
+        <div class="Employees">
+            <div class="Employee0">
                 <div class="form-group">
                     @Html.Label("Ids", "Сотрудник №1", htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
@@ -91,16 +91,16 @@
                 e.preventDefault();
                 i++;
                 var div = document.createElement('div');
-                div.className = "employee" + i.toString();
-                $('.employees').append(div);
-                $('.employee' + i.toString()).load('@Url.Action("AddEmployeeAsync", "BusinessTrip")?index=' + i)
+                div.className = "Employee" + i.toString();
+                $('.Employees').append(div);
+                $('.Employee' + i.toString()).load('@Url.Action("AddEmployeeAsync", "BusinessTrip")?index=' + i)
             });
             // Удаление сотрудника
             $('#deleteEmployee').click(function (e) {
                 e.preventDefault();
                 if (i > 0)
                 {
-                    $('.employee' + i.toString()).remove();
+                    $('.Employee' + i.toString()).remove();
                     i--;
                 }
             });

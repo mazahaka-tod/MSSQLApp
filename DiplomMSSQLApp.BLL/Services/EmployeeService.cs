@@ -30,8 +30,8 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Добавление нового сотрудника
         public override async Task CreateAsync(EmployeeDTO eDto) {
-            Employee employee = await MapDTOAndDomainModelWithValidationAsync(eDto);
-            Database.Employees.Create(employee);
+            Employee Employee = await MapDTOAndDomainModelWithValidationAsync(eDto);
+            Database.Employees.Create(Employee);
             await Database.SaveAsync();
         }
 
@@ -45,8 +45,8 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<PostDTO, Post>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
             });
-            Employee employee = Mapper.Map<EmployeeDTO, Employee>(eDto);
-            return employee;
+            Employee Employee = Mapper.Map<EmployeeDTO, Employee>(eDto);
+            return Employee;
         }
 
         private async Task ValidationEmployeeAsync(EmployeeDTO item) {
@@ -65,10 +65,6 @@ namespace DiplomMSSQLApp.BLL.Services {
             Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
             if (post == null)
                 throw new ValidationException("Должность не найдена", "");
-            //if (item.Salary != null && post?.MinSalary != null && item.Salary < post.MinSalary)
-            //    throw new ValidationException("Зарплата должна быть больше " + post.MinSalary, "Salary");
-            //if (item.Salary != null && post?.MaxSalary != null && item.Salary > post.MaxSalary)
-            //    throw new ValidationException("Зарплата должна быть меньше " + post.MaxSalary, "Salary");
             Department department = await Database.Departments.FindByIdAsync(item.DepartmentId ?? 0);
             if (department == null)
                 throw new ValidationException("Отдел не найден", "");
@@ -76,8 +72,8 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Обновление информации о сотруднике
         public override async Task EditAsync(EmployeeDTO eDto) {
-            Employee employee = await MapDTOAndDomainModelWithValidationAsync(eDto);
-            Database.Employees.Update(employee);
+            Employee Employee = await MapDTOAndDomainModelWithValidationAsync(eDto);
+            Database.Employees.Update(Employee);
             await Database.SaveAsync();
         }
 
@@ -85,11 +81,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task<EmployeeDTO> FindByIdAsync(int? id) {
             if (id == null)
                 throw new ValidationException("Не установлено id сотрудника", "");
-            Employee employee = await Database.Employees.FindByIdAsync(id.Value);
-            if (employee == null)
+            Employee Employee = await Database.Employees.FindByIdAsync(id.Value);
+            if (Employee == null)
                 throw new ValidationException("Сотрудник не найден", "");
             InitializeMapper();
-            EmployeeDTO eDto = Mapper.Map<Employee, EmployeeDTO>(employee);
+            EmployeeDTO eDto = Mapper.Map<Employee, EmployeeDTO>(Employee);
             return eDto;
         }
 
@@ -106,9 +102,9 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Получение списка всех сотрудников
         public override async Task<IEnumerable<EmployeeDTO>> GetAllAsync() {
-            IEnumerable<Employee> employees = await Database.Employees.GetAsync();
+            IEnumerable<Employee> Employees = await Database.Employees.GetAsync();
             InitializeMapper();
-            IEnumerable<EmployeeDTO> collection = Mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeDTO>>(employees);
+            IEnumerable<EmployeeDTO> collection = Mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeDTO>>(Employees);
             return collection;
         }
 
@@ -123,7 +119,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         private Func<Employee, bool> CreatePredicate(EmployeeFilter filter) {
-            bool predicate(Employee employee) {
+            bool predicate(Employee Employee) {
                 bool returnValue = false;
                 if (filter.IsAntiFilter)    // Если флаг установлен, то выбираются записи несоответствующие фильтру
                     returnValue = true;
@@ -132,7 +128,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                     string[] lastNameArray = filter.LastName.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();   // Удаляем пустые элементы из массива
                     if (lastNameArray.Length == 1)          // Если заполнено только одно поле LastName
                     {
-                        if (!Regex.IsMatch(employee.LastName, lastNameArray[0], RegexOptions.IgnoreCase))
+                        if (!Regex.IsMatch(Employee.LastName, lastNameArray[0], RegexOptions.IgnoreCase))
                             return returnValue;             // Проверяемая запись не соответствует фильтру по фамилии
                     }
                     else if (lastNameArray.Length > 1)      // Если заполнено несколько полей LastName
@@ -141,7 +137,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                         {
                             bool flag = true;
                             foreach (string lastName in lastNameArray)
-                                if (Regex.IsMatch(employee.LastName, lastName, RegexOptions.IgnoreCase)) {
+                                if (Regex.IsMatch(Employee.LastName, lastName, RegexOptions.IgnoreCase)) {
                                     flag = false;
                                     break;
                                 }
@@ -150,38 +146,38 @@ namespace DiplomMSSQLApp.BLL.Services {
                         else    // Если не установлена галка "Минимум одно соответствие" (т.е. фамилия должна соответствовать всем шаблонам)
                         {
                             foreach (string lastName in lastNameArray)
-                                if (!Regex.IsMatch(employee.LastName, lastName, RegexOptions.IgnoreCase))
+                                if (!Regex.IsMatch(Employee.LastName, lastName, RegexOptions.IgnoreCase))
                                     return returnValue;     // Проверяемая запись не соответствует фильтру по фамилии
                         }
                     }
                 }
                 // Фильтр по email
-                if (!string.IsNullOrWhiteSpace(filter.Email) && !Regex.IsMatch(employee.Email, filter.Email, RegexOptions.IgnoreCase))
+                if (!string.IsNullOrWhiteSpace(filter.Email) && !Regex.IsMatch(Employee.Email, filter.Email, RegexOptions.IgnoreCase))
                     return returnValue;             // Проверяемая запись не соответствует фильтру по email
                 // Фильтр по номеру телефона
-                if (filter.IsPhoneNumber && string.IsNullOrWhiteSpace(employee.PhoneNumber))
+                if (filter.IsPhoneNumber && string.IsNullOrWhiteSpace(Employee.PhoneNumber))
                     return returnValue;             // Проверяемая запись не соответствует фильтру по наличию номера телефона
                 // Фильтр по дате найма на работу
-                if (!string.IsNullOrWhiteSpace(filter.HireDate) && DateTime.TryParse(filter.HireDate, out DateTime date) && employee.HireDate != date)
+                if (!string.IsNullOrWhiteSpace(filter.HireDate) && DateTime.TryParse(filter.HireDate, out DateTime date) && Employee.HireDate != date)
                     return returnValue;             // Проверяемая запись не соответствует фильтру по дате найма на работу
                 // Фильтры по зарплате
-                if (filter.MinSalary.HasValue && employee.Salary.HasValue && employee.Salary.Value < filter.MinSalary.Value)
+                if (filter.MinSalary.HasValue && Employee.Salary.HasValue && Employee.Salary.Value < filter.MinSalary.Value)
                     return returnValue;             // Проверяемая запись не соответствует фильтру по минимальной зарплате
-                if (filter.MaxSalary.HasValue && employee.Salary.HasValue && employee.Salary.Value > filter.MaxSalary.Value)
+                if (filter.MaxSalary.HasValue && Employee.Salary.HasValue && Employee.Salary.Value > filter.MaxSalary.Value)
                     return returnValue;             // Проверяемая запись не соответствует фильтру по максимальной зарплате
                 // Фильтр по премии
                 if (filter.Bonus != null) {
                     double?[] bonuses = filter.Bonus.Where(b => b != null).ToArray();
-                    if (bonuses.Length > 0 && !bonuses.Contains(employee.Bonus))
+                    if (bonuses.Length > 0 && !bonuses.Contains(Employee.Bonus))
                         return returnValue;         // Проверяемая запись не соответствует фильтру по премии
                 }
-                if (filter.IsBonus && !employee.Bonus.HasValue)
+                if (filter.IsBonus && !Employee.Bonus.HasValue)
                     return returnValue;             // Проверяемая запись не соответствует фильтру по наличию премии
                 // Фильтр по должности
-                if (!string.IsNullOrWhiteSpace(filter.PostTitle) && !Regex.IsMatch(employee.Post.Title, filter.PostTitle, RegexOptions.IgnoreCase))
+                if (!string.IsNullOrWhiteSpace(filter.PostTitle) && !Regex.IsMatch(Employee.Post.Title, filter.PostTitle, RegexOptions.IgnoreCase))
                     return returnValue;             // Проверяемая запись не соответствует фильтру по должности
                 // Фильтр по названию отдела
-                if (!string.IsNullOrWhiteSpace(filter.DepartmentName) && !Regex.IsMatch(employee.Department.DepartmentName, filter.DepartmentName, RegexOptions.IgnoreCase))
+                if (!string.IsNullOrWhiteSpace(filter.DepartmentName) && !Regex.IsMatch(Employee.Department.DepartmentName, filter.DepartmentName, RegexOptions.IgnoreCase))
                     return returnValue;             // Проверяемая запись не соответствует фильтру по названию отдела
                 return !returnValue;                // Если дошли до сюда, значит проверяемая запись соответствует фильтру
             }
@@ -280,9 +276,9 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Удаление сотрудника
         public override async Task DeleteAsync(int id) {
-            Employee employee = await Database.Employees.FindByIdAsync(id);
-            if (employee == null) return;
-            Database.Employees.Remove(employee);
+            Employee Employee = await Database.Employees.FindByIdAsync(id);
+            if (Employee == null) return;
+            Database.Employees.Remove(Employee);
             await Database.SaveAsync();
         }
 
@@ -294,8 +290,8 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Запись информации о должностях в файл
         public virtual async Task ExportJsonAsync(string fullPath) {
-            IEnumerable<Employee> employees = await Database.Employees.GetAsync();
-            var transformEmployees = employees.Select(e => new {
+            IEnumerable<Employee> Employees = await Database.Employees.GetAsync();
+            var transformEmployees = Employees.Select(e => new {
                 e.LastName,
                 e.FirstName,
                 e.Email,
@@ -310,10 +306,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             }).ToArray();
             using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
                 sw.WriteLine("{\"Employees\":[");
-                int employeesLength = transformEmployees.Length;
-                for (int i = 1; i < employeesLength; i++) {
+                int EmployeesLength = transformEmployees.Length;
+                for (int i = 1; i < EmployeesLength; i++) {
                     sw.Write(new JavaScriptSerializer().Serialize(transformEmployees[i]));
-                    if (i != employeesLength - 1) sw.WriteLine(",");
+                    if (i != EmployeesLength - 1) sw.WriteLine(",");
                 }
                 sw.WriteLine("]}");
             }
@@ -321,13 +317,13 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Тест добавления сотрудников
         public override async Task TestCreateAsync(int num) {
-            IEnumerable<Employee> employees = await CreateEmployeesCollectionForTestAsync(num);
-            await RunTestCreateAsync(employees);
+            IEnumerable<Employee> Employees = await CreateEmployeesCollectionForTestAsync(num);
+            await RunTestCreateAsync(Employees);
             WriteResultTestCreateInFile(num);
         }
 
         private async Task<IEnumerable<Employee>> CreateEmployeesCollectionForTestAsync(int num) {
-            List<Employee> employees = new List<Employee>();
+            List<Employee> Employees = new List<Employee>();
             string[] lastNames = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson",
                 "White", "Harris", "Martin", "Thompson", "Wood", "Lewis", "Scott", "Cooper", "King", "Green", "Walker", "Edwards", "Turner", "Morgan", "Baker", "Hill" };
             string[] firstNames = { "James", "Alex", "Ben", "Daniel", "Tom", "Ryan", "Sam", "Lewis", "Joe", "David", "Harry", "George", "Jamie", "Dan", "Matt", "Robert" };
@@ -336,7 +332,7 @@ namespace DiplomMSSQLApp.BLL.Services {
             Post firstPost = (await Database.Posts.GetFirstAsync()) ?? new Post { Id = 1, Title = "unknown" };
             Department firstDepartment = (await Database.Departments.GetFirstAsync()) ?? new Department { Id = 1, DepartmentName = "unknown" };
             for (int i = 0; i < num; i++) {
-                Employee employee = new Employee {
+                Employee Employee = new Employee {
                     LastName = lastNames[i % lastNames.Length],
                     FirstName = firstNames[i % firstNames.Length],
                     Email = lastNames[i % lastNames.Length] + emails[i % emails.Length],
@@ -350,15 +346,15 @@ namespace DiplomMSSQLApp.BLL.Services {
                     Department = firstDepartment,
                     DepartmentId = firstDepartment.Id
                 };
-                employees.Add(employee);
+                Employees.Add(Employee);
             }
-            return employees;
+            return Employees;
         }
 
-        private async Task RunTestCreateAsync(IEnumerable<Employee> employees) {
+        private async Task RunTestCreateAsync(IEnumerable<Employee> Employees) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            Database.Employees.Create(employees);
+            Database.Employees.Create(Employees);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
@@ -378,10 +374,10 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Тест выборки сотрудников
         public override async Task TestReadAsync(int num, int salary) {
-            int employeesCount = (await Database.Employees.GetAsync()).Count();
+            int EmployeesCount = (await Database.Employees.GetAsync()).Count();
             int resultCount = Database.Employees.Get(salary).Count();
             RunTestRead(num, salary);
-            WriteResultTestReadInFile(employeesCount,  resultCount, num, salary);
+            WriteResultTestReadInFile(EmployeesCount,  resultCount, num, salary);
         }
 
         private void RunTestRead(int num, int salary) {
@@ -395,10 +391,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestReadInFile(int employeesCount, int resultCount, int num, int salary) {
+        private void WriteResultTestReadInFile(int EmployeesCount, int resultCount, int num, int salary) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Общее количество сотрудников: ");
-            sb.Append(employeesCount);
+            sb.Append(EmployeesCount);
             sb.Append("; Количество найденных сотрудников: ");
             sb.Append(resultCount);
             sb.Append("; Количество выборок: ");
@@ -414,25 +410,25 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Тест обновления сотрудников
         public override async Task TestUpdateAsync(int num) {
-            Employee[] employees = (await Database.Employees.GetAsync()).Take(num).ToArray();
-            int employeesLength = employees.Length;
-            await RunTestUpdateAsync(employees);
-            WriteResultTestUpdateInFile(employeesLength);
+            Employee[] Employees = (await Database.Employees.GetAsync()).Take(num).ToArray();
+            int EmployeesLength = Employees.Length;
+            await RunTestUpdateAsync(Employees);
+            WriteResultTestUpdateInFile(EmployeesLength);
         }
 
-        private async Task RunTestUpdateAsync(Employee[] employees) {
+        private async Task RunTestUpdateAsync(Employee[] Employees) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            for (int i = 0; i < employees.Length; i++) {
-                employees[i].LastName = "Martin";
-                employees[i].FirstName = "Max";
-                employees[i].Email = "Martin@mail.ru";
-                employees[i].HireDate = new DateTime(2018, 8, 8);
-                employees[i].Salary = 100000;
-                employees[i].PhoneNumber = "+7-944-569-85-36";
-                employees[i].Bonus = 0.2;
-                employees[i].Address = "Moskow Mira Avenue 105";
-                Database.Employees.Update(employees[i]);
+            for (int i = 0; i < Employees.Length; i++) {
+                Employees[i].LastName = "Martin";
+                Employees[i].FirstName = "Max";
+                Employees[i].Email = "Martin@mail.ru";
+                Employees[i].HireDate = new DateTime(2018, 8, 8);
+                Employees[i].Salary = 100000;
+                Employees[i].PhoneNumber = "+7-944-569-85-36";
+                Employees[i].Bonus = 0.2;
+                Employees[i].Address = "Moskow Mira Avenue 105";
+                Database.Employees.Update(Employees[i]);
                 await Database.SaveAsync();
             }
             stopWatch.Stop();
@@ -440,10 +436,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestUpdateInFile(int employeesLength) {
+        private void WriteResultTestUpdateInFile(int EmployeesLength) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество обновленных сотрудников: ");
-            sb.Append(employeesLength);
+            sb.Append(EmployeesLength);
             sb.Append("; Время: ");
             sb.Append(ElapsedTime);
             using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {
@@ -453,26 +449,26 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Тест удаления сотрудников
         public override async Task TestDeleteAsync(int num) {
-            IEnumerable<Employee> employees = (await Database.Employees.GetAsync()).Take(num);
-            int employeesCount = employees.Count();
-            await RunTestDeleteAsync(employees);
-            WriteResultTestDeleteInFile(employeesCount);
+            IEnumerable<Employee> Employees = (await Database.Employees.GetAsync()).Take(num);
+            int EmployeesCount = Employees.Count();
+            await RunTestDeleteAsync(Employees);
+            WriteResultTestDeleteInFile(EmployeesCount);
         }
 
-        private async Task RunTestDeleteAsync(IEnumerable<Employee> employees) {
+        private async Task RunTestDeleteAsync(IEnumerable<Employee> Employees) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            Database.Employees.RemoveSeries(employees);
+            Database.Employees.RemoveSeries(Employees);
             await Database.SaveAsync();
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             ElapsedTime = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}.{ts.Milliseconds:000}";
         }
 
-        private void WriteResultTestDeleteInFile(int employeesCount) {
+        private void WriteResultTestDeleteInFile(int EmployeesCount) {
             StringBuilder sb = new StringBuilder();
             sb.Append("Количество удаленных сотрудников: ");
-            sb.Append(employeesCount);
+            sb.Append(EmployeesCount);
             sb.Append("; Время: ");
             sb.Append(ElapsedTime);
             using (StreamWriter sw = new StreamWriter(PathToFileForTests, true, Encoding.UTF8)) {

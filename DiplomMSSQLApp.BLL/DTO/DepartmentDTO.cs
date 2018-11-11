@@ -7,8 +7,8 @@ namespace DiplomMSSQLApp.BLL.DTO
         public int Id { get; set; }
         public string DepartmentName { get; set; }
         public string Manager { get; set; }
-        public int? OrganizationId { get; set; }
-        public OrganizationDTO Organization { get; set; }
+        public int? EmployeeId { get; set; }
+        public EmployeeDTO Employee { get; set; }
         public virtual ICollection<EmployeeDTO> Employees { get; set; }
 
         public DepartmentDTO()

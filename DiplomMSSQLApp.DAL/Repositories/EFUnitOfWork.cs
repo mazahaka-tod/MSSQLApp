@@ -9,8 +9,8 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         private HRContext db;
         private EFGenericRepository<BusinessTrip> _businessTripRepository;
         private EFGenericRepository<Department> _departmentRepository;
-        private EFEmployeeRepository _employeeRepository;
-        private EFGenericRepository<Organization> _organizationRepository;
+        private EFEmployeeRepository _EmployeeRepository;
+        private EFOrganizationRepository _OrganizationRepository;
         private EFPostRepository _postRepository;
 
         public EFUnitOfWork(string connectionString) {
@@ -35,17 +35,17 @@ namespace DiplomMSSQLApp.DAL.Repositories {
 
         public IGenericRepository<Employee> Employees {
             get {
-                if (_employeeRepository == null)
-                    _employeeRepository = new EFEmployeeRepository(db);
-                return _employeeRepository;
+                if (_EmployeeRepository == null)
+                    _EmployeeRepository = new EFEmployeeRepository(db);
+                return _EmployeeRepository;
             }
         }
 
         public IGenericRepository<Organization> Organizations {
             get {
-                if (_organizationRepository == null)
-                    _organizationRepository = new EFGenericRepository<Organization>(db);
-                return _organizationRepository;
+                if (_OrganizationRepository == null)
+                    _OrganizationRepository = new EFOrganizationRepository(db);
+                return _OrganizationRepository;
             }
         }
 

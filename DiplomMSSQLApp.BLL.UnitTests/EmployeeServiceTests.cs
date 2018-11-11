@@ -492,7 +492,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 PostTitle = pt,
                 DepartmentName = dn
             };
-            Employee[] employees = new Employee[] {
+            Employee[] Employees = new Employee[] {
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
@@ -536,10 +536,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
-                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
-            EmployeeService employeeService = GetNewService(mock.Object);
+                .Returns((Func<Employee, bool> predicate) => Employees.Where(predicate));
+            EmployeeService EmployeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
+            EmployeeDTO[] result = EmployeeService.Get(filter).ToArray();
 
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(2, result[0].Id);
@@ -574,7 +574,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 DepartmentName = dn,
                 IsAntiFilter = true
             };
-            Employee[] employees = new Employee[] {
+            Employee[] Employees = new Employee[] {
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
@@ -618,10 +618,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
-                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
-            EmployeeService employeeService = GetNewService(mock.Object);
+                .Returns((Func<Employee, bool> predicate) => Employees.Where(predicate));
+            EmployeeService EmployeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
+            EmployeeDTO[] result = EmployeeService.Get(filter).ToArray();
 
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(4, result[0].Id);
@@ -655,7 +655,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 PostTitle = pt,
                 DepartmentName = dn
             };
-            Employee[] employees = new Employee[] {
+            Employee[] Employees = new Employee[] {
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
@@ -699,10 +699,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
-                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
-            EmployeeService employeeService = GetNewService(mock.Object);
+                .Returns((Func<Employee, bool> predicate) => Employees.Where(predicate));
+            EmployeeService EmployeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
+            EmployeeDTO[] result = EmployeeService.Get(filter).ToArray();
 
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual(2, result[0].Id);
@@ -735,7 +735,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 DepartmentName = dn,
                 IsAntiFilter = true
             };
-            Employee[] employees = new Employee[] {
+            Employee[] Employees = new Employee[] {
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
@@ -779,10 +779,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
-                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
-            EmployeeService employeeService = GetNewService(mock.Object);
+                .Returns((Func<Employee, bool> predicate) => Employees.Where(predicate));
+            EmployeeService EmployeeService = GetNewService(mock.Object);
 
-            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
+            EmployeeDTO[] result = EmployeeService.Get(filter).ToArray();
 
             Assert.AreEqual(3, result.Length);
             Assert.AreEqual(3, result[0].Id);
@@ -807,7 +807,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 SortField = field,
                 SortOrder = "Asc"
             };
-            Employee[] employees = new Employee[] {
+            Employee[] Employees = new Employee[] {
                 new Employee() {
                     Id = 1,
                     LastName = "Sidorov",
@@ -852,11 +852,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
-                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+                .Returns((Func<Employee, bool> predicate) => Employees.Where(predicate));
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
-            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
+            EmployeeDTO[] result = EmployeeService.Get(filter).ToArray();
 
             Assert.AreEqual(4, result.Length);
             Assert.AreEqual(4, result[0].Id);
@@ -882,7 +882,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 SortField = field,
                 SortOrder = "Desc"
             };
-            Employee[] employees = new Employee[] {
+            Employee[] Employees = new Employee[] {
                 new Employee() {
                     Id = 1,
                     LastName = "Sidorov",
@@ -927,11 +927,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
-                .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+                .Returns((Func<Employee, bool> predicate) => Employees.Where(predicate));
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
-            EmployeeDTO[] result = employeeService.Get(filter).ToArray();
+            EmployeeDTO[] result = EmployeeService.Get(filter).ToArray();
 
             Assert.AreEqual(4, result.Length);
             Assert.AreEqual(1, result[0].Id);
@@ -949,10 +949,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
-            employeeService.Get(filter);
+            EmployeeService.Get(filter);
 
             mock.Verify(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()), Times.Once());
         }
@@ -962,12 +962,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
-            employeeService.Get(filter);
+            EmployeeService.Get(filter);
 
-            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
+            Assert.IsTrue(File.Exists(EmployeeService.PathToFileForTests));
         }
 
         [Test]
@@ -975,12 +975,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
-            employeeService.Get(filter);
+            EmployeeService.Get(filter);
 
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+            Assert.IsTrue(Regex.IsMatch(EmployeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
 
         [Test]
@@ -1000,13 +1000,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
+            EmployeeService EmployeeService = GetNewService(mock.Object);
 
-            employeeService.Get(filter);
+            EmployeeService.Get(filter);
 
             Assert.AreEqual("Фамилия = W; Фамилия = Z; Email = mail.ru; Есть телефон; Дата приема на работу = 2018-09-01; " +
                 "Зарплата >= 20000; Зарплата <= 50000; Премия = 0,1; Премия = 0,2; Есть премия; Должность = Manager; " +
-                "Название отдела = Management; Используется отрицание; ", employeeService.MessageAboutFilterParametersUsed);
+                "Название отдела = Management; Используется отрицание; ", EmployeeService.MessageAboutFilterParametersUsed);
         }
 
         [Test]
@@ -1014,11 +1014,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             EmployeeFilter filter = new EmployeeFilter { };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
+            EmployeeService EmployeeService = GetNewService(mock.Object);
 
-            employeeService.Get(filter);
+            EmployeeService.Get(filter);
 
-            Assert.AreEqual("Фильтр не задан; ", employeeService.MessageAboutFilterParametersUsed);
+            Assert.AreEqual("Фильтр не задан; ", EmployeeService.MessageAboutFilterParametersUsed);
         }
 
         /// <summary>
@@ -1030,9 +1030,9 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
+            EmployeeService EmployeeService = GetNewService(mock.Object);
 
-            await employeeService.ExportJsonAsync(fullPath);
+            await EmployeeService.ExportJsonAsync(fullPath);
 
             Assert.IsTrue(File.Exists(fullPath));
         }
@@ -1046,10 +1046,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
             mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
 
-            await employeeService.TestCreateAsync(1);
+            await EmployeeService.TestCreateAsync(1);
 
             mock.Verify(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()), Times.Once());
         }
@@ -1060,10 +1060,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
             mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
 
-            await employeeService.TestCreateAsync(1);
+            await EmployeeService.TestCreateAsync(1);
 
             mock.Verify((m => m.SaveAsync()), Times.Once());
         }
@@ -1076,10 +1076,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
             mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = fullPath;
 
-            await employeeService.TestCreateAsync(1);
+            await EmployeeService.TestCreateAsync(1);
 
             Assert.IsTrue(File.Exists(fullPath));
         }
@@ -1090,12 +1090,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
             mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
             mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
 
-            await employeeService.TestCreateAsync(1);
+            await EmployeeService.TestCreateAsync(1);
 
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+            Assert.IsTrue(Regex.IsMatch(EmployeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
 
         /// <summary>
@@ -1107,10 +1107,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
             mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
 
-            await employeeService.TestReadAsync(num, 0);
+            await EmployeeService.TestReadAsync(num, 0);
 
             mock.Verify(m => m.Employees.Get(It.IsAny<int>()), Times.Exactly(4));
         }
@@ -1122,10 +1122,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
             mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = fullPath;
 
-            await employeeService.TestReadAsync(1, 0);
+            await EmployeeService.TestReadAsync(1, 0);
 
             Assert.IsTrue(File.Exists(fullPath));
         }
@@ -1135,12 +1135,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
             mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
 
-            await employeeService.TestReadAsync(1, 0);
+            await EmployeeService.TestReadAsync(1, 0);
 
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+            Assert.IsTrue(Regex.IsMatch(EmployeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
 
         /// <summary>
@@ -1150,10 +1150,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public async Task TestUpdateAsync_ParameterIsOne_CallsUpdateMethodOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { new Employee(), new Employee() });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
 
-            await employeeService.TestUpdateAsync(1);
+            await EmployeeService.TestUpdateAsync(1);
 
             mock.Verify(m => m.Employees.Update(It.IsAny<Employee>()), Times.Once());
         }
@@ -1162,10 +1162,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public async Task TestUpdateAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { new Employee(), new Employee() });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
 
-            await employeeService.TestUpdateAsync(1);
+            await EmployeeService.TestUpdateAsync(1);
 
             mock.Verify((m => m.SaveAsync()), Times.Once());
         }
@@ -1176,10 +1176,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = fullPath;
 
-            await employeeService.TestUpdateAsync(1);
+            await EmployeeService.TestUpdateAsync(1);
 
             Assert.IsTrue(File.Exists(fullPath));
         }
@@ -1188,12 +1188,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public async Task TestUpdateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
 
-            await employeeService.TestUpdateAsync(1);
+            await EmployeeService.TestUpdateAsync(1);
 
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+            Assert.IsTrue(Regex.IsMatch(EmployeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
 
         /// <summary>
@@ -1203,10 +1203,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public async Task TestDeleteAsync_ParameterIsOne_CallsUpdateMethodOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
 
-            await employeeService.TestDeleteAsync(1);
+            await EmployeeService.TestDeleteAsync(1);
 
             mock.Verify(m => m.Employees.RemoveSeries(It.IsAny<IEnumerable<Employee>>()), Times.Once());
         }
@@ -1215,10 +1215,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public async Task TestDeleteAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
 
-            await employeeService.TestDeleteAsync(1);
+            await EmployeeService.TestDeleteAsync(1);
 
             mock.Verify((m => m.SaveAsync()), Times.Once());
         }
@@ -1229,10 +1229,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = fullPath;
 
-            await employeeService.TestDeleteAsync(1);
+            await EmployeeService.TestDeleteAsync(1);
 
             Assert.IsTrue(File.Exists(fullPath));
         }
@@ -1241,12 +1241,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public async Task TestDeleteAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
+            EmployeeService EmployeeService = GetNewService(mock.Object);
+            EmployeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
 
-            await employeeService.TestDeleteAsync(1);
+            await EmployeeService.TestDeleteAsync(1);
 
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
+            Assert.IsTrue(Regex.IsMatch(EmployeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
     }
 }

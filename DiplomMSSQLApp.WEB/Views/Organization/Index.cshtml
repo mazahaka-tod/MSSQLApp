@@ -57,8 +57,162 @@
             @Html.DisplayFor(model => model.Email)
         </dd>
 
+        <dt>
+            @Html.DisplayNameFor(model => model.WWW)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WWW)
+        </dd>
     </dl>
 </div>
+
+<div>
+    <div id="requisitesToggle" class="btn btn-default">
+        Реквизиты <i>(Показать)</i>
+    </div>
+    <div id="requisites" style="display:none;">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.OKPO)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.OKPO)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.INN)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.INN)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.OGRN)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.OGRN)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.OKATO)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.OKATO)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.OKOPF)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.OKOPF)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.OKFS)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.OKFS)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.OKVED)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.OKVED)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Requisites.PFR)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Requisites.PFR)
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<br />
+<div>
+    <div id="bankToggle" class="btn btn-default">
+        Банк <i>(Показать)</i>
+    </div>
+    <div id="bank" style="display:none;">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Bank.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Bank.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Bank.BankAccount)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Bank.BankAccount)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Bank.BankCorrespondentAccount)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Bank.BankCorrespondentAccount)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Bank.KPP)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Bank.KPP)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Bank.BIK)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Bank.BIK)
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<br />
 <p>
-    @Html.ActionLink("Изменить", "Edit", new { id = Model.Id }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Изменить информацию", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
 </p>
+
+@section scripts {
+    <script>
+    $(document).ready(function () {
+        // Показывает или скрывает блок с реквизитами
+        $('#requisitesToggle').on('click', function (event) {
+            var $this = $(this);
+            $('#requisites').slideToggle('slow', function () {
+                $this.html('Реквизиты <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+            });
+        });
+
+        // Показывает или скрывает блок с информацией о банке
+        $('#bankToggle').on('click', function (event) {
+            var $this = $(this);
+            $('#bank').slideToggle('slow', function () {
+                $this.html('Банк <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+            });
+        });
+    })
+    </script>
+}
