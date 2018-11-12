@@ -26,8 +26,8 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<DTO.Requisites, DAL.Entities.Requisites>();
                 cfg.CreateMap<DTO.Bank, DAL.Entities.Bank>();
             });
-            Organization Organization = Mapper.Map<OrganizationDTO, Organization>(oDto);
-            Database.Organizations.Update(Organization);
+            Organization organization = Mapper.Map<OrganizationDTO, Organization>(oDto);
+            Database.Organizations.Update(organization);
             await Database.SaveAsync();
         }
 
@@ -40,11 +40,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task<OrganizationDTO> FindByIdAsync(int? id) {
             if (id == null)
                 throw new ValidationException("Не установлен id организации", "");
-            Organization Organization = await Database.Organizations.FindByIdAsync(id.Value);
-            if (Organization == null)
+            Organization organization = await Database.Organizations.FindByIdAsync(id.Value);
+            if (organization == null)
                 throw new ValidationException("Организация не найдена", "");
             InitializeMapper();
-            OrganizationDTO oDto = Mapper.Map<Organization, OrganizationDTO>(Organization);
+            OrganizationDTO oDto = Mapper.Map<Organization, OrganizationDTO>(organization);
             return oDto;
         }
 
@@ -58,17 +58,17 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Получение списка организаций
         public override async Task<IEnumerable<OrganizationDTO>> GetAllAsync() {
-            IEnumerable<Organization> Organizations = await Database.Organizations.GetAsync();
+            IEnumerable<Organization> organizations = await Database.Organizations.GetAsync();
             InitializeMapper();
-            IEnumerable<OrganizationDTO> collection = Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationDTO>>(Organizations);
+            IEnumerable<OrganizationDTO> collection = Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationDTO>>(organizations);
             return collection;
         }
 
         // Получение первой организации
         public override async Task<OrganizationDTO> GetFirstAsync() {
-            Organization Organization = await Database.Organizations.GetFirstAsync();
+            Organization organization = await Database.Organizations.GetFirstAsync();
             InitializeMapper();
-            OrganizationDTO oDto = Mapper.Map<Organization, OrganizationDTO>(Organization);
+            OrganizationDTO oDto = Mapper.Map<Organization, OrganizationDTO>(organization);
             return oDto;
         }
 

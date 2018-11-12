@@ -13,19 +13,19 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     public class OrganizationController : Controller
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private IService<OrganizationDTO> _OrganizationService;
+        private IService<OrganizationDTO> _organizationService;
 
         public OrganizationController(IService<OrganizationDTO> os) {
-            _OrganizationService = os;
+            _organizationService = os;
         }
 
         // Отображение информации об организации
         public async Task<ActionResult> Index()
         {
-            OrganizationDTO oDto = await _OrganizationService.GetFirstAsync();
+            OrganizationDTO oDto = await _organizationService.GetFirstAsync();
             InitializeMapper();
-            OrganizationViewModel Organization = Mapper.Map<OrganizationDTO, OrganizationViewModel>(oDto);
-            return View("Index", Organization);
+            OrganizationViewModel organization = Mapper.Map<OrganizationDTO, OrganizationViewModel>(oDto);
+            return View("Index", organization);
         }
 
         private void InitializeMapper() {
@@ -39,10 +39,10 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Обновление информации об организации
         public async Task<ActionResult> Edit(int? id) {
             try {
-                OrganizationDTO oDto = await _OrganizationService.FindByIdAsync(id);
+                OrganizationDTO oDto = await _organizationService.FindByIdAsync(id);
                 InitializeMapper();
-                OrganizationViewModel Organization = Mapper.Map<OrganizationDTO, OrganizationViewModel>(oDto);
-                return View("Edit", Organization);
+                OrganizationViewModel organization = Mapper.Map<OrganizationDTO, OrganizationViewModel>(oDto);
+                return View("Edit", organization);
             }
             catch (ValidationException ex) {
                 _logger.Warn(ex.Message);
@@ -50,22 +50,22 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             }
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(OrganizationViewModel Organization) {
+        public async Task<ActionResult> Edit(OrganizationViewModel organization) {
             try {
                 Mapper.Initialize(cfg => {
                     cfg.CreateMap<OrganizationViewModel, OrganizationDTO>();
                     cfg.CreateMap<Models.Requisites, BLL.DTO.Requisites>();
                     cfg.CreateMap<Models.Bank, BLL.DTO.Bank>();
                 });
-                OrganizationDTO oDto = Mapper.Map<OrganizationViewModel, OrganizationDTO>(Organization);
-                await _OrganizationService.EditAsync(oDto);
+                OrganizationDTO oDto = Mapper.Map<OrganizationViewModel, OrganizationDTO>(organization);
+                await _organizationService.EditAsync(oDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
                 _logger.Warn(ex.Message);
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            return View("Edit", Organization);
+            return View("Edit", organization);
         }
     }
 }

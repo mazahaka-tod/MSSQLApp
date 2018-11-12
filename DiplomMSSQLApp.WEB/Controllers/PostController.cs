@@ -15,12 +15,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     public class PostController : Controller {
-        private IService<EmployeeDTO> EmployeeService;
+        private IService<EmployeeDTO> employeeService;
         private IService<PostDTO> postService;
         private IService<DepartmentDTO> departmentService;
 
         public PostController(IService<EmployeeDTO> es, IService<PostDTO> ps, IService<DepartmentDTO> ds) {
-            EmployeeService = es;
+            employeeService = es;
             postService = ps;
             departmentService = ds;
         }
@@ -221,7 +221,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         protected override void Dispose(bool disposing) {
-            EmployeeService.Dispose();
+            employeeService.Dispose();
             postService.Dispose();
             departmentService.Dispose();
             base.Dispose(disposing);

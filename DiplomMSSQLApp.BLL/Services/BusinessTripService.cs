@@ -51,9 +51,9 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         private async Task AddEmployeesOnBusinessTripAsync(BusinessTrip bt, int[] ids) {
             foreach (int id in ids.Distinct()) {
-                Employee Employee = await Database.Employees.FindByIdAsync(id);
-                if (Employee != null)
-                    bt.Employees.Add(Employee);
+                Employee employee = await Database.Employees.FindByIdAsync(id);
+                if (employee != null)
+                    bt.Employees.Add(employee);
             }
         }
 

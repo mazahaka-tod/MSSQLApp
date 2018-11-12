@@ -13,11 +13,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     public class DepartmentController : Controller {
-        private IService<EmployeeDTO> EmployeeService;
+        private IService<EmployeeDTO> employeeService;
         private IService<DepartmentDTO> departmentService;
 
         public DepartmentController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds) {
-            EmployeeService = es;
+            employeeService = es;
             departmentService = ds;
         }
 
@@ -52,8 +52,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         private async Task<SelectList> GetSelectListEmployeesAsync() {
-            IEnumerable<EmployeeDTO> Employees = await EmployeeService.GetAllAsync();
-            IEnumerable<SelectListItem> items = Employees.Select(e => new SelectListItem() {
+            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
+            IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
                                                     Value = e.LastName + " " + e.FirstName,
                                                     Text = e.LastName + " " + e.FirstName
                                                 }).OrderBy(e => e.Text);
@@ -153,7 +153,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         protected override void Dispose(bool disposing) {
-            EmployeeService.Dispose();
+            employeeService.Dispose();
             departmentService.Dispose();
             base.Dispose(disposing);
         }
