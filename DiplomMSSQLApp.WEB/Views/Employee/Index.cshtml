@@ -8,18 +8,6 @@
 <hr />
 
 <div>
-    <div id="animationToggle" class="btn btn-default">
-        С хорошим настроением лучше работается <i>(Показать)</i>
-    </div>
-    <div id="animation" style="display:none;">
-        <img src=@Url.Content("~/Content/Animations/TheBest.gif") alt="TheBest" style="margin:10px;" />
-        <div>Лучший:)</div>
-    </div>
-</div>
-
-<hr />
-
-<div>
     <div id="filterToggle" class="btn btn-default">
         Поиск по фильтру <i>(Показать)</i>
     </div>
@@ -172,113 +160,13 @@
                             </dt>
                             <dd>
                                 <input type="submit" value="Найти" class="btn btn-primary" />
-                                <a id="reset" class="btn btn-default">Сброс</a>
+                                @Html.ActionLink("Сброс", null, null, new { id = "reset", @class = "btn btn-default" })
                             </dd>
                         </dl>
                     </td>
                 </tr>
             </table>
         }
-    </div>
-</div>
-
-<hr />
-
-<div>
-    <div id="performanceTestsToggle" class="btn btn-default">
-        Тесты производительности <i>(Показать)</i>
-    </div>
-    <div id="performanceTests" style="display:none;">
-        <p>
-            @using (Html.BeginForm("TestCreate", "Employee")) {
-                <div class="form-horizontal">
-                    <h4>@Html.Label("Test", "Тест добавления сотрудников")</h4>
-
-                    <div class="form-group">
-                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            <input type="number" min=1 max=1000000 value=10 name="num" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value="Добавить" class="btn btn-default" />
-                        </div>
-                    </div>
-                </div>
-            }
-        </p>
-        <hr />
-        <p>
-            @using (Html.BeginForm("TestRead", "Employee")) {
-                <div class="form-horizontal">
-                    <h4>@Html.Label("Test", "Тест выборки сотрудников")</h4>
-
-                    <div class="form-group">
-                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            <input type="number" min=1 max=1000000 value=10 name="num" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.Label("Salary", "Salary >= ", htmlAttributes: new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            <input type="number" min=1 max=1000000 value=50000 name="salary" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value="Выбрать" class="btn btn-default" />
-                        </div>
-                    </div>
-                </div>
-            }
-        </p>
-        <hr />
-        <p>
-            @using (Html.BeginForm("TestUpdate", "Employee")) {
-                <div class="form-horizontal">
-                    <h4>@Html.Label("Test", "Тест обновления сотрудников")</h4>
-
-                    <div class="form-group">
-                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            <input type="number" min=1 max=1000000 value=10 name="num" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value="Обновить" class="btn btn-default" />
-                        </div>
-                    </div>
-                </div>
-            }
-        </p>
-        <hr />
-        <p>
-            @using (Html.BeginForm("TestDelete", "Employee")) {
-                <div class="form-horizontal">
-                    <h4>@Html.Label("Test", "Тест удаления сотрудников")</h4>
-
-                    <div class="form-group">
-                        @Html.Label("Num", "Количество запросов", htmlAttributes: new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            <input type="number" min=1 max=1000000 value=10 name="num" class="form-control" />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value="Удалить" class="btn btn-default" />
-                        </div>
-                    </div>
-                </div>
-            }
-        </p>
     </div>
 </div>
 
@@ -460,27 +348,11 @@
             }
         });
 
-        // Показывает или скрывает блок с анимацией
-        $('#animationToggle').on('click', function (event) {
-            var $this = $(this);
-            $('#animation').slideToggle('slow', function () {
-                $this.html('С хорошим настроением лучше работается <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
-            });
-        });
-
         // Показывает или скрывает блок с фильтром
         $('#filterToggle').on('click', function (event) {
             var $this = $(this);
             $('#filter').slideToggle('slow', function () {
                 $this.html('Поиск по фильтру <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
-            });
-        });
-
-        // Показывает или скрывает блок с тестами
-        $('#performanceTestsToggle').on('click', function (event) {
-            var $this = $(this);
-            $('#performanceTests').slideToggle('slow', function () {
-                $this.html('Тесты производительности <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
             });
         });
 

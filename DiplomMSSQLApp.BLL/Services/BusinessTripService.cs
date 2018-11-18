@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
@@ -44,7 +43,6 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<BusinessTripDTO, BusinessTrip>();
                 cfg.CreateMap<EmployeeDTO, Employee>()
                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                   .ForMember(e => e.Department, opt => opt.Ignore())
                    .ForMember(e => e.Post, opt => opt.Ignore());
             });
         }
@@ -87,14 +85,13 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
         }
 
         // Получение списка всех командировок
         public override async Task<IEnumerable<BusinessTripDTO>> GetAllAsync() {
-            IEnumerable<BusinessTrip> businessTrips = await Database.BusinessTrips.GetAsync();
+            IEnumerable<BusinessTrip> businessTrips = await Database.BusinessTrips.GetAllAsync();
             InitializeMapper();
             IEnumerable<BusinessTripDTO> collection = Mapper.Map<IEnumerable<BusinessTrip>, IEnumerable<BusinessTripDTO>>(businessTrips);
             return collection;
@@ -124,30 +121,6 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         public override Task EditAsync(BusinessTripDTO item) {
-            throw new System.NotImplementedException();
-        }
-
-        public override IEnumerable<BusinessTripDTO> Get(EmployeeFilter f) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestCreateAsync(int num) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestReadAsync(int num, int salary) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestUpdateAsync(int num) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestDeleteAsync(int num) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task<BusinessTripDTO> GetFirstAsync() {
             throw new System.NotImplementedException();
         }
     }

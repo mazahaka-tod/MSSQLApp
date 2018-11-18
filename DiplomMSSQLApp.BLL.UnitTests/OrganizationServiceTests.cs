@@ -102,7 +102,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         [Test]
         public async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Organizations.GetAsync()).ReturnsAsync(() => new Organization[] {
+            mock.Setup(m => m.Organizations.GetAllAsync()).ReturnsAsync(() => new Organization[] {
                 new Organization() { Id = 1, Name = "Gazprom" },
                 new Organization() { Id = 2, Name = "MTS" },
                 new Organization() { Id = 3, Name = "Nike" }

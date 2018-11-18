@@ -15,13 +15,8 @@ namespace DiplomMSSQLApp.BLL.Services {
         public abstract void Dispose();
         public abstract Task EditAsync(T item);
         public abstract Task<T> FindByIdAsync(int? id);
-        public abstract IEnumerable<T> Get(EmployeeFilter filter);
         public abstract Task<IEnumerable<T>> GetAllAsync();
-        public abstract Task<T> GetFirstAsync();
-        public abstract Task TestCreateAsync(int num);
-        public abstract Task TestReadAsync(int num, int salary);
-        public abstract Task TestUpdateAsync(int num);
-        public abstract Task TestDeleteAsync(int num);
+        
         // Paging
         public virtual IEnumerable<T> GetPage(IEnumerable<T> col, int page) {
             PageInfo = new PageInfo { PageNumber = page, PageSize = NumberOfObjectsPerPage, TotalItems = col.Count() };

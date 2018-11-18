@@ -28,23 +28,16 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Manager, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.Manager, ViewBag.Employees as SelectList, new { @class = "form-control" })
+                @Html.DropDownListFor(model => model.Manager, ViewBag.Employees as SelectList, "Нет", new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Manager, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Обновить" class="btn btn-default" />
+                <input type="submit" value="Обновить" class="btn btn-primary" />
+                @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>
 }
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
-
-@*@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}*@

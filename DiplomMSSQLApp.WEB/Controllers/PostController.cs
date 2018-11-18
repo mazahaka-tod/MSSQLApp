@@ -43,6 +43,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         // Добавление новой должности
         public async Task<ActionResult> Create() {
+            IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
+            if (departments.Count() == 0)
+                return View("Error", new string[] { "Нельзя добавить должность, если нет ни одного отдела" });
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             return View("Create");
         }
@@ -62,11 +65,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         private async Task<SelectList> GetSelectListDepartmentsAsync() {
             IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
-            if (departments.Count() == 0) {
-                DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
-                await departmentService.CreateAsync(btDto);
-                departments = new List<DepartmentDTO> { btDto };
-            }
+            //if (departments.Count() == 0) {
+            //    DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
+            //    await departmentService.CreateAsync(btDto);
+            //    departments = new List<DepartmentDTO> { btDto };
+            //}
             return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
         }
 
@@ -75,7 +78,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<PostViewModel, PostDTO>();
                 cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
             PostDTO pDto = Mapper.Map<PostViewModel, PostDTO>(p);
@@ -118,7 +120,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<PostDTO, PostViewModel>();
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
             PostViewModel p = Mapper.Map<PostDTO, PostViewModel>(pDto);
@@ -177,47 +178,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 Directory.CreateDirectory(dir);
             string fullPath = dir + filename;
             return fullPath;
-        }
-
-        // Тест добавления сотрудников
-        [ActionName("TestCreate")]
-        public async Task<ActionResult> TestCreateAsync(int num) {
-            string fullPath = CreateDirectoryToFile("Create.txt");
-            (postService as PostService).PathToFileForTests = fullPath;
-            await postService.TestCreateAsync(num);
-            return RedirectToAction("Index");
-        }
-
-        // Тест выборки сотрудников
-        [ActionName("TestRead")]
-        public async Task<ActionResult> TestReadAsync(int num, int salary) {
-            string fullPath = CreateDirectoryToFile("Read.txt");
-            (postService as PostService).PathToFileForTests = fullPath;
-            await postService.TestReadAsync(num, salary);
-            return RedirectToAction("Index");
-        }
-
-        // Тест обновления сотрудников
-        [ActionName("TestUpdate")]
-        public async Task<ActionResult> TestUpdateAsync(int num) {
-            string fullPath = CreateDirectoryToFile("Update.txt");
-            (postService as PostService).PathToFileForTests = fullPath;
-            await postService.TestUpdateAsync(num);
-            return RedirectToAction("Index");
-        }
-
-        // Тест удаления сотрудников
-        [ActionName("TestDelete")]
-        public async Task<ActionResult> TestDeleteAsync(int num) {
-            string fullPath = CreateDirectoryToFile("Delete.txt");
-            (postService as PostService).PathToFileForTests = fullPath;
-            try {
-                await postService.TestDeleteAsync(num);
-            }
-            catch (Exception) {
-                return View("Error", new string[] { "Нельзя удалить должность, пока в ней работает хотя бы один сотрудник." });
-            }
-            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing) {

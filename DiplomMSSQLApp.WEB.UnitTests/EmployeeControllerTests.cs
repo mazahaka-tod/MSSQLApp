@@ -75,9 +75,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests
                 new EmployeeDTO {
                     Id = 1,
                     LastName = "Brown",
-                    Email = "Brown@mail.ru",
-                    Salary = 15000,
-                    Bonus = 0.1
+                    Contacts = new BLL.DTO.Contacts { Email = "Brown@mail.ru" },
+                    Post = new PostDTO {
+                        Salary = 15000,
+                        Premium = 0.1
+                    }
                 }
             });
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
@@ -88,9 +90,9 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Assert.AreEqual(1, model.Employees.Count());
             Assert.AreEqual(1, model.Employees.FirstOrDefault().Id);
             Assert.AreEqual("Brown", model.Employees.FirstOrDefault().LastName);
-            Assert.AreEqual("Brown@mail.ru", model.Employees.FirstOrDefault().Email);
-            Assert.AreEqual(15000, model.Employees.FirstOrDefault().Salary);
-            Assert.AreEqual(0.1, model.Employees.FirstOrDefault().Bonus);
+            Assert.AreEqual("Brown@mail.ru", model.Employees.FirstOrDefault().Contacts.Email);
+            Assert.AreEqual(15000, model.Employees.FirstOrDefault().Post.Salary);
+            Assert.AreEqual(0.1, model.Employees.FirstOrDefault().Post.Premium);
         }
 
         [Test]
@@ -257,13 +259,13 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             ViewResult result = (await controller.CreateAsync(new EmployeeViewModel {
                 Id = 2,
                 LastName = "Brown",
-                Email = "Brown@mail.ru"
+                Contacts = new Models.Contacts { Email = "Brown@mail.ru" }
             })) as ViewResult;
 
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(2, model.Id);
             Assert.AreEqual("Brown", model.LastName);
-            Assert.AreEqual("Brown@mail.ru", model.Email);
+            Assert.AreEqual("Brown@mail.ru", model.Contacts.Email);
         }
 
         [Test]
@@ -355,7 +357,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
                 LastName = "Brown",
-                Email = "Brown@mail.ru"
+                Contacts = new BLL.DTO.Contacts { Email = "Brown@mail.ru" }
             });
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
@@ -366,7 +368,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(1, model.Id);
             Assert.AreEqual("Brown", model.LastName);
-            Assert.AreEqual("Brown@mail.ru", model.Email);
+            Assert.AreEqual("Brown@mail.ru", model.Contacts.Email);
         }
 
         [Test]
@@ -497,13 +499,13 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             ViewResult result = (await controller.EditAsync(new EmployeeViewModel {
                 Id = 2,
                 LastName = "Brown",
-                Email = "Brown@mail.ru"
+                Contacts = new Models.Contacts { Email = "Brown@mail.ru" }
             })) as ViewResult;
 
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(2, model.Id);
             Assert.AreEqual("Brown", model.LastName);
-            Assert.AreEqual("Brown@mail.ru", model.Email);
+            Assert.AreEqual("Brown@mail.ru", model.Contacts.Email);
         }
 
         [Test]
@@ -593,7 +595,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
                 LastName = "Brown",
-                Email = "Brown@mail.ru"
+                Contacts = new BLL.DTO.Contacts { Email = "Brown@mail.ru" }
             });
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
@@ -602,7 +604,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(1, model.Id);
             Assert.AreEqual("Brown", model.LastName);
-            Assert.AreEqual("Brown@mail.ru", model.Email);
+            Assert.AreEqual("Brown@mail.ru", model.Contacts.Email);
         }
 
         [Test]
@@ -647,7 +649,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
                 LastName = "Brown",
-                Email = "Brown@mail.ru"
+                Contacts = new BLL.DTO.Contacts { Email = "Brown@mail.ru" }
             });
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
@@ -656,7 +658,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(1, model.Id);
             Assert.AreEqual("Brown", model.LastName);
-            Assert.AreEqual("Brown@mail.ru", model.Email);
+            Assert.AreEqual("Brown@mail.ru", model.Contacts.Email);
         }
 
         [Test]
@@ -730,58 +732,6 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
             RedirectToRouteResult result = (await controller.ExportJsonAsync()) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
-
-        /// <summary>
-        /// // TestCreateAsync method
-        /// </summary>
-        [Test]
-        public async Task TestCreateAsync_RedirectToIndex() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestCreateAsync(1)) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
-
-        /// <summary>
-        /// // TestReadAsync method
-        /// </summary>
-        [Test]
-        public async Task TestReadAsync_RedirectToIndex() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestReadAsync(1, 0)) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
-
-        /// <summary>
-        /// // TestUpdateAsync method
-        /// </summary>
-        [Test]
-        public async Task TestUpdateAsync_RedirectToIndex() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestUpdateAsync(1)) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
-
-        /// <summary>
-        /// // TestDeleteAsync method
-        /// </summary>
-        [Test]
-        public async Task TestDeleteAsync_RedirectToIndex() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestDeleteAsync(1)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }

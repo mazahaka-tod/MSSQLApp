@@ -20,7 +20,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
             _dbSet.Add(item);
         }
         // Добавление последовательности элементов
-        public void Create(IEnumerable<TEntity> items) {
+        public void CreateSeries(IEnumerable<TEntity> items) {
             _dbSet.AddRange(items);
         }
         // Поиск по id
@@ -28,7 +28,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
             return await _dbSet.FindAsync(id);
         }
         // Получение всех элементов
-        public virtual async Task<IEnumerable<TEntity>> GetAsync() {
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync() {
             return await _dbSet.ToListAsync();
         }
         // Получение элементов, удовлетворяющих предикату
@@ -49,7 +49,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         }
         // Удаление всех элементов
         public async Task RemoveAllAsync() {
-            _dbSet.RemoveRange(await GetAsync());
+            _dbSet.RemoveRange(await GetAllAsync());
         }
         // Обновление элемента
         public void Update(TEntity item) {
@@ -57,12 +57,12 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         }
 
         // Нереализованные методы
-        public virtual IEnumerable<TEntity> Get(int salary) {
-            throw new NotImplementedException();
-        }
+        //public virtual IEnumerable<TEntity> Get(int salary) {
+        //    throw new NotImplementedException();
+        //}
 
-        public virtual IEnumerable<TEntity> Get(bool flag) {
-            throw new NotImplementedException();
-        }
+        //public virtual IEnumerable<TEntity> Get(bool flag) {
+        //    throw new NotImplementedException();
+        //}
     }
 }

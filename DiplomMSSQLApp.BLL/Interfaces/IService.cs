@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.BLL.Interfaces
-{
-    public interface IService<TEntity> where TEntity : class
-    {
+namespace DiplomMSSQLApp.BLL.Interfaces {
+    public interface IService<TEntity> where TEntity : class {
         PageInfo PageInfo { get; set; }
 
         Task CreateAsync(TEntity item);
@@ -14,13 +12,7 @@ namespace DiplomMSSQLApp.BLL.Interfaces
         void Dispose();
         Task EditAsync(TEntity item);
         Task<TEntity> FindByIdAsync(int? id);
-        IEnumerable<TEntity> Get(EmployeeFilter filter);
-        Task<IEnumerable<TEntity> > GetAllAsync();
-        Task<TEntity> GetFirstAsync();
+        Task<IEnumerable<TEntity>> GetAllAsync();
         IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page);
-        Task TestCreateAsync(int num);
-        Task TestReadAsync(int num, int salary);
-        Task TestUpdateAsync(int num);
-        Task TestDeleteAsync(int num);
     }
 }

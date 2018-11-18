@@ -475,7 +475,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.BusinessTrips.GetAsync()).ReturnsAsync(() => new BusinessTrip[] {
+            mock.Setup(m => m.BusinessTrips.GetAllAsync()).ReturnsAsync(() => new BusinessTrip[] {
                 new BusinessTrip() { Id = 1, Name = "01.09.2018_022" },
                 new BusinessTrip() { Id = 2, Name = "02.09.2018_023" },
                 new BusinessTrip() { Id = 3, Name = "03.09.2018_024" }

@@ -13,7 +13,6 @@
     }
 
     public class Requisites {
-        public int Id { get; set; }
         public string OKPO { get; set; }
         public string INN { get; set; }
         public string OGRN { get; set; }

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace DiplomMSSQLApp.DAL.Repositories {
     public class EFUnitOfWork : IUnitOfWork {
         private HRContext db;
-        private EFGenericRepository<BusinessTrip> _businessTripRepository;
-        private EFGenericRepository<Department> _departmentRepository;
-        private EFEmployeeRepository _employeeRepository;
-        private EFOrganizationRepository _organizationRepository;
-        private EFPostRepository _postRepository;
+        private IGenericRepository<BusinessTrip>    _businessTripRepository;
+        private IGenericRepository<Department>      _departmentRepository;
+        private IGenericRepository<Employee>        _employeeRepository;
+        private IGenericRepository<Organization>    _organizationRepository;
+        private IGenericRepository<Post>            _postRepository;
 
         public EFUnitOfWork(string connectionString) {
             db = new HRContext(connectionString);
@@ -44,7 +44,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         public IGenericRepository<Organization> Organizations {
             get {
                 if (_organizationRepository == null)
-                    _organizationRepository = new EFOrganizationRepository(db);
+                    _organizationRepository = new EFGenericRepository<Organization>(db);
                 return _organizationRepository;
             }
         }

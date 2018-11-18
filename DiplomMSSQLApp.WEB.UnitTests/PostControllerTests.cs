@@ -445,57 +445,5 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
-
-        /// <summary>
-        /// // TestCreateAsync method
-        /// </summary>
-        [Test]
-        public async Task TestCreateAsync_RedirectToIndex() {
-            Mock<PostService> mock = new Mock<PostService>();
-            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestCreateAsync(1)) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
-        
-        /// <summary>
-        /// // TestReadAsync method
-        /// </summary>
-        [Test]
-        public async Task TestReadAsync_RedirectToIndex() {
-            Mock<PostService> mock = new Mock<PostService>();
-            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestReadAsync(1, 0)) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
-
-        /// <summary>
-        /// // TestUpdateAsync method
-        /// </summary>
-        [Test]
-        public async Task TestUpdateAsync_RedirectToIndex() {
-            Mock<PostService> mock = new Mock<PostService>();
-            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestUpdateAsync(1)) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
-
-        /// <summary>
-        /// // TestDeleteAsync method
-        /// </summary>
-        [Test]
-        public async Task TestDeleteAsync_RedirectToIndex() {
-            Mock<PostService> mock = new Mock<PostService>();
-            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
-
-            RedirectToRouteResult result = (await controller.TestDeleteAsync(1)) as RedirectToRouteResult;
-
-            Assert.AreEqual("Index", result.RouteValues["action"]);
-        }
     }
 }

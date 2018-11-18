@@ -16,12 +16,12 @@
             }
             @if (Model.Filter.Columns.Contains("2")) {
                 <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Email)
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Contacts.Email)
                 </th>
             }
             @if (Model.Filter.Columns.Contains("3")) {
                 <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).PhoneNumber)
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Contacts.MobilePhone)
                 </th>
             }
             @if (Model.Filter.Columns.Contains("4")) {
@@ -31,12 +31,12 @@
             }
             @if (Model.Filter.Columns.Contains("5")) {
                 <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Salary)
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Post.Salary)
                 </th>
             }
             @if (Model.Filter.Columns.Contains("6")) {
                 <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Bonus)
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Post.Premium)
                 </th>
             }
             @if (Model.Filter.Columns.Contains("7")) {
@@ -46,7 +46,7 @@
             }
             @if (Model.Filter.Columns.Contains("8")) {
                 <th>
-                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Department.DepartmentName)
+                    @Html.DisplayNameFor(model => model.Employees.ElementAt(0).Post.Department.DepartmentName)
                 </th>
             }
             <th></th>
@@ -66,12 +66,12 @@
                 }
                 @if (Model.Filter.Columns.Contains("2")) {
                     <td>
-                        @Html.DisplayFor(modelItem => item.Email)
+                        @Html.DisplayFor(modelItem => item.Contacts.Email)
                     </td>
                 }
                 @if (Model.Filter.Columns.Contains("3")) {
                     <td width="130px">
-                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                        @Html.DisplayFor(modelItem => item.Contacts.MobilePhone)
                     </td>
                 }
                 @if (Model.Filter.Columns.Contains("4")) {
@@ -81,12 +81,12 @@
                 }
                 @if (Model.Filter.Columns.Contains("5")) {
                     <td>
-                        @Html.DisplayFor(modelItem => item.Salary)
+                        @Html.DisplayFor(modelItem => item.Post.Salary)
                     </td>
                 }
                 @if (Model.Filter.Columns.Contains("6")) {
                     <td>
-                        @Html.DisplayFor(modelItem => item.Bonus)
+                        @Html.DisplayFor(modelItem => item.Post.Premium)
                     </td>
                 }
                 @if (Model.Filter.Columns.Contains("7")) {
@@ -96,7 +96,7 @@
                 }
                 @if (Model.Filter.Columns.Contains("8")) {
                     <td>
-                        @Html.DisplayFor(modelItem => item.Department.DepartmentName)
+                        @Html.DisplayFor(modelItem => item.Post.Department.DepartmentName)
                     </td>
                 }
                 <td width="150px">

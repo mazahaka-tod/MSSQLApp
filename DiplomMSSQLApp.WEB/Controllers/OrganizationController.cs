@@ -2,6 +2,7 @@
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
+using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using NLog;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Отображение информации об организации
         public async Task<ActionResult> Index()
         {
-            OrganizationDTO oDto = await _organizationService.GetFirstAsync();
+            OrganizationDTO oDto = await (_organizationService as OrganizationService).GetFirstAsync();
             InitializeMapper();
             OrganizationViewModel organization = Mapper.Map<OrganizationDTO, OrganizationViewModel>(oDto);
             return View("Index", organization);

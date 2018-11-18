@@ -133,7 +133,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
-                Email = "this is a bad email"
+                Contacts = new DTO.Contacts { Email = "this is a bad email" }
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
@@ -325,7 +325,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
-                Email = "this is a bad email"
+                Contacts = new DTO.Contacts { Email = "this is a bad email" }
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
@@ -447,7 +447,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
         {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(() => new Employee[] {
+            mock.Setup(m => m.Employees.GetAllAsync()).ReturnsAsync(() => new Employee[] {
                 new Employee() { Id = 1, LastName = "Petrov" },
                 new Employee() { Id = 2, LastName = "Popov" },
                 new Employee() { Id = 3, LastName = "Ivanov" }
@@ -496,42 +496,58 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
-                    Email = "Petrov@mail.ru",
-                    PhoneNumber = "89991554545",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Petrov@mail.ru",
+                        MobilePhone = "89991554545"
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 13000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 13000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 2,
                     LastName = "Panin",
-                    Email = "Panin@mail.ru",
-                    PhoneNumber = "89991554546",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Panin@mail.ru",
+                        MobilePhone = "89991554546"
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 17000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 17000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 3,
                     LastName = "Ivanov",
-                    Email = "Ivanov@yandex.ru",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Ivanov@yandex.ru",
+                    },
                     HireDate = new DateTime(2018, 09, 02),
-                    Salary = 21000,
-                    Post = new Post { Title = "Intern" },
-                    Department = new Department { DepartmentName = "IT" }
+                    Post = new Post {
+                        Title = "Intern",
+                        Salary = 21000,
+                        Department = new Department { DepartmentName = "IT" }
+                    }
                 },
                 new Employee() {
                     Id = 4,
                     LastName = "Brown",
-                    Email = "Brown@gmail.com",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Brown@gmail.com",
+                    },
                     HireDate = new DateTime(2018, 09, 03),
-                    Salary = 23000,
-                    Post = new Post { Title = "Engineer" },
-                    Department = new Department { DepartmentName = "Logistics" }
+                    Post = new Post {
+                        Title = "Engineer",
+                        Salary = 23000,
+                        Department = new Department { DepartmentName = "Logistics" }
+                    }
                 }
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
@@ -578,42 +594,58 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
-                    Email = "Petrov@mail.ru",
-                    PhoneNumber = "89991554545",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Petrov@mail.ru",
+                        MobilePhone = "89991554545"
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 13000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 13000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 2,
                     LastName = "Panin",
-                    Email = "Panin@mail.ru",
-                    PhoneNumber = "89991554546",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Panin@mail.ru",
+                        MobilePhone = "89991554546"
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 17000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 17000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 3,
                     LastName = "Ivanov",
-                    Email = "Ivanov@yandex.ru",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Ivanov@yandex.ru",
+                    },
                     HireDate = new DateTime(2018, 09, 02),
-                    Salary = 11000,
-                    Post = new Post { Title = "Intern" },
-                    Department = new Department { DepartmentName = "IT" }
+                    Post = new Post {
+                        Title = "Intern",
+                        Salary = 11000,
+                        Department = new Department { DepartmentName = "IT" }
+                    }
                 },
                 new Employee() {
                     Id = 4,
                     LastName = "Brown",
-                    Email = "Brown@gmail.com",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Brown@gmail.com",
+                    },
                     HireDate = new DateTime(2018, 09, 03),
-                    Salary = 9000,
-                    Post = new Post { Title = "Engineer" },
-                    Department = new Department { DepartmentName = "Logistics" }
+                    Post = new Post {
+                        Title = "Engineer",
+                        Salary = 9000,
+                        Department = new Department { DepartmentName = "Logistics" }
+                    }
                 }
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
@@ -659,42 +691,58 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
-                    Email = "Petrov@yandex.ru",
-                    PhoneNumber = "89991554545",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Petrov@yandex.ru",
+                        MobilePhone = "89991554545"
+                    },
                     HireDate = new DateTime(2018, 09, 02),
-                    Salary = 17000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Intern" },
-                    Department = new Department { DepartmentName = "IT" }
+                    Post = new Post {
+                        Title = "Intern",
+                        Salary = 17000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "IT" }
+                    }
                 },
                 new Employee() {
                     Id = 2,
                     LastName = "Panin",
-                    Email = "Panin@mail.ru",
-                    PhoneNumber = "89991554546",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Panin@mail.ru",
+                        MobilePhone = "89991554546"
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 13000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 13000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 3,
                     LastName = "Ivanov",
-                    Email = "Ivanov@mail.ru",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Ivanov@mail.ru",
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 11000,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 11000,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 4,
                     LastName = "Sidorov",
-                    Email = "Sidorov@gmail.com",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Sidorov@gmail.com",
+                    },
                     HireDate = new DateTime(2018, 09, 03),
-                    Salary = 9000,
-                    Post = new Post { Title = "Engineer" },
-                    Department = new Department { DepartmentName = "Logistics" }
+                    Post = new Post {
+                        Title = "Engineer",
+                        Salary = 9000,
+                        Department = new Department { DepartmentName = "Logistics" }
+                    }
                 }
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
@@ -739,42 +787,58 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new Employee() {
                     Id = 1,
                     LastName = "Petrov",
-                    Email = "Petrov@yandex.ru",
-                    PhoneNumber = "89991554545",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Petrov@yandex.ru",
+                        MobilePhone = "89991554545"
+                    },
                     HireDate = new DateTime(2018, 09, 02),
-                    Salary = 17000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Intern" },
-                    Department = new Department { DepartmentName = "IT" }
+                    Post = new Post {
+                        Title = "Intern",
+                        Salary = 17000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "IT" }
+                    }
                 },
                 new Employee() {
                     Id = 2,
                     LastName = "Panin",
-                    Email = "Panin@mail.ru",
-                    PhoneNumber = "89991554546",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Panin@mail.ru",
+                        MobilePhone = "89991554546"
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 13000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 13000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 3,
                     LastName = "Ivanov",
-                    Email = "Ivanov@mail.ru",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Ivanov@mail.ru",
+                    },
                     HireDate = new DateTime(2018, 09, 01),
-                    Salary = 11000,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 11000,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 4,
                     LastName = "Sidorov",
-                    Email = "Sidorov@gmail.com",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Sidorov@gmail.com",
+                    },
                     HireDate = new DateTime(2018, 09, 03),
-                    Salary = 9000,
-                    Post = new Post { Title = "Engineer" },
-                    Department = new Department { DepartmentName = "Logistics" }
+                    Post = new Post {
+                        Title = "Engineer",
+                        Salary = 9000,
+                        Department = new Department { DepartmentName = "Logistics" }
+                    }
                 }
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
@@ -811,43 +875,60 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new Employee() {
                     Id = 1,
                     LastName = "Sidorov",
-                    Email = "Sidorov@yandex.ru",
-                    PhoneNumber = "89991554547",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Sidorov@yandex.ru",
+                        MobilePhone = "89991554547",
+                    },
                     HireDate = new DateTime(2018, 09, 05),
-                    Salary = 17000,
-                    Bonus = 0.3,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 17000,
+                        Premium = 0.3,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 2,
                     LastName = "Petrov",
-                    Email = "Petrov@mail.ru",
-                    PhoneNumber = "89991554546",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Petrov@mail.ru",
+                        MobilePhone = "89991554546"
+                    },
                     HireDate = new DateTime(2018, 09, 04),
-                    Salary = 16000,
-                    Bonus = 0.2,
-                    Post = new Post { Title = "Intern" },
-                    Department = new Department { DepartmentName = "Logistics" }
+                    Post = new Post {
+                        Title = "Intern",
+                        Salary = 16000,
+                        Premium = 0.2,
+                        Department = new Department { DepartmentName = "Logistics" }
+                    }
                 },
                 new Employee() {
                     Id = 3,
                     LastName = "Panin",
-                    Email = "Panin@mail.ru",
-                    PhoneNumber = "89991554545",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Panin@mail.ru",
+                        MobilePhone = "89991554545"
+                    },
                     HireDate = new DateTime(2018, 09, 03),
-                    Salary = 15000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Engineer" },
-                    Department = new Department { DepartmentName = "IT" }
+                    Post = new Post {
+                        Title = "Engineer",
+                        Salary = 15000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "IT" }
+                    }
                 },
                 new Employee() {
                     Id = 4,
                     LastName = "Ivanov",
-                    PhoneNumber = "89991554544",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Ivanov@mail.ru",
+                        MobilePhone = "89991554544"
+                    },
                     HireDate = new DateTime(2018, 09, 02),
-                    Post = new Post { Title = "Administrator" },
-                    Department = new Department { DepartmentName = "HR" }
+                    Post = new Post {
+                        Title = "Administrator",
+                        Department = new Department { DepartmentName = "HR" }
+                    }
                 }
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
@@ -886,43 +967,59 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 new Employee() {
                     Id = 1,
                     LastName = "Sidorov",
-                    Email = "Sidorov@yandex.ru",
-                    PhoneNumber = "89991554547",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Sidorov@yandex.ru",
+                        MobilePhone = "89991554547"
+                    },
                     HireDate = new DateTime(2018, 09, 05),
-                    Salary = 17000,
-                    Bonus = 0.3,
-                    Post = new Post { Title = "Manager" },
-                    Department = new Department { DepartmentName = "Management" }
+                    Post = new Post {
+                        Title = "Manager",
+                        Salary = 17000,
+                        Premium = 0.3,
+                        Department = new Department { DepartmentName = "Management" }
+                    }
                 },
                 new Employee() {
                     Id = 2,
                     LastName = "Petrov",
-                    Email = "Petrov@mail.ru",
-                    PhoneNumber = "89991554546",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Petrov@mail.ru",
+                        MobilePhone = "89991554546"
+                    },
                     HireDate = new DateTime(2018, 09, 04),
-                    Salary = 16000,
-                    Bonus = 0.2,
-                    Post = new Post { Title = "Intern" },
-                    Department = new Department { DepartmentName = "Logistics" }
+                    Post = new Post {
+                        Title = "Intern",
+                        Salary = 16000,
+                        Premium = 0.2,
+                        Department = new Department { DepartmentName = "Logistics" }
+                    }
                 },
                 new Employee() {
                     Id = 3,
                     LastName = "Panin",
-                    Email = "Panin@mail.ru",
-                    PhoneNumber = "89991554545",
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = "Panin@mail.ru",
+                        MobilePhone = "89991554545"
+                    },
                     HireDate = new DateTime(2018, 09, 03),
-                    Salary = 15000,
-                    Bonus = 0.1,
-                    Post = new Post { Title = "Engineer" },
-                    Department = new Department { DepartmentName = "IT" }
+                    Post = new Post {
+                        Title = "Engineer",
+                        Salary = 15000,
+                        Premium = 0.1,
+                        Department = new Department { DepartmentName = "IT" }
+                    }
                 },
                 new Employee() {
                     Id = 4,
                     LastName = "Ivanov",
-                    PhoneNumber = "89991554544",
+                    Contacts = new DAL.Entities.Contacts {
+                        MobilePhone = "89991554544"
+                    },
                     HireDate = new DateTime(2018, 09, 02),
-                    Post = new Post { Title = "Administrator" },
-                    Department = new Department { DepartmentName = "HR" }
+                    Post = new Post {
+                        Title = "Administrator",
+                        Department = new Department { DepartmentName = "HR" }
+                    }
                 }
             };
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
@@ -955,32 +1052,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             employeeService.Get(filter);
 
             mock.Verify(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()), Times.Once());
-        }
-
-        [Test]
-        public void Get_SortFieldPropertyIsEqualToLastName_CreatesResultFile() {
-            EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
-
-            employeeService.Get(filter);
-
-            Assert.IsTrue(File.Exists(employeeService.PathToFileForTests));
-        }
-
-        [Test]
-        public void Get_SortFieldPropertyIsEqualToLastName_TestTimeIsWrittenToElapsedTimeProperty() {
-            EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
-
-            employeeService.Get(filter);
-
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
 
         [Test]
@@ -1029,224 +1100,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Employees.json";
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
+            mock.Setup(m => m.Employees.GetAllAsync()).ReturnsAsync(new Employee[] { });
             EmployeeService employeeService = GetNewService(mock.Object);
 
             await employeeService.ExportJsonAsync(fullPath);
 
             Assert.IsTrue(File.Exists(fullPath));
-        }
-
-        /// <summary>
-        /// // TestCreateAsync method
-        /// </summary>
-        [Test]
-        public async Task TestCreateAsync_CallsWithGoodParameter_CallsCreateMethodOnce() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
-            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
-            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
-
-            await employeeService.TestCreateAsync(1);
-
-            mock.Verify(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()), Times.Once());
-        }
-
-        [Test]
-        public async Task TestCreateAsync_CallsWithGoodParameter_CallsSaveAsyncMethodOnce() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
-            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
-            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
-
-            await employeeService.TestCreateAsync(1);
-
-            mock.Verify((m => m.SaveAsync()), Times.Once());
-        }
-
-        [Test]
-        public async Task TestCreateAsync_CallsWithGoodParameter_CreatesResultFile() {
-            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
-            File.Delete(fullPath);
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
-            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
-            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
-
-            await employeeService.TestCreateAsync(1);
-
-            Assert.IsTrue(File.Exists(fullPath));
-        }
-
-        [Test]
-        public async Task TestCreateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetFirstAsync()).ReturnsAsync(new Post() { });
-            mock.Setup(m => m.Departments.GetFirstAsync()).ReturnsAsync(new Department() { });
-            mock.Setup(m => m.Employees.Create(It.IsAny<IEnumerable<Employee>>()));
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Create.txt";
-
-            await employeeService.TestCreateAsync(1);
-
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
-        }
-
-        /// <summary>
-        /// // TestReadAsync method
-        /// </summary>
-        [Test]
-        public async Task TestReadAsync_ParameterIsThree_CallsGetMethodFourTimes() {
-            int num = 3;
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
-
-            await employeeService.TestReadAsync(num, 0);
-
-            mock.Verify(m => m.Employees.Get(It.IsAny<int>()), Times.Exactly(4));
-        }
-
-        [Test]
-        public async Task TestReadAsync_CallsWithGoodParameter_CreatesResultFile() {
-            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
-            File.Delete(fullPath);
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
-
-            await employeeService.TestReadAsync(1, 0);
-
-            Assert.IsTrue(File.Exists(fullPath));
-        }
-
-        [Test]
-        public async Task TestReadAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            mock.Setup(m => m.Employees.Get(It.IsAny<int>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Read.txt";
-
-            await employeeService.TestReadAsync(1, 0);
-
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
-        }
-
-        /// <summary>
-        /// // TestUpdateAsync method
-        /// </summary>
-        [Test]
-        public async Task TestUpdateAsync_ParameterIsOne_CallsUpdateMethodOnce() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { new Employee(), new Employee() });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
-
-            await employeeService.TestUpdateAsync(1);
-
-            mock.Verify(m => m.Employees.Update(It.IsAny<Employee>()), Times.Once());
-        }
-
-        [Test]
-        public async Task TestUpdateAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { new Employee(), new Employee() });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
-
-            await employeeService.TestUpdateAsync(1);
-
-            mock.Verify((m => m.SaveAsync()), Times.Once());
-        }
-
-        [Test]
-        public async Task TestUpdateAsync_CallsWithGoodParameter_CreatesResultFile() {
-            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
-            File.Delete(fullPath);
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
-
-            await employeeService.TestUpdateAsync(1);
-
-            Assert.IsTrue(File.Exists(fullPath));
-        }
-
-        [Test]
-        public async Task TestUpdateAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Update.txt";
-
-            await employeeService.TestUpdateAsync(1);
-
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
-        }
-
-        /// <summary>
-        /// // TestDeleteAsync method
-        /// </summary>
-        [Test]
-        public async Task TestDeleteAsync_ParameterIsOne_CallsUpdateMethodOnce() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
-
-            await employeeService.TestDeleteAsync(1);
-
-            mock.Verify(m => m.Employees.RemoveSeries(It.IsAny<IEnumerable<Employee>>()), Times.Once());
-        }
-
-        [Test]
-        public async Task TestDeleteAsync_ParameterIsOne_CallsSaveAsyncMethodOnce() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
-
-            await employeeService.TestDeleteAsync(1);
-
-            mock.Verify((m => m.SaveAsync()), Times.Once());
-        }
-
-        [Test]
-        public async Task TestDeleteAsync_CallsWithGoodParameter_CreatesResultFile() {
-            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
-            File.Delete(fullPath);
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = fullPath;
-
-            await employeeService.TestDeleteAsync(1);
-
-            Assert.IsTrue(File.Exists(fullPath));
-        }
-
-        [Test]
-        public async Task TestDeleteAsync_CallsWithGoodParameter_TestTimeIsWrittenToElapsedTimeProperty() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAsync()).ReturnsAsync(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Delete.txt";
-
-            await employeeService.TestDeleteAsync(1);
-
-            Assert.IsTrue(Regex.IsMatch(employeeService.ElapsedTime, @"^\d{2}:\d{2}:\d{2}\.\d{3}$"));
         }
     }
 }

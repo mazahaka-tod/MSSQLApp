@@ -1,19 +1,25 @@
-﻿@model DiplomMSSQLApp.WEB.Models.EmployeeViewModel
+﻿@using DiplomMSSQLApp.WEB.Models
+@model EmployeeViewModel
 
 @{
     ViewBag.Title = "Подробная информация о сотруднике";
 }
 
 <h2>Подробная информация о сотруднике</h2>
+<hr />
 
 <div>
-
-    <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.PersonnelNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PersonnelNumber)
+        </dd>
+
         <dt>
             @Html.DisplayNameFor(model => model.LastName)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.LastName)
         </dd>
@@ -21,83 +27,176 @@
         <dt>
             @Html.DisplayNameFor(model => model.FirstName)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.FirstName)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.DisplayNameFor(model => model.Patronymic)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Email)
+            @Html.DisplayFor(model => model.Patronymic)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.PhoneNumber)
+            @Html.DisplayNameFor(model => model.Age)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Address)
+            @Html.DisplayFor(model => model.Age)
         </dd>
 
         <dt>
             @Html.DisplayNameFor(model => model.HireDate)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.HireDate)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Salary)
+            @Html.DisplayNameFor(model => model.PostId)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Salary)
+            @Html.DisplayFor(model => model.PostId)
+        </dd>
+
+        <dt>Дата и место рождения</dt>
+        <dd></dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Birth.BirthDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Birth.BirthDate)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Bonus)
+            @Html.DisplayNameFor(model => model.Birth.BirthPlace)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Bonus)
+            @Html.DisplayFor(model => model.Birth.BirthPlace)
+        </dd>
+
+        <dt>Паспорт</dt>
+        <dd></dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Passport.Series)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Passport.Series)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Post.Title)
+            @Html.DisplayNameFor(model => model.Passport.Number)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Post.Title)
+            @Html.DisplayFor(model => model.Passport.Number)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Department.DepartmentName)
+            @Html.DisplayNameFor(model => model.Passport.WhoIssued)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Department.DepartmentName)
+            @Html.DisplayFor(model => model.Passport.WhoIssued)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Passport.DateOfIssue)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Passport.DateOfIssue)
+        </dd>
+
+        <dt>Контакты</dt>
+        <dd></dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Contacts.Address)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contacts.Address)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Contacts.HomePhone)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contacts.HomePhone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Contacts.MobilePhone)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contacts.MobilePhone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Contacts.Email)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contacts.Email)
+        </dd>
+
+        <dt>Образование</dt>
+        <dd></dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Education.Level)
+        </dt>
+        <dd>
+            @if (Model.Education.Level != Level.Нет) {
+                @Html.DisplayFor(model => model.Education.Level);
+            }
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Education.EducationalInstitution)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Education.EducationalInstitution)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Education.Faculty)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Education.Faculty)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Education.Specialization)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Education.Specialization)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Education.YearEnd)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Education.YearEnd)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Education.Qualification)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Education.Qualification)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Education.EducationDocument)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Education.EducationDocument)
         </dd>
 
         <dt>
             @Html.DisplayNameFor(model => model.BusinessTrips)
         </dt>
-
-        @if (Model.BusinessTrips != null)
-        {
-            foreach (var item in Model.BusinessTrips)
-            {
+        @if (Model.BusinessTrips != null) {
+            foreach (var item in Model.BusinessTrips) {
                 <dd>
                     @item.Name
                 </dd>
@@ -107,6 +206,6 @@
 </div>
 <br />
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Назад", "Index", null, new { @class = "btn btn-default" })
 </p>

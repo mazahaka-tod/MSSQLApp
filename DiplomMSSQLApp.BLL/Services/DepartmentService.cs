@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
@@ -61,14 +60,13 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<Department, DepartmentDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Department, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
         }
 
         // Получение списка всех отделов
         public override async Task<IEnumerable<DepartmentDTO>> GetAllAsync() {
-            IEnumerable<Department> departments = await Database.Departments.GetAsync();
+            IEnumerable<Department> departments = await Database.Departments.GetAllAsync();
             InitializeMapper();
             IEnumerable<DepartmentDTO> collection = Mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentDTO>>(departments);
             return collection;
@@ -90,31 +88,6 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         public override void Dispose() {
             Database.Dispose();
-        }
-
-        // Нереализованные методы
-        public override IEnumerable<DepartmentDTO> Get(EmployeeFilter f) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestCreateAsync(int num) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestReadAsync(int num, int salary) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestUpdateAsync(int num) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task TestDeleteAsync(int num) {
-            throw new System.NotImplementedException();
-        }
-
-        public override Task<DepartmentDTO> GetFirstAsync() {
-            throw new System.NotImplementedException();
         }
     }
 }

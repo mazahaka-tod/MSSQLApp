@@ -35,7 +35,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
             string fullPath = CreateDirectoryToFile("Filter.txt");
             (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            IEnumerable<EmployeeDTO> eDto = employeeService.Get(filter);
+            IEnumerable<EmployeeDTO> eDto = (employeeService as EmployeeService).Get(filter);
             eDto = employeeService.GetPage(eDto, page);     // Paging
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
@@ -44,6 +44,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(d => d.Employees, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
+
+                cfg.CreateMap<BLL.DTO.Birth, Models.Birth>();
+                cfg.CreateMap<BLL.DTO.Passport, Models.Passport>();
+                cfg.CreateMap<BLL.DTO.Contacts, Models.Contacts>();
+                cfg.CreateMap<BLL.DTO.Education, Models.Education>();
             });
             IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
             EmployeeListViewModel model = new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo };
@@ -66,6 +71,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Добавление нового сотрудника
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
+            IEnumerable<PostDTO> posts = await postService.GetAllAsync();
+            if (posts.Count() == 0)
+                return View("Error", new string[] { "Нельзя добавить сотрудника, если нет ни одной свободной должности" });
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
             return View("Create");
@@ -87,21 +95,21 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         private async Task<SelectList> GetSelectListDepartmentsAsync() {
             IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
-            if (departments.Count() == 0) {
-                DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
-                await departmentService.CreateAsync(btDto);
-                departments = new List<DepartmentDTO> { btDto };
-            }
+            //if (departments.Count() == 0) {
+            //    DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
+            //    await departmentService.CreateAsync(btDto);
+            //    departments = new List<DepartmentDTO> { btDto };
+            //}
             return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
         }
 
         private async Task<SelectList> GetSelectListPostsAsync() {
             IEnumerable<PostDTO> posts = await postService.GetAllAsync();
-            if (posts.Count() == 0) {
-                PostDTO pDto = new PostDTO { Id = 1, Title = "unknown" };
-                await postService.CreateAsync(pDto);
-                posts = new List<PostDTO> { pDto };
-            }
+            //if (posts.Count() == 0) {
+            //    PostDTO pDto = new PostDTO { Id = 1, Title = "unknown" };
+            //    await postService.CreateAsync(pDto);
+            //    posts = new List<PostDTO> { pDto };
+            //}
             return new SelectList(posts.OrderBy(p => p.Title), "Id", "Title");
         }
 
@@ -113,6 +121,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                    .ForMember(d => d.Employees, opt => opt.Ignore());
                 cfg.CreateMap<PostViewModel, PostDTO>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
+
+                cfg.CreateMap<Models.Birth, BLL.DTO.Birth>();
+                cfg.CreateMap<Models.Passport, BLL.DTO.Passport>();
+                cfg.CreateMap<Models.Contacts, BLL.DTO.Contacts>();
+                cfg.CreateMap<Models.Education, BLL.DTO.Education>();
             });
             EmployeeDTO eDto = Mapper.Map<EmployeeViewModel, EmployeeDTO>(e);
             return eDto;
@@ -159,6 +172,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                    .ForMember(d => d.Employees, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, PostViewModel>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
+
+                cfg.CreateMap<BLL.DTO.Birth, Models.Birth>();
+                cfg.CreateMap<BLL.DTO.Passport, Models.Passport>();
+                cfg.CreateMap<BLL.DTO.Contacts, Models.Contacts>();
+                cfg.CreateMap<BLL.DTO.Education, Models.Education>();
             });
             EmployeeViewModel e = Mapper.Map<EmployeeDTO, EmployeeViewModel>(eDto);
             return e;
@@ -200,42 +218,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return RedirectToAction("Index");
         }
 
-        // Тест добавления сотрудников
-        [ActionName("TestCreate")]
-        public async Task<ActionResult> TestCreateAsync(int num) {
-            string fullPath = CreateDirectoryToFile("Create.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestCreateAsync(num);
-            return RedirectToAction("Index");
-        }
-
-        // Тест выборки сотрудников
-        [ActionName("TestRead")]
-        public async Task<ActionResult> TestReadAsync(int num, int salary) {
-            string fullPath = CreateDirectoryToFile("Read.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestReadAsync(num, salary);
-            return RedirectToAction("Index");
-        }
-
-        // Тест обновления сотрудников
-        [ActionName("TestUpdate")]
-        public async Task<ActionResult> TestUpdateAsync(int num) {
-            string fullPath = CreateDirectoryToFile("Update.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestUpdateAsync(num);
-            return RedirectToAction("Index");
-        }
-
-        // Тест удаления сотрудников
-        [ActionName("TestDelete")]
-        public async Task<ActionResult> TestDeleteAsync(int num) {
-            string fullPath = CreateDirectoryToFile("Delete.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
-            await employeeService.TestDeleteAsync(num);
-            return RedirectToAction("Index");
-        }
-        
         public ActionResult About() {
             return View("About");
         }

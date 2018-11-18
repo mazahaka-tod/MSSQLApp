@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
@@ -58,14 +57,14 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Получение списка организаций
         public override async Task<IEnumerable<OrganizationDTO>> GetAllAsync() {
-            IEnumerable<Organization> organizations = await Database.Organizations.GetAsync();
+            IEnumerable<Organization> organizations = await Database.Organizations.GetAllAsync();
             InitializeMapper();
             IEnumerable<OrganizationDTO> collection = Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationDTO>>(organizations);
             return collection;
         }
 
         // Получение первой организации
-        public override async Task<OrganizationDTO> GetFirstAsync() {
+        public virtual async Task<OrganizationDTO> GetFirstAsync() {
             Organization organization = await Database.Organizations.GetFirstAsync();
             InitializeMapper();
             OrganizationDTO oDto = Mapper.Map<Organization, OrganizationDTO>(organization);
@@ -81,31 +80,11 @@ namespace DiplomMSSQLApp.BLL.Services {
             throw new NotImplementedException();
         }
 
-        public override Task DeleteAllAsync() {
-            throw new NotImplementedException();
-        }
-
         public override Task DeleteAsync(int id) {
             throw new NotImplementedException();
         }
 
-        public override Task TestCreateAsync(int num) {
-            throw new NotImplementedException();
-        }
-
-        public override Task TestDeleteAsync(int num) {
-            throw new NotImplementedException();
-        }
-
-        public override Task TestReadAsync(int num, int salary) {
-            throw new NotImplementedException();
-        }
-
-        public override Task TestUpdateAsync(int num) {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerable<OrganizationDTO> Get(EmployeeFilter filter) {
+        public override Task DeleteAllAsync() {
             throw new NotImplementedException();
         }
     }

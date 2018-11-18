@@ -5,11 +5,19 @@
 }
 
 <h2>Удаление сотрудника</h2>
+<hr />
 
 <h3>Вы уверены, что хотите удалить сотрудника?</h3>
 <div>
-    <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.PersonnelNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PersonnelNumber)
+        </dd>
+
         <dt>
             @Html.DisplayNameFor(model => model.LastName)
         </dt>
@@ -27,27 +35,27 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.DisplayNameFor(model => model.Patronymic)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Email)
+            @Html.DisplayFor(model => model.Patronymic)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.PhoneNumber)
+            @Html.DisplayNameFor(model => model.Gender)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.PhoneNumber)
+            @Html.DisplayFor(model => model.Gender)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Address)
+            @Html.DisplayNameFor(model => model.Age)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Address)
+            @Html.DisplayFor(model => model.Age)
         </dd>
 
         <dt>
@@ -59,49 +67,23 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Salary)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Salary)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Bonus)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Bonus)
-        </dd>
-
-        <dt>
             @Html.DisplayNameFor(model => model.Post.Title)
         </dt>
 
         <dd>
             @Html.DisplayFor(model => model.Post.Title)
         </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Department.DepartmentName)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Department.DepartmentName)
-        </dd>
-
     </dl>
 
     @using (Html.BeginForm()) {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(model => model.Id)
 
-        <div class="form-actions no-color">
-            <input type="submit" value="Удалить" class="btn btn-default" />
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Удалить" class="btn btn-primary" />
+                @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
+            </div>
         </div>
     }
-</div>
-<br />
-<div>
-    @Html.ActionLink("Back to List", "Index")
 </div>

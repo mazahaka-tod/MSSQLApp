@@ -1,36 +1,60 @@
 ﻿@model IEnumerable<string>
 
 @{
-    ViewBag.Title = "Ошибка";
+    Layout = null;
 }
 
-<h2>Ошибка</h2>
-<hr />
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка</title>
+    @Styles.Render("~/Content/css")
+</head>
+<body>
+    <div class="container body-content text-muted">
+        <h2>Ошибка</h2>
 
-@if (Model != null) {
-    <div class="alert alert-danger">
-        @switch (Model.Count()) {
-            case 0:
-                @: Что-то пошло не так. Пожалуйста, попытайтесь еще раз
-                break;
-            case 1:
-                @Model.First();
-                break;
-            default:
-                @: Следующие ошибки были обнаружены:
-                <ul>
-                    @foreach (string error in Model) {
-                        <li>@error</li>
-                    }
-                </ul>
-                break;
+        @if (Model != null) {
+            <div>
+                @switch (Model.Count()) {
+                    case 0:
+                        @: Что-то пошло не так. Пожалуйста, попытайтесь еще раз
+                        break;
+                    case 1:
+                        @Model.First();
+                        break;
+                    default:
+                        @: Следующие ошибки были обнаружены:
+                        <ul>
+                            @foreach (string error in Model) {
+                                <li>@error</li>
+                            }
+                        </ul>
+                        break;
+                }
+            </div>
         }
-    </div>
-}
 
-<p>
-    <img src=@Url.Content("~/Content/Animations/Error.gif") alt="" height="50" />
-</p>
-<p>
-    @Html.ActionLink("На главную", "Index", "Organization", null, new { @class = "btn btn-default" })
-</p>
+        <p>
+            <img src=@Url.Content("~/Content/Animations/Error.gif") alt="" height="50" />
+        </p>
+        <p>
+            @Html.ActionLink("На главную", "Index", "Organization", null, new { @class = "btn btn-primary" })
+        </p>
+
+        <footer>
+            <p>&copy; 2017-@DateTime.Now.Year Human Resources Application</p>
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+        $('body').css('background-image', 'url(@Url.Content("~/Content/Images/background_error.jpg"))')
+    })
+</script>

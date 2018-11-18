@@ -22,7 +22,6 @@ namespace DiplomMSSQLApp.WEB.Models {
     }
 
     public class Requisites {
-        public int Id { get; set; }
         [Display(Name = "ОКПО")]
         public string OKPO { get; set; }
         [Display(Name = "ИНН")]

@@ -61,7 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\EFEmployeeRepository.cs" />
     <Compile Include="Repositories\EFGenericRepository.cs" />
-    <Compile Include="Repositories\EFOrganizationRepository.cs" />
     <Compile Include="Repositories\EFPostRepository.cs" />
     <Compile Include="Repositories\EFUnitOfWork.cs" />
   </ItemGroup>
