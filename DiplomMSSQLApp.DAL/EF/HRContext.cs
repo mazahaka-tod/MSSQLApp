@@ -28,10 +28,14 @@ namespace DiplomMSSQLApp.DAL.EF {
 
     public class HRContextInitializer : DropCreateDatabaseIfModelChanges<HRContext> {
         protected override void Seed(HRContext db) {
-            Organization organization = new Organization { Id = 1, Name = "ПАО «Газпром»",
-                LegalAddress = "ул. Наметкина, 16, Москва, ГСП-7, 117997",
-                Phone = "+7 495 719-30-01", Fax = "+7 495 719-83-33", Email = "gazprom@gazprom.ru",
-                Requisites = new Requisites { }, Bank = new Bank { }
+            Organization organization = new Organization {
+                Id = 1,
+                Name = "Отделение ПФР",
+                LegalAddress = "194214, Санкт-Петербург, пр. Энгельса, дом 73",
+                Phone = "+7 (812) 292-85-92",
+                Fax = "+7 (812) 292-81-54",
+                Requisites = new Requisites { },
+                Bank = new Bank { }
             };
             db.Organizations.Add(organization);
             db.SaveChanges();

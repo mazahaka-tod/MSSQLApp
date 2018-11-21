@@ -7,7 +7,7 @@ namespace DiplomMSSQLApp.BLL.DTO {
 
     public class EmployeeDTO {
         public int Id { get; set; }
-        public int PersonnelNumber { get; set; }    // Табельный номер
+        public int PersonnelNumber { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public string Patronymic { get; set; }
@@ -23,11 +23,6 @@ namespace DiplomMSSQLApp.BLL.DTO {
         public virtual ICollection<BaseBusinessTripDTO> BusinessTrips { get; set; }
 
         public EmployeeDTO() {
-            //Birth = new Birth();
-            //Passport = new Passport();
-            //Contacts = new Contacts();
-            //Education = new Education();
-            //Post = new PostDTO();
             BusinessTrips = new List<BaseBusinessTripDTO>();
         }
     }

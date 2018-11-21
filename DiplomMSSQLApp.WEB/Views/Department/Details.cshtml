@@ -5,44 +5,54 @@
 }
 
 <h2>Подробная информация об отделе</h2>
+<hr />
 
 <div>
-
-    <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+
         <dt>
             @Html.DisplayNameFor(model => model.DepartmentName)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.DepartmentName)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Manager)
+            @Html.DisplayNameFor(model => model.OrganizationId)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Manager)
+            @Html.DisplayFor(model => model.Organization.Name)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Employees)
+            @Html.DisplayNameFor(model => model.ManagerId)
         </dt>
+        <dd>
+            @if (Model.Manager != null) {
+                @(Model.Manager.LastName + " " + Model.Manager.FirstName + " " + Model.Manager.Patronymic);
+            }
+        </dd>
 
-        @if (Model.Employees != null)
-        {
-            foreach (var item in Model.Employees)
-            {
+        <dt>
+            @Html.DisplayNameFor(model => model.Posts)
+        </dt>
+        @if (Model.Posts != null) {
+            foreach (var item in Model.Posts) {
                 <dd>
-                    @item.LastName
-                    @item.FirstName
+                    @item.Title
                 </dd>
             }
         }
     </dl>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+<br />
+<div>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Назад", "Index", null, new { @class = "btn btn-default" })
+</div>

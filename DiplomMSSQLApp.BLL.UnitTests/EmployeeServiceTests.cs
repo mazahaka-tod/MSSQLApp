@@ -935,7 +935,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
             EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
@@ -1026,7 +1025,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()))
                 .Returns((Func<Employee, bool> predicate) => employees.Where(predicate));
             EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
             EmployeeDTO[] result = employeeService.Get(filter).ToArray();
 
@@ -1047,49 +1045,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
             EmployeeService employeeService = GetNewService(mock.Object);
-            employeeService.PathToFileForTests = "./DiplomMSSQLApp.WEB/Results/Employee/Filter.txt";
 
             employeeService.Get(filter);
 
             mock.Verify(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()), Times.Once());
-        }
-
-        [Test]
-        public void Get_AllFilterParameterIsSet_CreatesMessageAboutFilterParametersUsedProperty() {
-            EmployeeFilter filter = new EmployeeFilter {
-                LastName = new string[] { "W", null, "", "Z" },
-                Email = "mail.ru",
-                IsPhoneNumber = true,
-                HireDate = "2018-09-01",
-                MinSalary = 20000,
-                MaxSalary = 50000,
-                Bonus = new double?[] { 0.1, null, 0.2 },
-                IsBonus = true,
-                PostTitle = "Manager",
-                DepartmentName = "Management",
-                IsAntiFilter = true
-            };
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-
-            employeeService.Get(filter);
-
-            Assert.AreEqual("Фамилия = W; Фамилия = Z; Email = mail.ru; Есть телефон; Дата приема на работу = 2018-09-01; " +
-                "Зарплата >= 20000; Зарплата <= 50000; Премия = 0,1; Премия = 0,2; Есть премия; Должность = Manager; " +
-                "Название отдела = Management; Используется отрицание; ", employeeService.MessageAboutFilterParametersUsed);
-        }
-
-        [Test]
-        public void Get_NoneFilterParameterIsSet_CreatesMessageAboutFilterParametersUsedProperty() {
-            EmployeeFilter filter = new EmployeeFilter { };
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
-
-            employeeService.Get(filter);
-
-            Assert.AreEqual("Фильтр не задан; ", employeeService.MessageAboutFilterParametersUsed);
         }
 
         /// <summary>

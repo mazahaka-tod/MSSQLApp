@@ -33,15 +33,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             // поэтому производим декодирование строки filterAsJsonString в объект EmployeeFilter и присваиваем его переменной filter
             if (filterAsJsonString != null)
                 filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
-            string fullPath = CreateDirectoryToFile("Filter.txt");
-            (employeeService as EmployeeService).PathToFileForTests = fullPath;
             IEnumerable<EmployeeDTO> eDto = (employeeService as EmployeeService).Get(filter);
             eDto = employeeService.GetPage(eDto, page);     // Paging
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
                 cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                    .ForMember(d => d.Employees, opt => opt.Ignore());
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
 
@@ -58,14 +56,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             }
             logger.Info("Executed sync request");
             return View("Index", model);
-        }
-
-        private string CreateDirectoryToFile(string filename) {
-            string dir = Server.MapPath("~/Results/Employee/");
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-            string fullPath = dir + filename;
-            return fullPath;
         }
 
         // Добавление нового сотрудника
@@ -118,7 +108,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
                 cfg.CreateMap<BaseBusinessTripViewModel, BaseBusinessTripDTO>();
                 cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
-                   .ForMember(d => d.Employees, opt => opt.Ignore());
+                   .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<PostViewModel, PostDTO>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
 
@@ -169,7 +159,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
                 cfg.CreateMap<BaseBusinessTripDTO, BaseBusinessTripViewModel>();
                 cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                   .ForMember(d => d.Employees, opt => opt.Ignore());
+                   .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, PostViewModel>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
 
@@ -216,6 +206,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             System.IO.File.Delete(fullPath);
             await (employeeService as EmployeeService).ExportJsonAsync(fullPath);
             return RedirectToAction("Index");
+        }
+
+        private string CreateDirectoryToFile(string filename) {
+            string dir = Server.MapPath("~/Results/Employee/");
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            string fullPath = dir + filename;
+            return fullPath;
         }
 
         public ActionResult About() {

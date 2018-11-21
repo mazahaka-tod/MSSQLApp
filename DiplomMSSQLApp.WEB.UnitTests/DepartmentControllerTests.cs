@@ -39,8 +39,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<DepartmentDTO>>(), It.IsAny<int>())).Returns(new DepartmentDTO[] {
                 new DepartmentDTO {
                     Id = 1,
-                    DepartmentName = "IT",
-                    Manager = "Brown"
+                    Code = 101,
+                    DepartmentName = "IT"
                 }
             });
             DepartmentController controller = GetNewDepartmentController(null, mock.Object);
@@ -50,8 +50,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             DepartmentListViewModel model = result.ViewData.Model as DepartmentListViewModel;
             Assert.AreEqual(1, model.Departments.Count());
             Assert.AreEqual(1, model.Departments.FirstOrDefault().Id);
+            Assert.AreEqual(101, model.Departments.FirstOrDefault().Code);
             Assert.AreEqual("IT", model.Departments.FirstOrDefault().DepartmentName);
-            Assert.AreEqual("Brown", model.Departments.FirstOrDefault().Manager);
         }
         
         [Test]
@@ -131,14 +131,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             ViewResult result = (await controller.CreateAsync(new DepartmentViewModel {
                 Id = 2,
-                DepartmentName = "IT",
-                Manager = "Brown"
+                Code = 101,
+                DepartmentName = "IT"
             })) as ViewResult;
 
             DepartmentViewModel model = result.ViewData.Model as DepartmentViewModel;
             Assert.AreEqual(2, model.Id);
+            Assert.AreEqual(101, model.Code);
             Assert.AreEqual("IT", model.DepartmentName);
-            Assert.AreEqual("Brown", model.Manager);
         }
         
         [Test]
@@ -178,8 +178,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new DepartmentDTO {
                 Id = _id.Value,
-                DepartmentName = "IT",
-                Manager = "Brown"
+                Code = 101,
+                DepartmentName = "IT"
             });
             DepartmentController controller = GetNewDepartmentController(emock.Object, dmock.Object);
 
@@ -187,8 +187,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             DepartmentViewModel model = result.ViewData.Model as DepartmentViewModel;
             Assert.AreEqual(2, model.Id);
+            Assert.AreEqual(101, model.Code);
             Assert.AreEqual("IT", model.DepartmentName);
-            Assert.AreEqual("Brown", model.Manager);
         }
         
         [Test]
@@ -266,14 +266,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             ViewResult result = (await controller.EditAsync(new DepartmentViewModel {
                 Id = 2,
-                DepartmentName = "IT",
-                Manager = "Brown"
+                Code = 101,
+                DepartmentName = "IT"
             })) as ViewResult;
 
             DepartmentViewModel model = result.ViewData.Model as DepartmentViewModel;
             Assert.AreEqual(2, model.Id);
+            Assert.AreEqual(101, model.Code);
             Assert.AreEqual("IT", model.DepartmentName);
-            Assert.AreEqual("Brown", model.Manager);
         }
         
         [Test]
@@ -311,8 +311,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new DepartmentDTO {
                 Id = _id.Value,
-                DepartmentName = "IT",
-                Manager = "Brown"
+                Code = 101,
+                DepartmentName = "IT"
             });
             DepartmentController controller = GetNewDepartmentController(null, mock.Object);
 
@@ -320,8 +320,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             DepartmentViewModel model = result.ViewData.Model as DepartmentViewModel;
             Assert.AreEqual(2, model.Id);
+            Assert.AreEqual(101, model.Code);
             Assert.AreEqual("IT", model.DepartmentName);
-            Assert.AreEqual("Brown", model.Manager);
         }
         
         [Test]
@@ -365,8 +365,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new DepartmentDTO {
                 Id = _id.Value,
-                DepartmentName = "IT",
-                Manager = "Brown"
+                Code = 101,
+                DepartmentName = "IT"
             });
             DepartmentController controller = GetNewDepartmentController(null, mock.Object);
 
@@ -374,8 +374,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             DepartmentViewModel model = result.ViewData.Model as DepartmentViewModel;
             Assert.AreEqual(2, model.Id);
+            Assert.AreEqual(101, model.Code);
             Assert.AreEqual("IT", model.DepartmentName);
-            Assert.AreEqual("Brown", model.Manager);
         }
         
         [Test]

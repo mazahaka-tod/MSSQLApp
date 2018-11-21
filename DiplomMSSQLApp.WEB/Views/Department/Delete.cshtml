@@ -5,39 +5,62 @@
 }
 
 <h2>Удаление отдела</h2>
+<hr />
 
 <h3>Вы уверены, что хотите удалить отдел?</h3>
+
 <div>
-    <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+
         <dt>
             @Html.DisplayNameFor(model => model.DepartmentName)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.DepartmentName)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Manager)
+            @Html.DisplayNameFor(model => model.OrganizationId)
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Manager)
+            @Html.DisplayFor(model => model.Organization.Name)
         </dd>
 
+        <dt>
+            @Html.DisplayNameFor(model => model.ManagerId)
+        </dt>
+        <dd>
+            @if (Model.Manager != null) {
+                @(Model.Manager.LastName + " " + Model.Manager.FirstName + " " + Model.Manager.Patronymic);
+            }
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Posts)
+        </dt>
+        @if (Model.Posts != null) {
+            foreach (var item in Model.Posts) {
+                <dd>
+                    @item.Title
+                </dd>
+            }
+        }
     </dl>
+    <br />
 
     @using (Html.BeginForm()) {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(model => model.Id)
 
         <div class="form-actions no-color">
-            <input type="submit" value="Удалить" class="btn btn-default" />
+            <input type="submit" value="Удалить" class="btn btn-primary" />
+            @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
         </div>
     }
-</div>
-<br />
-<div>
-    @Html.ActionLink("Back to List", "Index")
 </div>

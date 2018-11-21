@@ -7,7 +7,7 @@ namespace DiplomMSSQLApp.DAL.Entities {
 
     public class Employee {
         public int Id { get; set; }
-        public int PersonnelNumber { get; set; }    // Табельный номер
+        public int PersonnelNumber { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public string Patronymic { get; set; }
@@ -23,10 +23,6 @@ namespace DiplomMSSQLApp.DAL.Entities {
         public virtual ICollection<BusinessTrip> BusinessTrips { get; set; }
 
         public Employee() {
-            //Birth = new Birth();
-            //Passport = new Passport();
-            //Contacts = new Contacts();
-            //Education = new Education();
             BusinessTrips = new List<BusinessTrip>();
         }
     }
@@ -53,7 +49,6 @@ namespace DiplomMSSQLApp.DAL.Entities {
         public string Email { get; set; }
     }
 
-    //public enum Level { HigherMaster, HigherBachelor, HigherUncompleted, SpecializedSecondary, Secondary };
     public enum Level { Нет, Высшее_Магистр, Высшее_Бакалавр, Высшее_Неоконченное, Среднее_Специальное, Среднее };
 
     [ComplexType]

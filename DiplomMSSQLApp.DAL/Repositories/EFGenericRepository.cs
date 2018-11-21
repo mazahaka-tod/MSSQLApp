@@ -19,10 +19,6 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         public void Create(TEntity item) {
             _dbSet.Add(item);
         }
-        // Добавление последовательности элементов
-        public void CreateSeries(IEnumerable<TEntity> items) {
-            _dbSet.AddRange(items);
-        }
         // Поиск по id
         public virtual async Task<TEntity> FindByIdAsync(int id) {
             return await _dbSet.FindAsync(id);
@@ -55,14 +51,5 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         public void Update(TEntity item) {
             _context.Entry(item).State = EntityState.Modified;
         }
-
-        // Нереализованные методы
-        //public virtual IEnumerable<TEntity> Get(int salary) {
-        //    throw new NotImplementedException();
-        //}
-
-        //public virtual IEnumerable<TEntity> Get(bool flag) {
-        //    throw new NotImplementedException();
-        //}
     }
 }

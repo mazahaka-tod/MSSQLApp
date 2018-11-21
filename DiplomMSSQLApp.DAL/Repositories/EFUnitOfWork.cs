@@ -28,7 +28,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         public IGenericRepository<Department> Departments {
             get {
                 if (_departmentRepository == null)
-                    _departmentRepository = new EFGenericRepository<Department>(db);
+                    _departmentRepository = new EFDepartmentRepository(db);
                 return _departmentRepository;
             }
         }

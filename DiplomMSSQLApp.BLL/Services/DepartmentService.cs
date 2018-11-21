@@ -26,7 +26,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         private Department MapDTOAndDomainModelWithValidation(DepartmentDTO dDto) {
             ValidationDepartment(dDto);
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>()
-                                        .ForMember(d => d.Employees, opt => opt.Ignore()));
+                                        .ForMember(d => d.Posts, opt => opt.Ignore()));
             Department department = Mapper.Map<DepartmentDTO, Department>(dDto);
             return department;
         }
@@ -60,7 +60,15 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<Department, DepartmentDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore());
+                cfg.CreateMap<Organization, OrganizationDTO>()
+                    .ForMember(o => o.Requisites, opt => opt.Ignore())
+                    .ForMember(o => o.Bank, opt => opt.Ignore());
+                cfg.CreateMap<Post, PostDTO>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
             });
         }
 

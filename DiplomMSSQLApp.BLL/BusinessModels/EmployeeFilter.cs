@@ -1,8 +1,6 @@
-﻿namespace DiplomMSSQLApp.BLL.BusinessModels
-{
+﻿namespace DiplomMSSQLApp.BLL.BusinessModels {
     // бизнес-модель для реализации фильтра выборки сотрудников
-    public class EmployeeFilter
-    {
+    public class EmployeeFilter {
         public string[] LastName { get; set; }
         public bool IsMatchAnyLastName { get; set; }
         public string Email { get; set; }
@@ -19,8 +17,7 @@
         public string SortOrder { get; set; }
         public string[] Columns { get; set; }
 
-        public EmployeeFilter()
-        {
+        public EmployeeFilter() {
             Columns = new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" };
         }
     }

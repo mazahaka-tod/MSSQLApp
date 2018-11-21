@@ -15,18 +15,32 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     public class DepartmentController : Controller {
         private IService<EmployeeDTO> employeeService;
         private IService<DepartmentDTO> departmentService;
+        private IService<OrganizationDTO> organizationService;
 
-        public DepartmentController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds) {
+        public DepartmentController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<OrganizationDTO> os) {
             employeeService = es;
             departmentService = ds;
+            organizationService = os;
         }
 
         [ActionName("Index")]
         public async Task<ActionResult> IndexAsync(int page = 1) {
             IEnumerable<DepartmentDTO> dDto = await departmentService.GetAllAsync();
             dDto = departmentService.GetPage(dDto, page);     // Paging
-            Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                                        .ForMember(d => d.Employees, opt => opt.Ignore()));
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
+                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore())
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore());
+                cfg.CreateMap<OrganizationDTO, OrganizationViewModel>()
+                    .ForMember(o => o.Requisites, opt => opt.Ignore())
+                    .ForMember(o => o.Bank, opt => opt.Ignore());
+            });
             IEnumerable<DepartmentViewModel> departments = Mapper.Map<IEnumerable<DepartmentDTO>, IEnumerable<DepartmentViewModel>>(dDto);
             return View("Index", new DepartmentListViewModel { Departments = departments, PageInfo = departmentService.PageInfo });
         }
@@ -34,6 +48,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Добавление нового отдела
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
+            ViewBag.Organizations = await GetSelectListOrganizationsAsync();
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View("Create");
         }
@@ -47,33 +62,41 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
+            ViewBag.Organizations = await GetSelectListOrganizationsAsync();
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View("Create", d);
+        }
+
+        private async Task<SelectList> GetSelectListOrganizationsAsync() {
+            IEnumerable<OrganizationDTO> organizations = await organizationService.GetAllAsync();
+            return new SelectList(organizations.OrderBy(o => o.Name), "Id", "Name");
         }
 
         private async Task<SelectList> GetSelectListEmployeesAsync() {
             IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
             IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
-                                                    Value = e.LastName + " " + e.FirstName,
-                                                    Text = e.LastName + " " + e.FirstName
-                                                }).OrderBy(e => e.Text);
+                                                    Value = e.Id.ToString(),
+                                                    Text = e.LastName + " " + e.FirstName + " " + e.Patronymic
+            }).OrderBy(e => e.Text);
             return new SelectList(items, "Value", "Text");
         }
 
-        private DepartmentDTO MapViewModelWithDTO(DepartmentViewModel d) {
+        private DepartmentDTO MapViewModelWithDTO(DepartmentViewModel department) {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>();
-                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
+                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
+                //cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
+                    //.ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    //.ForMember(e => e.Post, opt => opt.Ignore());
             });
-            DepartmentDTO dDto = Mapper.Map<DepartmentViewModel, DepartmentDTO>(d);
+            DepartmentDTO dDto = Mapper.Map<DepartmentViewModel, DepartmentDTO>(department);
             return dDto;
         }
 
         // Обновление информации об отделе
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
+            ViewBag.Organizations = await GetSelectListOrganizationsAsync();
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return await GetViewAsync(id, "Edit");
         }
@@ -87,6 +110,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
+            ViewBag.Organizations = await GetSelectListOrganizationsAsync();
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View("Edit", d);
         }
@@ -107,10 +131,19 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<DepartmentDTO, DepartmentViewModel>();
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
+                    .ForMember(e => e.Post, opt => opt.Ignore())
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore());
+                cfg.CreateMap<OrganizationDTO, OrganizationViewModel>()
+                    .ForMember(o => o.Requisites, opt => opt.Ignore())
+                    .ForMember(o => o.Bank, opt => opt.Ignore());
+                cfg.CreateMap<PostDTO, PostViewModel>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
             });
-            DepartmentViewModel d = Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
-            return d;
+            DepartmentViewModel department = Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
+            return department;
         }
 
         // Подробная информация об отделе
@@ -130,7 +163,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 await departmentService.DeleteAsync(id);
             }
             catch (Exception) {
-                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность или работает хотя бы один сотрудник." });
+                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность." });
             }
             return RedirectToAction("Index");
         }
@@ -145,7 +178,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 await departmentService.DeleteAllAsync();
             }
             catch (Exception) {
-                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность или работает хотя бы один сотрудник." });
+                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность." });
             }
             return RedirectToAction("Index");
         }

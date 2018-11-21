@@ -123,13 +123,9 @@ namespace DiplomMSSQLApp.BLL.Services {
                 p.Department?.DepartmentName
             }).ToArray();
             using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
-                sw.WriteLine("{\"Posts\":[");
-                int postsLength = transformPosts.Length;
-                for (int i = 1; i < postsLength; i++) {
-                    sw.Write(new JavaScriptSerializer().Serialize(transformPosts[i]));
-                    if (i != postsLength - 1) sw.WriteLine(",");
-                }
-                sw.WriteLine("]}");
+                sw.WriteLine("{\"Posts\":");
+                sw.WriteLine(new JavaScriptSerializer().Serialize(transformPosts));
+                sw.WriteLine("}");
             }
         }
 

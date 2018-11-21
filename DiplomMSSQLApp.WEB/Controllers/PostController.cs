@@ -34,7 +34,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
                 cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                    .ForMember(d => d.Employees, opt => opt.Ignore());
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
             });
             IEnumerable<PostViewModel> posts = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
 

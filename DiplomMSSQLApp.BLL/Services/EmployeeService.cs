@@ -17,9 +17,6 @@ using System.Web.Script.Serialization;
 namespace DiplomMSSQLApp.BLL.Services {
     public class EmployeeService : BaseService<EmployeeDTO> {
         public IUnitOfWork Database { get; set; }
-        public string MessageAboutFilterParametersUsed { get; set; }   // Сообщение записывается в файл WEB/Results/Employee/Filter.txt
-        public string ElapsedTime { get; set; }
-        public string PathToFileForTests { get; set; }
 
         public EmployeeService(IUnitOfWork uow) {
             Database = uow;
@@ -40,7 +37,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<EmployeeDTO, Employee>();
                 cfg.CreateMap<BaseBusinessTripDTO, BusinessTrip>();
                 cfg.CreateMap<DepartmentDTO, Department>()
-                   .ForMember(d => d.Employees, opt => opt.Ignore());
+                   .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, Post>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
 
@@ -98,7 +95,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<Employee, EmployeeDTO>();
                 cfg.CreateMap<BusinessTrip, BaseBusinessTripDTO>();
                 cfg.CreateMap<Department, DepartmentDTO>()
-                    .ForMember(d => d.Employees, opt => opt.Ignore());
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<Post, PostDTO>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
 
@@ -120,7 +117,6 @@ namespace DiplomMSSQLApp.BLL.Services {
         // Получение списка сотрудников по фильтру
         public virtual IEnumerable<EmployeeDTO> Get(EmployeeFilter filter) {
             Func<Employee, bool> predicate = CreatePredicate(filter);
-            CreateMessageAboutFilterParametersUsed(filter);
             IEnumerable<Employee> filteredSortedCollection = FilterAndSortEmployees(filter, predicate);
             InitializeMapper();
             IEnumerable<EmployeeDTO> collection = Mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeDTO>>(filteredSortedCollection);
@@ -191,46 +187,6 @@ namespace DiplomMSSQLApp.BLL.Services {
                 return !returnValue;                // Если дошли до сюда, значит проверяемая запись соответствует фильтру
             }
             return predicate;
-        }
-
-        private void CreateMessageAboutFilterParametersUsed(EmployeeFilter filter) {
-            MessageAboutFilterParametersUsed = "";
-            // Фильтр по фамилии
-            if (filter.LastName != null)
-                foreach (string lastName in filter.LastName)
-                    if (!string.IsNullOrWhiteSpace(lastName))
-                        MessageAboutFilterParametersUsed += "Фамилия = " + lastName + "; ";
-            // Фильтр по email
-            if (!string.IsNullOrWhiteSpace(filter.Email))
-                MessageAboutFilterParametersUsed += "Email = " + filter.Email + "; ";
-            // Фильтр по номеру телефона
-            if (filter.IsPhoneNumber)
-                MessageAboutFilterParametersUsed += "Есть телефон; ";
-            // Фильтр по дате найма на работу
-            if (!string.IsNullOrWhiteSpace(filter.HireDate))
-                MessageAboutFilterParametersUsed += "Дата приема на работу = " + filter.HireDate + "; ";
-            // Фильтры по зарплате
-            if (filter.MinSalary.HasValue)
-                MessageAboutFilterParametersUsed += "Зарплата >= " + filter.MinSalary.Value + "; ";
-            if (filter.MaxSalary.HasValue)
-                MessageAboutFilterParametersUsed += "Зарплата <= " + filter.MaxSalary.Value + "; ";
-            // Фильтры по премии
-            if (filter.Bonus != null)
-                foreach (var bonus in filter.Bonus)
-                    if (bonus.HasValue)
-                        MessageAboutFilterParametersUsed += "Премия = " + bonus + "; ";
-            if (filter.IsBonus)
-                MessageAboutFilterParametersUsed += "Есть премия; ";
-            // Фильтр по должности
-            if (!string.IsNullOrWhiteSpace(filter.PostTitle))
-                MessageAboutFilterParametersUsed += "Должность = " + filter.PostTitle + "; ";
-            // Фильтр по названию отдела
-            if (!string.IsNullOrWhiteSpace(filter.DepartmentName))
-                MessageAboutFilterParametersUsed += "Название отдела = " + filter.DepartmentName + "; ";
-            if (filter.IsAntiFilter)
-                MessageAboutFilterParametersUsed += "Используется отрицание; ";
-            if (MessageAboutFilterParametersUsed == "")
-                MessageAboutFilterParametersUsed = "Фильтр не задан; ";
         }
 
         private IEnumerable<Employee> FilterAndSortEmployees(EmployeeFilter filter, Func<Employee, bool> predicate) {

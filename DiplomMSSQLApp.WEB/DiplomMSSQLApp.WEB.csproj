@@ -229,19 +229,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Results\Employee\Create.txt" />
-    <Content Include="Results\Employee\Delete.txt" />
-    <Content Include="Results\Employee\Filter.txt" />
-    <Content Include="Results\Employee\Read.txt" />
-    <Content Include="Results\Employee\Update.txt" />
-    <Content Include="Results\Post\Create.txt" />
-    <Content Include="Results\Post\Delete.txt" />
-    <Content Include="Results\Post\Read.txt" />
-    <Content Include="Results\Post\Update.txt" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Results\Employee\Employees.json" />
-    <Content Include="Results\Post\Posts.json" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -321,6 +311,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Logs\" />
+    <Folder Include="Results\Post\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
