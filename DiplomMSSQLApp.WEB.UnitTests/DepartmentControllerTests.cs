@@ -17,7 +17,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
     [TestFixture]
     public class DepartmentControllerTests {
         protected DepartmentController GetNewDepartmentController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds) {
-            return new DepartmentController(es, ds);
+            return new DepartmentController(es, ds, null);
         }
 
         /// <summary>

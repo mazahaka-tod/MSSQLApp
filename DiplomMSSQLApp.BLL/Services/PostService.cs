@@ -3,6 +3,7 @@ using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
+using DiplomMSSQLApp.DAL.Repositories;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,24 +25,32 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Добавление новой должности
         public override async Task CreateAsync(PostDTO pDto) {
-            Post post = MapDTOAndDomainModelWithValidation(pDto);
+            Post post = await MapDTOAndDomainModelWithValidationAsync(pDto);
             Database.Posts.Create(post);
             await Database.SaveAsync();
         }
 
-        private Post MapDTOAndDomainModelWithValidation(PostDTO pDto) {
-            ValidationPost(pDto);
+        private async Task<Post> MapDTOAndDomainModelWithValidationAsync(PostDTO pDto) {
+            await ValidationPostAsync(pDto);
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<PostDTO, Post>();
+                cfg.CreateMap<DepartmentDTO, Department>()
+                    .ForMember(d => d.Manager, opt => opt.Ignore())
+                    .ForMember(d => d.Organization, opt => opt.Ignore())
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeDTO, Employee>()
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
             Post post = Mapper.Map<PostDTO, Post>(pDto);
             return post;
         }
 
-        private void ValidationPost(PostDTO pDto) {
+        private async Task ValidationPostAsync(PostDTO pDto) {
             if (pDto.Title == null)
                 throw new ValidationException("Требуется ввести название должности", "Title");
             if (pDto.NumberOfUnits == null)
@@ -56,11 +65,15 @@ namespace DiplomMSSQLApp.BLL.Services {
                 throw new ValidationException("Требуется ввести надбавку", "Premium");
             if (pDto.Premium < 0 || pDto.Premium > 100000)
                 throw new ValidationException("Надбавка должна быть в диапазоне [0, 100000]", "Premium");
+            int employeesCount = await (Database.Employees as EFEmployeeRepository).GetEmployeesCountAsync(pDto.Id);
+            if (pDto.NumberOfUnits < employeesCount)
+                throw new ValidationException("Количество штатных единиц не может быть меньше, " +
+                    "чем количество сотрудников, работающих в должности в данный момент [" + employeesCount + "]", "NumberOfUnits");
         }
 
         // Обновление информации о должности
         public override async Task EditAsync(PostDTO pDto) {
-            Post post = MapDTOAndDomainModelWithValidation(pDto);
+            Post post = await MapDTOAndDomainModelWithValidationAsync(pDto);
             Database.Posts.Update(post);
             await Database.SaveAsync();
         }
@@ -79,14 +92,18 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         private void InitializeMapper() {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<Post, PostDTO>()
-                    .ForMember(p => p.Department, opt => opt.Ignore())
-                    .ForMember(p => p.Employees, opt => opt.Ignore());
-                //cfg.CreateMap<Department, DepartmentDTO>()
-                    //.ForMember(d => d.Employees, opt => opt.Ignore());
-                //cfg.CreateMap<Employee, EmployeeDTO>()
-                    //.ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    //.ForMember(e => e.Post, opt => opt.Ignore());
+                cfg.CreateMap<Post, PostDTO>();
+                cfg.CreateMap<Department, DepartmentDTO>()
+                    .ForMember(d => d.Manager, opt => opt.Ignore())
+                    .ForMember(d => d.Organization, opt => opt.Ignore())
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
+                cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
             });
         }
 

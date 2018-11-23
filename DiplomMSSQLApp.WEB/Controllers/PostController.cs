@@ -73,14 +73,15 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
         }
 
-        private PostDTO MapViewModelWithDTO(PostViewModel p) {
+        private PostDTO MapViewModelWithDTO(PostViewModel post) {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<PostViewModel, PostDTO>();
+                cfg.CreateMap<PostViewModel, PostDTO>()
+                    .ForMember(p => p.Department, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
-            PostDTO pDto = Mapper.Map<PostViewModel, PostDTO>(p);
+            PostDTO pDto = Mapper.Map<PostViewModel, PostDTO>(post);
             return pDto;
         }
 
@@ -118,12 +119,20 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         private PostViewModel MapDTOWithViewModel(PostDTO pDto) {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<PostDTO, PostViewModel>();
+                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
+                    .ForMember(d => d.Manager, opt => opt.Ignore())
+                    .ForMember(d => d.Organization, opt => opt.Ignore())
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
-            PostViewModel p = Mapper.Map<PostDTO, PostViewModel>(pDto);
-            return p;
+            PostViewModel post = Mapper.Map<PostDTO, PostViewModel>(pDto);
+            return post;
         }
 
         // Подробная информация о должности

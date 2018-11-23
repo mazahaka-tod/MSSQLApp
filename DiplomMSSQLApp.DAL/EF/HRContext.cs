@@ -19,6 +19,7 @@ namespace DiplomMSSQLApp.DAL.EF {
                         .Map(t => t.MapLeftKey("EmployeeId")
                         .MapRightKey("BusinessTripId")
                         .ToTable("EmployeeBusinessTrip"));
+            base.OnModelCreating(modelBuilder);
         }
 
         static HRContext() {

@@ -85,9 +85,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
                     .ForMember(d => d.Posts, opt => opt.Ignore());
-                //cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
-                    //.ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    //.ForMember(e => e.Post, opt => opt.Ignore());
             });
             DepartmentDTO dDto = Mapper.Map<DepartmentViewModel, DepartmentDTO>(department);
             return dDto;

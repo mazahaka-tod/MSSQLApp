@@ -51,10 +51,6 @@ namespace DiplomMSSQLApp.WEB.Models {
         public virtual ICollection<BaseBusinessTripViewModel> BusinessTrips { get; set; }
 
         public EmployeeViewModel() {
-            //Birth = new Birth();
-            //Passport = new Passport();
-            //Contacts = new Contacts();
-            //Education = new Education();
             BusinessTrips = new List<BaseBusinessTripViewModel>();
         }
     }

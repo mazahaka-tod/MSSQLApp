@@ -58,12 +58,13 @@
                 <dd>
                     @item.LastName
                     @item.FirstName
+                    @item.Patronymic
                 </dd>
             }
         }
     </dl>
 </div>
-<br />
+
 <p>
     @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
     @Html.ActionLink("Назад", "Index", null, new { @class = "btn btn-default" })
