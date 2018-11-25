@@ -45,10 +45,10 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View("Create");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
-        public async Task<ActionResult> CreateAsync(BusinessTripViewModel bt, int[] ids) {
+        public async Task<ActionResult> CreateAsync(BusinessTripViewModel bt) {
             try {
                 BusinessTripDTO btDto = MapViewModelWithDTO(bt);
-                await (businessTripService as BusinessTripService).CreateAsync(btDto, ids);
+                await (businessTripService as BusinessTripService).CreateAsync(btDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
@@ -89,10 +89,10 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return await GetViewAsync(id, "Edit");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(BusinessTripViewModel bt, int[] ids) {
+        public async Task<ActionResult> EditAsync(BusinessTripViewModel bt) {
             try {
                 BusinessTripDTO btDto = MapViewModelWithDTO(bt);
-                await (businessTripService as BusinessTripService).EditAsync(btDto, ids);
+                await (businessTripService as BusinessTripService).EditAsync(btDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {

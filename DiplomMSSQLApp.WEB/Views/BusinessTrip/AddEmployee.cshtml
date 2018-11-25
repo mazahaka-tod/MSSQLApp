@@ -3,9 +3,9 @@
 }
 
 <div class="form-group">
-    @Html.Label("Ids", "Сотрудник №" + (i + 1).ToString(), htmlAttributes: new { @class = "control-label col-md-2" })
+    @Html.Label("Employees[" + i + "].Id", "Сотрудник №" + (i + 1).ToString(), htmlAttributes: new { @class = "control-label col-md-2" })
     <div class="col-md-10">
-        @Html.DropDownList("Ids", ViewBag.Employees as SelectList, new { @class = "form-control" })
-        @Html.ValidationMessage("Ids", "", new { @class = "text-danger" })
+        @Html.DropDownList("Employees[" + i + "].Id", ViewBag.Employees as SelectList, new { @class = "form-control" })
+        @Html.ValidationMessage("Employees[" + i + "].Id", "", new { @class = "text-danger" })
     </div>
 </div>

@@ -20,7 +20,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         public IGenericRepository<BusinessTrip> BusinessTrips {
             get {
                 if (_businessTripRepository == null)
-                    _businessTripRepository = new EFGenericRepository<BusinessTrip>(db);
+                    _businessTripRepository = new EFBusinessTripRepository(db);
                 return _businessTripRepository;
             }
         }

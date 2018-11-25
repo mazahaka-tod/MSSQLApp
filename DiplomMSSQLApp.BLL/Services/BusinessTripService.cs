@@ -20,11 +20,11 @@ namespace DiplomMSSQLApp.BLL.Services {
         public BusinessTripService() { }
 
         // Добавление новой командировки (с валидацией)
-        public virtual async Task CreateAsync(BusinessTripDTO btDto, int[] ids) {
+        public override async Task CreateAsync(BusinessTripDTO btDto) {
             ValidationBusinessTrip(btDto);
             InitializeMapperDTO();
             BusinessTrip bt = Mapper.Map<BusinessTripDTO, BusinessTrip>(btDto);
-            await AddEmployeesOnBusinessTripAsync(bt, ids);
+            await AddEmployeesOnBusinessTripAsync(bt);
             Database.BusinessTrips.Create(bt);
             await Database.SaveAsync();
         }
@@ -53,8 +53,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             });
         }
 
-        private async Task AddEmployeesOnBusinessTripAsync(BusinessTrip bt, int[] ids) {
-            foreach (int id in ids.Distinct()) {
+        private async Task AddEmployeesOnBusinessTripAsync(BusinessTrip bt) {
+            IEnumerable<int> ids = bt.Employees.Select(e => e.Id).Distinct().ToList();
+            bt.Employees.Clear();
+            foreach (int id in ids) {
                 Employee employee = await Database.Employees.FindByIdAsync(id);
                 if (employee != null)
                     bt.Employees.Add(employee);
@@ -62,14 +64,13 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Обновление информации о командировке
-        public virtual async Task EditAsync(BusinessTripDTO btDto, int[] ids) {
+        public override async Task EditAsync(BusinessTripDTO btDto) {
             ValidationBusinessTrip(btDto);
             BusinessTrip bt = await Database.BusinessTrips.FindByIdAsync(btDto.Id);
             if (bt == null) return;
             InitializeMapperDTO();
             Mapper.Map(btDto, bt);
-            bt.Employees.Clear();
-            await AddEmployeesOnBusinessTripAsync(bt, ids);
+            await AddEmployeesOnBusinessTripAsync(bt);
             Database.BusinessTrips.Update(bt);
             await Database.SaveAsync();
         }
@@ -121,10 +122,12 @@ namespace DiplomMSSQLApp.BLL.Services {
             await Database.SaveAsync();
         }
 
+        // Количество командировок
         public override async Task<int> CountAsync() {
             return await Database.BusinessTrips.CountAsync();
         }
 
+        // Количество командировок, удовлетворяющих предикату
         public override async Task<int> CountAsync(Expression<Func<BusinessTripDTO, bool>> predicateDTO) {
             Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTrip>());
             var predicate = Mapper.Map<Expression<Func<BusinessTripDTO, bool>>, Expression<Func<BusinessTrip, bool>>>(predicateDTO);
@@ -133,15 +136,6 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         public override void Dispose() {
             Database.Dispose();
-        }
-
-        // Нереализованные методы
-        public override Task CreateAsync(BusinessTripDTO item) {
-            throw new NotImplementedException();
-        }
-
-        public override Task EditAsync(BusinessTripDTO item) {
-            throw new NotImplementedException();
         }
     }
 }

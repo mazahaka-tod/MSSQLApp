@@ -55,10 +55,10 @@
         <div class="employees">
             <div class="employee0">
                 <div class="form-group">
-                    @Html.Label("Ids", "Сотрудник №1", htmlAttributes: new { @class = "control-label col-md-2" })
+                    @Html.Label("Employees[0].Id", "Сотрудник №1", htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.DropDownList("Ids", ViewBag.Employees as SelectList, new { @class = "form-control" })
-                        @Html.ValidationMessage("Ids", "", new { @class = "text-danger" })
+                        @Html.DropDownList("Employees[0].Id", ViewBag.Employees as SelectList, new { @class = "form-control" })
+                        @Html.ValidationMessage("Employees[0].Id", "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -92,8 +92,7 @@
             // Удаление сотрудника
             $('#deleteEmployee').click(function (e) {
                 e.preventDefault();
-                if (i > 0)
-                {
+                if (i > 0) {
                     $('.employee' + i.toString()).remove();
                     i--;
                 }
