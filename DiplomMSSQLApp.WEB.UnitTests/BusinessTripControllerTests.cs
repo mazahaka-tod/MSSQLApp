@@ -12,8 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace DiplomMSSQLApp.WEB.UnitTests
-{
+namespace DiplomMSSQLApp.WEB.UnitTests {
     [TestFixture]
     public class BusinessTripControllerTests {
         protected BusinessTripController GetNewBusinessTripController(IService<BusinessTripDTO> bs, IService<EmployeeDTO> es) {
@@ -71,8 +70,9 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         /// // CreateAsync_Get method
         /// </summary>
         [Test]
-        public async Task CreateAsync_Get_AsksForCreateView() {
+        public async Task CreateAsync_Get_ExistsEmployees_AsksForCreateView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
+            mock.Setup(m => m.CountAsync()).ReturnsAsync(1);
             BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
 
             ViewResult result = (await controller.CreateAsync()) as ViewResult;
@@ -81,18 +81,30 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task CreateAsync_Get_SetViewBagEmployees() {
+        public async Task CreateAsync_Get_ExistsEmployees_SetViewBagEmployees() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
+            mock.Setup(m => m.CountAsync()).ReturnsAsync(1);
             mock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
-                new EmployeeDTO() { Id = 2, LastName = "Brown", FirstName = "Daniel" }
+                new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович" }
             });
             BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
 
             ViewResult result = (await controller.CreateAsync()) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
-            Assert.AreEqual("Brown Daniel", item.Text);
+            Assert.AreEqual("Петров Петр Петрович", item.Text);
             Assert.AreEqual("2", item.Value);
+        }
+
+        [Test]
+        public async Task CreateAsync_Get_NoEmployees_AsksForErrorView() {
+            Mock<EmployeeService> mock = new Mock<EmployeeService>();
+            mock.Setup(m => m.CountAsync()).ReturnsAsync(0);
+            BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
+
+            ViewResult result = (await controller.CreateAsync()) as ViewResult;
+
+            Assert.AreEqual("Error", result.ViewName);
         }
 
         /// <summary>
@@ -138,19 +150,19 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_SetViewBagEmployees() {
+        public async Task CreateAsync_Post_ModelStateIsInvalid_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
-                new EmployeeDTO() { Id = 2, LastName = "Brown", FirstName = "Daniel" }
+                new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович" }
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
             ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
-            Assert.AreEqual("Brown Daniel", item.Text);
+            Assert.AreEqual("Петров Петр Петрович", item.Text);
             Assert.AreEqual("2", item.Value);
         }
 
@@ -214,15 +226,15 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         public async Task EditAsync_Get_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-			emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
-                new EmployeeDTO() { Id = 2, LastName = "Brown", FirstName = "Daniel" }
+            emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
+                new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович" }
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
             ViewResult result = (await controller.EditAsync(1)) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
-            Assert.AreEqual("Brown Daniel", item.Text);
+            Assert.AreEqual("Петров Петр Петрович", item.Text);
             Assert.AreEqual("2", item.Value);
         }
 
@@ -274,14 +286,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
-                new EmployeeDTO() { Id = 2, LastName = "Brown", FirstName = "Daniel" }
+                new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович" }
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
             ViewResult result = (await controller.EditAsync(new BusinessTripViewModel())) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
-            Assert.AreEqual("Brown Daniel", item.Text);
+            Assert.AreEqual("Петров Петр Петрович", item.Text);
             Assert.AreEqual("2", item.Value);
         }
 

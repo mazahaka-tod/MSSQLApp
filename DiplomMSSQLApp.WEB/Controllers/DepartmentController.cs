@@ -75,8 +75,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         private async Task<SelectList> GetSelectListEmployeesAsync() {
             IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
             IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
-                                                    Value = e.Id.ToString(),
-                                                    Text = e.LastName + " " + e.FirstName + " " + e.Patronymic
+                Value = e.Id.ToString(),
+                Text = e.LastName + " " + e.FirstName + " " + e.Patronymic
             }).OrderBy(e => e.Text);
             return new SelectList(items, "Value", "Text");
         }
@@ -175,7 +175,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 await departmentService.DeleteAllAsync();
             }
             catch (Exception) {
-                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность." });
+                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность" });
             }
             return RedirectToAction("Index");
         }
