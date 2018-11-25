@@ -72,7 +72,7 @@ namespace DiplomMSSQLApp.BLL.Services {
             int postsCount = await Database.Posts.CountAsync(p => p.Title == pDto.Title && p.DepartmentId == pDto.DepartmentId && p.Id != pDto.Id);
             if (postsCount > 0)
                 throw new ValidationException("Должность уже существует", "Title");
-            postsCount = await Database.Posts.CountAsync(p => p.Id == pDto.Id && p.Title != pDto.Title );
+            postsCount = await Database.Posts.CountAsync(p => p.Id == pDto.Id && p.Title != pDto.Title);
             if (employeesCount > 0 && postsCount > 0)
                 throw new ValidationException("Нельзя изменить название должности, пока в данной должности работает хотя бы один сотрудник", "Title");
             postsCount = await Database.Posts.CountAsync(p => p.Id == pDto.Id && p.DepartmentId != pDto.DepartmentId);
