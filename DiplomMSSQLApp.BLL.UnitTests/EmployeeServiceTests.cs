@@ -6,24 +6,19 @@ using DiplomMSSQLApp.DAL.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.BLL.UnitTests
-{
+namespace DiplomMSSQLApp.BLL.UnitTests {
     [TestFixture]
-    public class EmployeeServiceTests : BaseServiceTests<EmployeeService>
-    {
-        protected override EmployeeService GetNewService()
-        {
+    public class EmployeeServiceTests : BaseServiceTests<EmployeeService> {
+        protected override EmployeeService GetNewService() {
             return new EmployeeService();
         }
 
-        protected override EmployeeService GetNewService(IUnitOfWork uow)
-        {
+        protected override EmployeeService GetNewService(IUnitOfWork uow) {
             return new EmployeeService(uow);
         }
 
@@ -31,8 +26,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // GetPage method
         /// </summary>
         [Test]
-        public override void GetPage_CallsWithGoodParams_FillsPageInfoProperty()
-        {
+        public override void GetPage_CallsWithGoodParams_FillsPageInfoProperty() {
             EmployeeService es = GetNewService();
             es.NumberOfObjectsPerPage = 2;
             EmployeeDTO[] col = new EmployeeDTO[] {
@@ -49,8 +43,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_RequestedPageLessThan1_ReturnsFirstPage()
-        {
+        public override void GetPage_RequestedPageLessThan1_ReturnsFirstPage() {
             EmployeeService es = GetNewService();
 
             es.GetPage(new EmployeeDTO[0], -5);
@@ -59,8 +52,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_RequestedPageMoreThanTotalPages_ReturnsLastPage()
-        {
+        public override void GetPage_RequestedPageMoreThanTotalPages_ReturnsLastPage() {
             EmployeeService es = GetNewService();
             es.NumberOfObjectsPerPage = 3;
             EmployeeDTO[] col = new EmployeeDTO[] {
@@ -76,8 +68,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_CallsExistingPage_ReturnsSpecifiedPage()
-        {
+        public override void GetPage_CallsExistingPage_ReturnsSpecifiedPage() {
             EmployeeService es = GetNewService();
             es.NumberOfObjectsPerPage = 3;
             EmployeeDTO[] col = new EmployeeDTO[] {
@@ -101,11 +92,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // CreateAsync method
         /// </summary>
         [Test]
-        public void CreateAsync_LastNamePropertyIsNull_Throws()
-        {
+        public void CreateAsync_LastNamePropertyIsNull_Throws() {
             EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
-                LastName = null
+                LastName = null,
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) }
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
@@ -114,11 +105,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void CreateAsync_FirstNamePropertyIsNull_Throws()
-        {
+        public void CreateAsync_FirstNamePropertyIsNull_Throws() {
             EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
-                LastName = "Petrov"
+                LastName = "Petrov",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) }
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
@@ -127,12 +118,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void CreateAsync_EmailPropertyIsNotCorrectFormat_Throws()
-        {
+        public void CreateAsync_EmailPropertyIsNotCorrectFormat_Throws() {
             EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
                 Contacts = new DTO.Contacts { Email = "this is a bad email" }
             };
 
@@ -142,32 +133,46 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void CreateAsync_DepartmentPropertyIsNull_Throws()
-        {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
-            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
-            EmployeeService es = GetNewService(mock.Object);
+        public void CreateAsync_BirthDatePropertyMoreCurrentDate_Throws() {
+            EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = DateTime.Today.AddDays(5) },
+                Contacts = new DTO.Contacts()
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
 
-            StringAssert.Contains("Отдел не найден", ex.Message);
+            StringAssert.Contains("Некорректная дата рождения", ex.Message);
         }
 
         [Test]
-        public void CreateAsync_PostPropertyIsNull_Throws()
-        {
+        public void CreateAsync_AgePropertyLess14_Throws() {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = DateTime.Today.AddDays(-5) },
+                Contacts = new DTO.Contacts()
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
+
+            StringAssert.Contains("Нельзя принять сотрудника моложе 14 лет", ex.Message);
+        }
+
+        [Test]
+        public void CreateAsync_PostPropertyIsNull_Throws() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Post>(null));
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
@@ -176,16 +181,37 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe()
-        {
+        public void CreateAsync_EmployeesCountNotLessNumberOfUnitsProperty_Throws() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { NumberOfUnits = 2 });
+            mock.Setup(m => m.Employees.CountAsync(It.IsAny<Expression<Func<Employee, bool>>>())).ReturnsAsync(2);
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.CreateAsync(item));
+
+            StringAssert.Contains("В данной должности нет свободных штатных единиц", ex.Message);
+        }
+
+        [Test]
+        public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
             mock.Setup(m => m.Employees.Create(It.IsAny<Employee>()));
+            mock.Setup(m => m.Employees.CountAsync(It.IsAny<Expression<Func<Employee, bool>>>())).ReturnsAsync(-1);
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
             };
 
             await es.CreateAsync(item);
@@ -194,16 +220,18 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
-        {
+        public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
             mock.Setup(m => m.Employees.Create(It.IsAny<Employee>()));
+            mock.Setup(m => m.Employees.CountAsync(It.IsAny<Expression<Func<Employee, bool>>>())).ReturnsAsync(-1);
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
             };
 
             await es.CreateAsync(item);
@@ -215,8 +243,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // DeleteAsync method
         /// </summary>
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Employee>(null));
             EmployeeService es = GetNewService(mock.Object);
@@ -227,8 +254,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Employee>(null));
             EmployeeService es = GetNewService(mock.Object);
@@ -239,8 +265,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
             EmployeeService es = GetNewService(mock.Object);
@@ -251,8 +276,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
             EmployeeService es = GetNewService(mock.Object);
@@ -266,8 +290,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // DeleteAllAsync method
         /// </summary>
         [Test]
-        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.RemoveAllAsync()).Returns(Task.CompletedTask);
             EmployeeService es = GetNewService(mock.Object);
@@ -278,8 +301,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.RemoveAllAsync()).Returns(Task.CompletedTask);
             EmployeeService es = GetNewService(mock.Object);
@@ -293,11 +315,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // EditAsync method
         /// </summary>
         [Test]
-        public void EditAsync_LastNamePropertyIsNull_Throws()
-        {
+        public void EditAsync_LastNamePropertyIsNull_Throws() {
             EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
-                LastName = null
+                LastName = null,
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) }
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
@@ -306,11 +328,11 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void EditAsync_FirstNamePropertyIsNull_Throws()
-        {
+        public void EditAsync_FirstNamePropertyIsNull_Throws() {
             EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
-                LastName = "Petrov"
+                LastName = "Petrov",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) }
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
@@ -319,12 +341,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void EditAsync_EmailPropertyIsNotCorrectFormat_Throws()
-        {
+        public void EditAsync_EmailPropertyIsNotCorrectFormat_Throws() {
             EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
                 FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
                 Contacts = new DTO.Contacts { Email = "this is a bad email" }
             };
 
@@ -334,32 +356,46 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void EditAsync_DepartmentPropertyIsNull_Throws()
-        {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
-            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
-            EmployeeService es = GetNewService(mock.Object);
+        public void EditAsync_BirthDatePropertyMoreCurrentDate_Throws() {
+            EmployeeService es = GetNewService();
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = DateTime.Today.AddDays(5) },
+                Contacts = new DTO.Contacts()
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
 
-            StringAssert.Contains("Отдел не найден", ex.Message);
+            StringAssert.Contains("Некорректная дата рождения", ex.Message);
         }
 
         [Test]
-        public void EditAsync_PostPropertyIsNull_Throws()
-        {
+        public void EditAsync_AgePropertyLess14_Throws() {
+            EmployeeService es = GetNewService();
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = DateTime.Today.AddDays(-5) },
+                Contacts = new DTO.Contacts()
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("Нельзя принять сотрудника моложе 14 лет", ex.Message);
+        }
+
+        [Test]
+        public void EditAsync_PostPropertyIsNull_Throws() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Post>(null));
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
             };
 
             Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
@@ -368,16 +404,37 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
-        {
+        public void EditAsync_EmployeesCountNotLessNumberOfUnitsProperty_Throws() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
+            mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post { NumberOfUnits = 2 });
+            mock.Setup(m => m.Employees.CountAsync(It.IsAny<Expression<Func<Employee, bool>>>())).ReturnsAsync(2);
+            EmployeeService es = GetNewService(mock.Object);
+            EmployeeDTO item = new EmployeeDTO {
+                LastName = "Petrov",
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
+            };
+
+            Exception ex = Assert.CatchAsync(async () => await es.EditAsync(item));
+
+            StringAssert.Contains("В данной должности нет свободных штатных единиц", ex.Message);
+        }
+
+        [Test]
+        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
             mock.Setup(m => m.Employees.Update(It.IsAny<Employee>()));
+            mock.Setup(m => m.Employees.CountAsync(It.IsAny<Expression<Func<Employee, bool>>>())).ReturnsAsync(-1);
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
             };
 
             await es.EditAsync(item);
@@ -386,16 +443,18 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
-        {
+        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             mock.Setup(m => m.Posts.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Post());
             mock.Setup(m => m.Employees.Update(It.IsAny<Employee>()));
+            mock.Setup(m => m.Employees.CountAsync(It.IsAny<Expression<Func<Employee, bool>>>())).ReturnsAsync(-1);
             EmployeeService es = GetNewService(mock.Object);
             EmployeeDTO item = new EmployeeDTO {
                 LastName = "Petrov",
-                FirstName = "Max"
+                FirstName = "Max",
+                Birth = new DTO.Birth { BirthDate = new DateTime(2000, 6, 20) },
+                Contacts = new DTO.Contacts()
             };
 
             await es.EditAsync(item);
@@ -407,8 +466,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // FindByIdAsync method
         /// </summary>
         [Test]
-        public override void FindByIdAsync_IdParameterIsNull_Throws()
-        {
+        public override void FindByIdAsync_IdParameterIsNull_Throws() {
             EmployeeService es = GetNewService();
 
             Exception ex = Assert.CatchAsync(async () => await es.FindByIdAsync(null));
@@ -417,8 +475,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void FindByIdAsync_EmployeeNotFound_Throws()
-        {
+        public void FindByIdAsync_EmployeeNotFound_Throws() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Employee>(null));
             EmployeeService es = GetNewService(mock.Object);
@@ -429,8 +486,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
-        {
+        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync((int item_id) => new Employee() { Id = item_id });
             EmployeeService es = GetNewService(mock.Object);
@@ -444,8 +500,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // GetAllAsync method
         /// </summary>
         [Test]
-        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
-        {
+        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAllAsync()).ReturnsAsync(() => new Employee[] {
                 new Employee() { Id = 1, LastName = "Petrov" },
@@ -476,9 +531,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, false, null, false, null, null, null, null, true, null, null)]          // IsBonus
         [TestCase(null, false, null, false, null, null, null, null, false, "Manager", null)]    // PostTitle
         [TestCase(null, false, null, false, null, null, null, null, false, null, "Management")] // DepartmentName
-        public void Get_OneFilterParameterIsSet_ReturnsFilteredArray(string ln, bool im, string em, 
-            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
-        {
+        public void Get_OneFilterParameterIsSet_ReturnsFilteredArray(string ln, bool im, string em,
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn) {
             EmployeeFilter filter = new EmployeeFilter {
                 LastName = new string[] { ln, null, "" },
                 IsMatchAnyLastName = im,
@@ -574,8 +628,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, false, null, false, null, null, null, null, false, "Manager", null)]    // PostTitle
         [TestCase(null, false, null, false, null, null, null, null, false, null, "Management")] // DepartmentName
         public void Get_OneFilterParameterAndIsAntiFilterIsSet_ReturnsFilteredArray(string ln, bool im, string em,
-            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
-        {
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn) {
             EmployeeFilter filter = new EmployeeFilter {
                 LastName = new string[] { ln, null, "" },
                 IsMatchAnyLastName = im,
@@ -662,7 +715,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("Ivanov", result[1].LastName);
         }
 
-        [TestCase("P", "n",   false, null, false, null, null, null, null, false, null, null)]           // LastName1, LastName2
+        [TestCase("P", "n", false, null, false, null, null, null, null, false, null, null)]           // LastName1, LastName2
         [TestCase("P", null, false, "mail.ru", false, null, null, null, null, false, null, null)]       // LastName, Email
         [TestCase(null, null, false, "mail.ru", true, null, null, null, null, false, null, null)]       // Email, IsPhoneNumber
         [TestCase(null, null, false, null, true, "2018-09-01", null, null, null, false, null, null)]    // IsPhoneNumber, HireDate
@@ -672,8 +725,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, null, false, null, false, null, null, null, null, true, "Manager", null)]       // IsBonus, PostTitle
         [TestCase(null, null, false, null, false, null, null, null, null, true, null, "Management")]    // IsBonus, DepartmentName
         public void Get_TwoFilterParametersAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
-            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
-        {
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn) {
             EmployeeFilter filter = new EmployeeFilter {
                 LastName = new string[] { ln1, ln2, null, "" },
                 IsMatchAnyLastName = im,
@@ -767,8 +819,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase(null, null, false, null, false, null, null, null, null, true, "Manager", null)]       // IsBonus, PostTitle
         [TestCase(null, null, false, null, false, null, null, null, null, true, null, "Management")]    // IsBonus, DepartmentName
         public void Get_TwoFilterParametersAndIsAntiFilterAreSet_ReturnsFilteredArray(string ln1, string ln2, bool im, string em,
-            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn)
-        {
+            bool ipn, string hd, double? min, double? max, double? b, bool ib, string pt, string dn) {
             EmployeeFilter filter = new EmployeeFilter {
                 LastName = new string[] { ln1, ln2, null, "" },
                 IsMatchAnyLastName = im,
@@ -865,8 +916,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase("Bonus")]
         [TestCase("PostTitle")]
         [TestCase("DepartmentName")]
-        public void Get_AscSortIsSet_ReturnsSortedArray(string field)
-        {
+        public void Get_AscSortIsSet_ReturnsSortedArray(string field) {
             EmployeeFilter filter = new EmployeeFilter {
                 SortField = field,
                 SortOrder = "Asc"
@@ -956,8 +1006,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         [TestCase("Bonus")]
         [TestCase("PostTitle")]
         [TestCase("DepartmentName")]
-        public void Get_DescSortIsSet_ReturnsSortedArray(string field)
-        {
+        public void Get_DescSortIsSet_ReturnsSortedArray(string field) {
             EmployeeFilter filter = new EmployeeFilter {
                 SortField = field,
                 SortOrder = "Desc"

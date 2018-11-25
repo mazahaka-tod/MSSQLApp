@@ -103,7 +103,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.CreateAsync(null, null)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.CreateAsync(null)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
@@ -111,11 +111,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task CreateAsync_Post_ModelStateIsNotValid_AsksForCreateView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>(), It.IsAny<int[]>())).Throws(new ValidationException("", ""));
+            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.CreateAsync(null, null)) as ViewResult;
+            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
             Assert.AreEqual("Create", result.ViewName);
         }
@@ -123,14 +123,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task CreateAsync_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>(), It.IsAny<int[]>())).Throws(new ValidationException("", ""));
+            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
             ViewResult result = (await controller.CreateAsync(new BusinessTripViewModel {
                 Id = 2,
                 Name = "02.09.2018_026"
-            }, null)) as ViewResult;
+            })) as ViewResult;
 
             BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
             Assert.AreEqual(2, model.Id);
@@ -140,14 +140,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task CreateAsync_Post_ModelStateIsNotValid_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>(), It.IsAny<int[]>())).Throws(new ValidationException("", ""));
+            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
                 new EmployeeDTO() { Id = 2, LastName = "Brown", FirstName = "Daniel" }
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.CreateAsync(null, null)) as ViewResult;
+            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
             Assert.AreEqual("Brown Daniel", item.Text);
@@ -234,7 +234,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.EditAsync(new BusinessTripViewModel(), null)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.EditAsync(new BusinessTripViewModel())) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
@@ -242,11 +242,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task EditAsync_Post_ModelStateIsNotValid_AsksForEditView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>(), It.IsAny<int[]>())).Throws(new ValidationException("", ""));
+            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(new BusinessTripViewModel(), null)) as ViewResult;
+            ViewResult result = (await controller.EditAsync(new BusinessTripViewModel())) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
@@ -254,14 +254,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task EditAsync_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>(), It.IsAny<int[]>())).Throws(new ValidationException("", ""));
+            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
             ViewResult result = (await controller.EditAsync(new BusinessTripViewModel {
                 Id = 2,
                 Name = "02.09.2018_026"
-            }, null)) as ViewResult;
+            })) as ViewResult;
 
             BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
             Assert.AreEqual(2, model.Id);
@@ -271,14 +271,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         [Test]
         public async Task EditAsync_Post_ModelStateIsNotValid_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>(), It.IsAny<int[]>())).Throws(new ValidationException("", ""));
+            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
                 new EmployeeDTO() { Id = 2, LastName = "Brown", FirstName = "Daniel" }
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(new BusinessTripViewModel(), null)) as ViewResult;
+            ViewResult result = (await controller.EditAsync(new BusinessTripViewModel())) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
             Assert.AreEqual("Brown Daniel", item.Text);

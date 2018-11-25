@@ -8,18 +8,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.BLL.UnitTests
-{
+namespace DiplomMSSQLApp.BLL.UnitTests {
     [TestFixture]
-    public class BusinessTripServiceTests : BaseServiceTests<BusinessTripService>
-    {
-        protected override BusinessTripService GetNewService()
-        {
+    public class BusinessTripServiceTests : BaseServiceTests<BusinessTripService> {
+        protected override BusinessTripService GetNewService() {
             return new BusinessTripService();
         }
 
-        protected override BusinessTripService GetNewService(IUnitOfWork uow)
-        {
+        protected override BusinessTripService GetNewService(IUnitOfWork uow) {
             return new BusinessTripService(uow);
         }
 
@@ -27,8 +23,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // GetPage method
         /// </summary>
         [Test]
-        public override void GetPage_CallsWithGoodParams_FillsPageInfoProperty()
-        {
+        public override void GetPage_CallsWithGoodParams_FillsPageInfoProperty() {
             BusinessTripService bts = GetNewService();
             bts.NumberOfObjectsPerPage = 2;
             BusinessTripDTO[] col = new BusinessTripDTO[] {
@@ -45,8 +40,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_RequestedPageLessThan1_ReturnsFirstPage()
-        {
+        public override void GetPage_RequestedPageLessThan1_ReturnsFirstPage() {
             BusinessTripService bts = GetNewService();
 
             bts.GetPage(new BusinessTripDTO[0], -5);
@@ -55,8 +49,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_RequestedPageMoreThanTotalPages_ReturnsLastPage()
-        {
+        public override void GetPage_RequestedPageMoreThanTotalPages_ReturnsLastPage() {
             BusinessTripService bts = GetNewService();
             bts.NumberOfObjectsPerPage = 3;
             BusinessTripDTO[] col = new BusinessTripDTO[] {
@@ -72,8 +65,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_CallsExistingPage_ReturnsSpecifiedPage()
-        {
+        public override void GetPage_CallsExistingPage_ReturnsSpecifiedPage() {
             BusinessTripService bts = GetNewService();
             bts.NumberOfObjectsPerPage = 3;
             BusinessTripDTO[] col = new BusinessTripDTO[] {
@@ -97,8 +89,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // CreateAsync method
         /// </summary>
         [Test]
-        public void CreateAsync_NamePropertyIsNull_Throws()
-        {
+        public void CreateAsync_NamePropertyIsNull_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = null,
@@ -108,14 +99,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item));
 
             StringAssert.Contains("Требуется ввести код командировки", ex.Message);
         }
 
         [Test]
-        public void CreateAsync_DateStartPropertyMoreThanDateEndProperty_Throws()
-        {
+        public void CreateAsync_DateStartPropertyMoreThanDateEndProperty_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = "01.09.2018_021",
@@ -125,14 +115,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item));
 
             StringAssert.Contains("Дата окончания командировки не должна быть до даты начала", ex.Message);
         }
 
         [Test]
-        public void CreateAsync_DestinationPropertyIsNull_Throws()
-        {
+        public void CreateAsync_DestinationPropertyIsNull_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = "01.09.2018_021",
@@ -142,14 +131,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item));
 
             StringAssert.Contains("Требуется ввести место назначения", ex.Message);
         }
 
         [Test]
-        public void CreateAsync_PurposePropertyIsNull_Throws()
-        {
+        public void CreateAsync_PurposePropertyIsNull_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = "01.09.2018_021",
@@ -159,15 +147,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = null
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.CreateAsync(item));
 
             StringAssert.Contains("Требуется ввести цель командировки", ex.Message);
         }
 
         [Test]
-        public async Task CreateAsync_IdsParameterContainsThreeDifferentValues_CallsFindByIdAsyncMethodThreeTimes()
-        {
-            int[] ids = new int[] { 1, 2, 2, 3 };
+        public async Task CreateAsync_IdsParameterContainsThreeDifferentValues_CallsFindByIdAsyncMethodThreeTimes() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(It.IsAny<Employee>());
@@ -177,17 +163,22 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 DateStart = new DateTime(2018, 8, 10),
                 DateEnd = new DateTime(2018, 8, 20),
                 Destination = "Moscow",
-                Purpose = "Seminar"
+                Purpose = "Seminar",
+                Employees = new EmployeeDTO[] {
+                    new EmployeeDTO { Id = 1 },
+                    new EmployeeDTO { Id = 2 },
+                    new EmployeeDTO { Id = 2 },
+                    new EmployeeDTO { Id = 3 }
+                }
             };
 
-            await bts.CreateAsync(item, ids);
+            await bts.CreateAsync(item);
 
             mock.Verify(m => m.Employees.FindByIdAsync(It.IsAny<int>()), Times.Exactly(3));
         }
 
         [Test]
-        public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe()
-        {
+        public async Task CreateAsync_CallsWithGoodParams_CallsCreateMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
             BusinessTripService bts = GetNewService(mock.Object);
@@ -199,14 +190,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            await bts.CreateAsync(item, new int[0]);
+            await bts.CreateAsync(item);
 
             mock.Verify(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()), Times.Once());
         }
 
         [Test]
-        public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
-        {
+        public async Task CreateAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.Create(It.IsAny<BusinessTrip>()));
             BusinessTripService bts = GetNewService(mock.Object);
@@ -218,7 +208,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            await bts.CreateAsync(item, new int[0]);
+            await bts.CreateAsync(item);
 
             mock.Verify((m => m.SaveAsync()), Times.Once());
         }
@@ -227,8 +217,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // DeleteAsync method
         /// </summary>
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
             BusinessTripService bts = GetNewService(mock.Object);
@@ -239,8 +228,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
             BusinessTripService bts = GetNewService(mock.Object);
@@ -251,8 +239,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
             BusinessTripService bts = GetNewService(mock.Object);
@@ -263,8 +250,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
             BusinessTripService bts = GetNewService(mock.Object);
@@ -278,8 +264,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // DeleteAllAsync method
         /// </summary>
         [Test]
-        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
             BusinessTripService bts = GetNewService(mock.Object);
@@ -290,8 +275,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
             BusinessTripService bts = GetNewService(mock.Object);
@@ -305,8 +289,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // EditAsync method
         /// </summary>
         [Test]
-        public void EditAsync_NamePropertyIsNull_Throws()
-        {
+        public void EditAsync_NamePropertyIsNull_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = null,
@@ -316,14 +299,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item));
 
             StringAssert.Contains("Требуется ввести код командировки", ex.Message);
         }
 
         [Test]
-        public void EditAsync_DateStartPropertyMoreThanDateEndProperty_Throws()
-        {
+        public void EditAsync_DateStartPropertyMoreThanDateEndProperty_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = "01.09.2018_021",
@@ -333,14 +315,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item));
 
             StringAssert.Contains("Дата окончания командировки не должна быть до даты начала", ex.Message);
         }
 
         [Test]
-        public void EditAsync_DestinationPropertyIsNull_Throws()
-        {
+        public void EditAsync_DestinationPropertyIsNull_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = "01.09.2018_021",
@@ -350,14 +331,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item));
 
             StringAssert.Contains("Требуется ввести место назначения", ex.Message);
         }
 
         [Test]
-        public void EditAsync_PurposePropertyIsNull_Throws()
-        {
+        public void EditAsync_PurposePropertyIsNull_Throws() {
             BusinessTripService bts = GetNewService();
             BusinessTripDTO item = new BusinessTripDTO {
                 Name = "01.09.2018_021",
@@ -367,15 +347,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = null
             };
 
-            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item, It.IsAny<int[]>()));
+            Exception ex = Assert.CatchAsync(async () => await bts.EditAsync(item));
 
             StringAssert.Contains("Требуется ввести цель командировки", ex.Message);
         }
 
         [Test]
-        public async Task EditAsync_IdsParameterContainsThreeDifferentValue_CallsFindByIdAsyncMethodThreeTimes()
-        {
-            int[] ids = new int[] { 1, 2, 2, 3 };
+        public async Task EditAsync_IdsParameterContainsThreeDifferentValue_CallsFindByIdAsyncMethodThreeTimes() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
@@ -385,17 +363,22 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 DateStart = new DateTime(2018, 8, 10),
                 DateEnd = new DateTime(2018, 8, 20),
                 Destination = "Moscow",
-                Purpose = "Seminar"
+                Purpose = "Seminar",
+                Employees = new EmployeeDTO[] {
+                    new EmployeeDTO { Id = 1 },
+                    new EmployeeDTO { Id = 2 },
+                    new EmployeeDTO { Id = 2 },
+                    new EmployeeDTO { Id = 3 }
+                }
             };
 
-            await bts.EditAsync(item, ids);
+            await bts.EditAsync(item);
 
             mock.Verify(m => m.Employees.FindByIdAsync(It.IsAny<int>()), Times.Exactly(3));
         }
 
         [Test]
-        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
-        {
+        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
             BusinessTripService bts = GetNewService(mock.Object);
@@ -407,14 +390,13 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            await bts.EditAsync(item, new int[0]);
+            await bts.EditAsync(item);
 
             mock.Verify(m => m.BusinessTrips.Update(It.IsAny<BusinessTrip>()), Times.Once);
         }
 
         [Test]
-        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
-        {
+        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new BusinessTrip());
             BusinessTripService bts = GetNewService(mock.Object);
@@ -426,7 +408,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
                 Purpose = "Seminar"
             };
 
-            await bts.EditAsync(item, new int[0]);
+            await bts.EditAsync(item);
 
             mock.Verify(m => m.SaveAsync(), Times.Once);
         }
@@ -435,8 +417,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // FindByIdAsync method
         /// </summary>
         [Test]
-        public override void FindByIdAsync_IdParameterIsNull_Throws()
-        {
+        public override void FindByIdAsync_IdParameterIsNull_Throws() {
             BusinessTripService bts = GetNewService();
 
             Exception ex = Assert.CatchAsync(async () => await bts.FindByIdAsync(null));
@@ -445,8 +426,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void FindByIdAsync_BusinessTripNotFound_Throws()
-        {
+        public void FindByIdAsync_BusinessTripNotFound_Throws() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<BusinessTrip>(null));
             BusinessTripService bts = GetNewService(mock.Object);
@@ -457,8 +437,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
-        {
+        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.FindByIdAsync(It.IsAny<int>())).ReturnsAsync((int item_id) => new BusinessTrip() { Id = item_id });
             BusinessTripService bts = GetNewService(mock.Object);
@@ -472,8 +451,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // GetAllAsync method
         /// </summary>
         [Test]
-        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
-        {
+        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.BusinessTrips.GetAllAsync()).ReturnsAsync(() => new BusinessTrip[] {
                 new BusinessTrip() { Id = 1, Name = "01.09.2018_022" },
