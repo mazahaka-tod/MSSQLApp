@@ -4,6 +4,7 @@ using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
+using NLog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     public class BusinessTripController : Controller {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private IService<BusinessTripDTO> businessTripService;
         private IService<EmployeeDTO> employeeService;
 
@@ -34,6 +36,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Добавление новой командировки
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
+            int employeesCount = await employeeService.CountAsync();
+            if (employeesCount == 0) {
+                logger.Warn("No employees");
+                return View("Error", new string[] { "В организации нет сотрудников" });
+            }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View("Create");
         }
@@ -54,9 +61,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         private async Task<SelectList> GetSelectListEmployeesAsync() {
             IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
             IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
-                                                    Value = e.Id.ToString(),
-                                                    Text = e.LastName + " " + e.FirstName
-                                                }).OrderBy(e => e.Text);
+                Value = e.Id.ToString(),
+                Text = e.LastName + " " + e.FirstName + " " + e.Patronymic
+            }).OrderBy(e => e.Text);
             return new SelectList(items, "Value", "Text");
         }
 
@@ -64,7 +71,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
                 cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
             BusinessTripDTO btDto = Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
@@ -106,7 +117,11 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
             BusinessTripViewModel bt = Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(btDTO);

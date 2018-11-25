@@ -3,7 +3,9 @@ using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services {
@@ -18,27 +20,36 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Добавление нового отдела
         public override async Task CreateAsync(DepartmentDTO dDto) {
-            Department department = MapDTOAndDomainModelWithValidation(dDto);
+            Department department = await MapDTOAndDomainModelWithValidation(dDto);
             Database.Departments.Create(department);
             await Database.SaveAsync();
         }
 
-        private Department MapDTOAndDomainModelWithValidation(DepartmentDTO dDto) {
-            ValidationDepartment(dDto);
+        private async Task<Department> MapDTOAndDomainModelWithValidation(DepartmentDTO dDto) {
+            await ValidationDepartment(dDto);
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>()
                                         .ForMember(d => d.Posts, opt => opt.Ignore()));
             Department department = Mapper.Map<DepartmentDTO, Department>(dDto);
             return department;
         }
 
-        private void ValidationDepartment(DepartmentDTO item) {
-            if (item.DepartmentName == null)
+        private async Task ValidationDepartment(DepartmentDTO department) {
+            if (department.DepartmentName == null)
                 throw new ValidationException("Требуется ввести название отдела", "DepartmentName");
+            int departmentsCount = await Database.Departments.CountAsync(d => d.Code == department.Code && d.Id != department.Id);
+            if (departmentsCount > 0)
+                throw new ValidationException("Отдел с таким кодом уже существует", "Code");
+            departmentsCount = await Database.Departments.CountAsync(d => d.DepartmentName == department.DepartmentName && d.Id != department.Id);
+            if (departmentsCount > 0)
+                throw new ValidationException("Отдел с таким названием уже существует", "DepartmentName");
+            departmentsCount = await Database.Departments.CountAsync(d => d.ManagerId == department.ManagerId && d.Id != department.Id);
+            if (departmentsCount > 0)
+                throw new ValidationException("Сотрудник уже является начальником другого отдела", "ManagerId");
         }
 
         // Обновление информации об отделе
         public override async Task EditAsync(DepartmentDTO dDto) {
-            Department department = MapDTOAndDomainModelWithValidation(dDto);
+            Department department = await MapDTOAndDomainModelWithValidation(dDto);
             Database.Departments.Update(department);
             await Database.SaveAsync();
         }
@@ -52,6 +63,10 @@ namespace DiplomMSSQLApp.BLL.Services {
                 throw new ValidationException("Отдел не найден", "");
             InitializeMapper();
             DepartmentDTO dDto = Mapper.Map<Department, DepartmentDTO>(department);
+            if (dDto.ManagerId != null) {
+                Employee manager = await Database.Employees.FindByIdAsync(dDto.ManagerId.Value);
+                dDto.Manager = Mapper.Map<Employee, EmployeeDTO>(manager);
+            }
             return dDto;
         }
 
@@ -76,15 +91,24 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task<IEnumerable<DepartmentDTO>> GetAllAsync() {
             IEnumerable<Department> departments = await Database.Departments.GetAllAsync();
             InitializeMapper();
-            IEnumerable<DepartmentDTO> collection = Mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentDTO>>(departments);
-            return collection;
+            IEnumerable<DepartmentDTO> collectionDTO = Mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentDTO>>(departments);
+            // С помощью свойства ManagerId находим начальника отдела и присваиваем его свойству Manager
+            foreach (DepartmentDTO dDto in collectionDTO) {
+                if (dDto.ManagerId != null) {
+                    Employee manager = await Database.Employees.FindByIdAsync(dDto.ManagerId.Value);
+                    dDto.Manager = Mapper.Map<Employee, EmployeeDTO>(manager);
+                }
+            }
+            return collectionDTO;
         }
 
         // Удаление отдела
         public override async Task DeleteAsync(int id) {
-            Department item = await Database.Departments.FindByIdAsync(id);
-            if (item == null) return;
-            Database.Departments.Remove(item);
+            Department department = await Database.Departments.FindByIdAsync(id);
+            if (department == null) return;
+            if (department.Posts.Count > 0)
+                throw new ValidationException("Нельзя удалить отдел, пока в нем есть хотя бы одна должность", "");
+            Database.Departments.Remove(department);
             await Database.SaveAsync();
         }
 
@@ -92,6 +116,16 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task DeleteAllAsync() {
             await Database.Departments.RemoveAllAsync();
             await Database.SaveAsync();
+        }
+
+        public override async Task<int> CountAsync() {
+            return await Database.Departments.CountAsync();
+        }
+
+        public override async Task<int> CountAsync(Expression<Func<DepartmentDTO, bool>> predicateDTO) {
+            Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>());
+            var predicate = Mapper.Map<Expression<Func<DepartmentDTO, bool>>, Expression<Func<Department, bool>>>(predicateDTO);
+            return await Database.Departments.CountAsync(predicate);
         }
 
         public override void Dispose() {

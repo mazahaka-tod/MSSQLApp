@@ -76,7 +76,7 @@
                 }
                 @if (Model.Filter.Columns.Contains("4")) {
                     <td>
-                        @Html.DisplayFor(modelItem => item.HireDate)
+                        @item.HireDate.ToString("dd MMMM yyyy")
                     </td>
                 }
                 @if (Model.Filter.Columns.Contains("5")) {

@@ -8,7 +8,6 @@ namespace DiplomMSSQLApp.DAL.Entities {
         public int? OrganizationId { get; set; }
         public Organization Organization { get; set; }
         public int? ManagerId { get; set; }
-        public Employee Manager { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
 
         public Department() {

@@ -14,7 +14,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         }
 
         public override async Task<Employee> FindByIdAsync(int id) {
-            return await _dbSet.Include(e => e.Post).FirstOrDefaultAsync(e => e.Id == id);
+            return await _dbSet.Include(e => e.Post).Include(e => e.Post.Department).FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public override IEnumerable<Employee> Get(Func<Employee, bool> predicate) {
@@ -27,10 +27,6 @@ namespace DiplomMSSQLApp.DAL.Repositories {
 
         public override async Task<Employee> GetFirstAsync() {
             return await _dbSet.Include(e => e.Post).Include(e => e.Post.Department).FirstOrDefaultAsync();
-        }
-
-        public virtual async Task<int> GetEmployeesCountAsync(int postId) {
-            return await _dbSet.CountAsync(e => e.PostId == postId);
         }
     }
 }

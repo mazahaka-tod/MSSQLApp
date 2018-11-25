@@ -36,16 +36,13 @@
                 }
             </div>
         }
-
-        <p>
-            <img src=@Url.Content("~/Content/Animations/Error.gif") alt="" height="50" />
-        </p>
+        <br />
         <p>
             @Html.ActionLink("На главную", "Index", "Organization", null, new { @class = "btn btn-primary" })
         </p>
-
+        <br />
         <footer>
-            <p>&copy; 2017-@DateTime.Now.Year Human Resources Application</p>
+            <p>&copy; 2018-@DateTime.Now.Year Human Resources Application</p>
         </footer>
     </div>
     @Scripts.Render("~/bundles/jquery")
@@ -56,5 +53,6 @@
 <script>
     $(document).ready(function () {
         $('body').css('background-image', 'url(@Url.Content("~/Content/Images/background_error.jpg"))')
+        $('body').css('background-size', '100%')
     })
 </script>

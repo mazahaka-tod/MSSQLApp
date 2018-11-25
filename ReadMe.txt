@@ -1,6 +1,6 @@
 The project is intended to be used by the human resources department.
 The project is under active development.
-ER-diagram of the database can be viewed in the solution folder in the file 'ER-diagram DB.jpg'.
+ER-diagram of the database can be viewed in the solution folder in the file 'ERD.jpg'.
 The main functions implemented in the project:
 - CRUD operations;
 - a filter for retrieving employees from the database;
@@ -15,3 +15,4 @@ Used packages: Entity Framework, AspNet.Identity, AutoMapper, Ninject, Bootstrap
 P.S.
 Login: Admin
 Password: MySecret
+

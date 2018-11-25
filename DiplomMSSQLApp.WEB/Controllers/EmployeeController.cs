@@ -61,10 +61,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Добавление нового сотрудника
         [ActionName("Create")]
         public async Task<ActionResult> CreateAsync() {
-            IEnumerable<PostDTO> posts = await postService.GetAllAsync();
-            if (posts.Count() == 0)
-                return View("Error", new string[] { "Нельзя добавить сотрудника, если нет ни одной свободной должности" });
-            ViewBag.Departments = await GetSelectListDepartmentsAsync();
+            int totalNumberOfUnits = (await postService.GetAllAsync()).Sum(p => p.NumberOfUnits).Value;
+            int employeesCount = await employeeService.CountAsync();
+            if (employeesCount >= totalNumberOfUnits) {
+                logger.Warn("No vacancy");
+                return View("Error", new string[] { "Нельзя принять сотрудника, если нет свободных вакансий" });
+            }
             ViewBag.Posts = await GetSelectListPostsAsync();
             return View("Create");
         }
@@ -78,29 +80,17 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
             return View("Create", e);
         }
 
-        private async Task<SelectList> GetSelectListDepartmentsAsync() {
-            IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
-            //if (departments.Count() == 0) {
-            //    DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
-            //    await departmentService.CreateAsync(btDto);
-            //    departments = new List<DepartmentDTO> { btDto };
-            //}
-            return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
-        }
-
         private async Task<SelectList> GetSelectListPostsAsync() {
             IEnumerable<PostDTO> posts = await postService.GetAllAsync();
-            //if (posts.Count() == 0) {
-            //    PostDTO pDto = new PostDTO { Id = 1, Title = "unknown" };
-            //    await postService.CreateAsync(pDto);
-            //    posts = new List<PostDTO> { pDto };
-            //}
-            return new SelectList(posts.OrderBy(p => p.Title), "Id", "Title");
+            IEnumerable<SelectListItem> items = posts.Select(p => new SelectListItem() {
+                Value = p.Id.ToString(),
+                Text = p.Title + " [" + p.Department.DepartmentName + "]"
+            }).OrderBy(p => p.Text);
+            return new SelectList(items, "Value", "Text");
         }
 
         private EmployeeDTO MapViewModelWithDTO(EmployeeViewModel e) {
@@ -124,7 +114,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         // Обновление информации о сотруднике
         [ActionName("Edit")]
         public async Task<ActionResult> EditAsync(int? id) {
-            ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
             return await GetViewAsync(id, "Edit");
         }
@@ -138,7 +127,6 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             catch (ValidationException ex) {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            ViewBag.Departments = await GetSelectListDepartmentsAsync();
             ViewBag.Posts = await GetSelectListPostsAsync();
             return View("Edit", e);
         }

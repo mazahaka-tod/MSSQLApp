@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.DAL.Repositories {
@@ -13,6 +14,16 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         public EFGenericRepository(DbContext context) {
             _context = context;
             _dbSet = context.Set<TEntity>();
+        }
+        
+        // Количество элементов
+        public virtual async Task<int> CountAsync() {
+            return await _dbSet.CountAsync();
+        }
+
+        // Количество элементов, удовлетворяющих предикату
+        public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate) {
+            return await _dbSet.CountAsync(predicate);
         }
 
         // Добавление элемента

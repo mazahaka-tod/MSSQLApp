@@ -3,8 +3,10 @@ using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services {
@@ -42,8 +44,12 @@ namespace DiplomMSSQLApp.BLL.Services {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTripDTO, BusinessTrip>();
                 cfg.CreateMap<EmployeeDTO, Employee>()
-                   .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                   .ForMember(e => e.Post, opt => opt.Ignore());
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
             });
         }
 
@@ -84,7 +90,11 @@ namespace DiplomMSSQLApp.BLL.Services {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.Contacts, opt => opt.Ignore())
+                    .ForMember(e => e.Education, opt => opt.Ignore())
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
                     .ForMember(e => e.Post, opt => opt.Ignore());
             });
         }
@@ -111,17 +121,27 @@ namespace DiplomMSSQLApp.BLL.Services {
             await Database.SaveAsync();
         }
 
+        public override async Task<int> CountAsync() {
+            return await Database.BusinessTrips.CountAsync();
+        }
+
+        public override async Task<int> CountAsync(Expression<Func<BusinessTripDTO, bool>> predicateDTO) {
+            Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTrip>());
+            var predicate = Mapper.Map<Expression<Func<BusinessTripDTO, bool>>, Expression<Func<BusinessTrip, bool>>>(predicateDTO);
+            return await Database.BusinessTrips.CountAsync(predicate);
+        }
+
         public override void Dispose() {
             Database.Dispose();
         }
 
         // Нереализованные методы
         public override Task CreateAsync(BusinessTripDTO item) {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override Task EditAsync(BusinessTripDTO item) {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

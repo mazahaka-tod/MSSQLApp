@@ -21,7 +21,6 @@ namespace DiplomMSSQLApp.WEB.Models {
         [Display(Name = "Имя")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "Требуется ввести отчество")]
         [Display(Name = "Отчество")]
         public string Patronymic { get; set; }
 
@@ -29,7 +28,6 @@ namespace DiplomMSSQLApp.WEB.Models {
         [Display(Name = "Пол")]
         public Gender Gender { get; set; }
 
-        [Required(ErrorMessage = "Требуется ввести возраст")]
         [Display(Name = "Возраст")]
         public int Age { get; set; }
 
@@ -57,9 +55,10 @@ namespace DiplomMSSQLApp.WEB.Models {
 
     [ComplexType]
     public class Birth {
+        [Required(ErrorMessage = "Требуется ввести дату рождения")]
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Дата рождения")]
-        public DateTime? BirthDate { get; set; }
+        public DateTime BirthDate { get; set; }
         [Display(Name = "Место рождения")]
         public string BirthPlace { get; set; }
     }

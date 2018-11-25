@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using DiplomMSSQLApp.BLL.BusinessModels;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
+using System;
 
 namespace DiplomMSSQLApp.BLL.Services {
     public abstract class BaseService<T> : IService<T> where T : class {
         public virtual PageInfo PageInfo { get; set; }
         public int NumberOfObjectsPerPage { get; set; } = 8;
 
+        public abstract Task<int> CountAsync();
+        public abstract Task<int> CountAsync(Expression<Func<T, bool>> predicate);
         public abstract Task CreateAsync(T item);
         public abstract Task DeleteAsync(int id);
         public abstract Task DeleteAllAsync();

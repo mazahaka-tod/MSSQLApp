@@ -12,11 +12,11 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         }
 
         public override async Task<Department> FindByIdAsync(int id) {
-            return await _dbSet.Include(d => d.Organization).Include(d => d.Manager).Include(d => d.Posts).FirstOrDefaultAsync(d => d.Id == id);
+            return await _dbSet.Include(d => d.Organization).Include(d => d.Posts).FirstOrDefaultAsync(d => d.Id == id);
         }
 
         public override async Task<IEnumerable<Department>> GetAllAsync() {
-            return await _dbSet.Include(d => d.Organization).Include(d => d.Manager).ToListAsync();
+            return await _dbSet.Include(d => d.Organization).ToListAsync();
         }
     }
 }

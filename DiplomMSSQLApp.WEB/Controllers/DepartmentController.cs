@@ -159,8 +159,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             try {
                 await departmentService.DeleteAsync(id);
             }
-            catch (Exception) {
-                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность." });
+            catch (ValidationException ex) {
+                return View("Error", new string[] { ex.Message });
             }
             return RedirectToAction("Index");
         }

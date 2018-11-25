@@ -18,7 +18,7 @@
                     <td>
                         <dl class="dl-horizontal">
                             <dt>
-                                @Html.LabelFor(m => m.Filter.LastName, "Фамилия")
+                                @Html.LabelFor(m => m.Filter.LastName, "Фамилия сотрудника")
                             </dt>
                             <dd>
                                 <span id="lname">
@@ -46,7 +46,7 @@
                             </dt>
                             <dd>
                                 @Html.CheckBoxFor(m => m.Filter.IsPhoneNumber, new { style = "margin-bottom: 12px" })
-                                @Html.LabelFor(m => m.Filter.IsPhoneNumber, "Есть телефон")
+                                @Html.LabelFor(m => m.Filter.IsPhoneNumber, "Наличие мобильного телефона")
                             </dd>
 
                             <dt>
@@ -58,7 +58,7 @@
                             </dd>
 
                             <dt>
-                                @Html.LabelFor(m => m.Filter.MinSalary, "Зарплата от ", new { style = "margin-top: 12px" })
+                                @Html.LabelFor(m => m.Filter.MinSalary, "Оклад от ", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
                                 @Html.TextBoxFor(m => m.Filter.MinSalary, null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "0", max = "9999999" })
@@ -74,11 +74,11 @@
                             </dd>
 
                             <dt>
-                                @Html.LabelFor(m => m.Filter.Bonus, "Премия", new { style = "margin-top: 12px" })
+                                @Html.LabelFor(m => m.Filter.Bonus, "Надбавка", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
                                 <span id="bns">
-                                    @Html.TextBoxFor(m => m.Filter.Bonus[0], null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "0", max = "1", step = "0.01" })
+                                    @Html.TextBoxFor(m => m.Filter.Bonus[0], null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "0", max = "500000" })
                                     <span style="color:red;"></span>
                                 </span>
                                 <div>
@@ -86,7 +86,7 @@
                                     <a id="removebonus" style="display:none;">Удалить поле</a>
                                 </div>
                                 @Html.CheckBoxFor(m => m.Filter.IsBonus, new { style = "margin-bottom: 12px" })
-                                @Html.LabelFor(m => m.Filter.IsBonus, "Есть премия")
+                                @Html.LabelFor(m => m.Filter.IsBonus, "Наличие надбавок")
                             </dd>
 
                             <dt>
@@ -98,7 +98,7 @@
                             </dd>
 
                             <dt>
-                                @Html.LabelFor(m => m.Filter.DepartmentName, "Название отдела", new { style = "margin-top: 12px" })
+                                @Html.LabelFor(m => m.Filter.DepartmentName, "Отдел", new { style = "margin-top: 12px" })
                             </dt>
                             <dd>
                                 @Html.TextBoxFor(m => m.Filter.DepartmentName, null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "12" })
@@ -112,8 +112,19 @@
                                 @Html.Label("Sort", "Сортировка")
                             </dt>
                             <dd>
-                                @Html.DropDownListFor(m => m.Filter.SortField, new SelectList(new[] { new { label = "По фамилии сотрудника", value = "LastName" }, new { label = "По Email", value = "Email" }, new { label = "По дате найма на работу", value = "HireDate" }, new { label = "По зарплате", value = "Salary" }, new { label = "По премии", value = "Bonus" }, new { label = "По должности", value = "Post" }, new { label = "По названию отдела", value = "DepartmentName" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
-                                @Html.DropDownListFor(m => m.Filter.SortOrder, new SelectList(new[] { new { label = "По возрастанию", value = "Asc" }, new { label = "По убыванию", value = "Desc" } }, "value", "label"), new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownListFor(m => m.Filter.SortField, new SelectList(new[] {
+                                    new { label = "По фамилии сотрудника", value = "LastName" },
+                                    new { label = "По Email", value = "Email" },
+                                    new { label = "По дате найма на работу", value = "HireDate" },
+                                    new { label = "По окладу", value = "Salary" },
+                                    new { label = "По надбавке", value = "Bonus" },
+                                    new { label = "По должности", value = "Post" },
+                                    new { label = "По отделу", value = "DepartmentName" } }, "value", "label"), 
+                                    new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownListFor(m => m.Filter.SortOrder, new SelectList(new[] {
+                                    new { label = "По возрастанию", value = "Asc" },
+                                    new { label = "По убыванию", value = "Desc" } }, "value", "label"), 
+                                    new { @class = "form-control", style = "margin-bottom: 12px" })
                             </dd>
 
                             <dt>
@@ -130,22 +141,22 @@
                                 @Html.Label("Columns2", "Email")
                                 <br />
                                 <input type="checkbox" id="Filter_Columns3" name="Filter.Columns" value="3" />
-                                @Html.Label("Columns3", "Телефон")
+                                @Html.Label("Columns3", "Мобильный телефон")
                                 <br />
                                 <input type="checkbox" id="Filter_Columns4" name="Filter.Columns" value="4" />
                                 @Html.Label("Columns4", "Дата приема на работу")
                                 <br />
                                 <input type="checkbox" id="Filter_Columns5" name="Filter.Columns" value="5" />
-                                @Html.Label("Columns5", "Зарплата")
+                                @Html.Label("Columns5", "Оклад")
                                 <br />
                                 <input type="checkbox" id="Filter_Columns6" name="Filter.Columns" value="6" />
-                                @Html.Label("Columns6", "Премия")
+                                @Html.Label("Columns6", "Надбавка")
                                 <br />
                                 <input type="checkbox" id="Filter_Columns7" name="Filter.Columns" value="7" />
                                 @Html.Label("Columns7", "Должность")
                                 <br />
                                 <input type="checkbox" id="Filter_Columns8" name="Filter.Columns" value="8" />
-                                @Html.Label("Columns8", "Название отдела")
+                                @Html.Label("Columns8", "Отдел")
                             </dd>
 
                             <dt>
@@ -197,7 +208,7 @@
             return false;
         });
 
-        // Добавляет на форму фильтра текстовое поле Фамилия
+        // Добавляет на форму фильтра текстовое поле Фамилия сотрудника
         $('#addlastname').on('click', function (event) {
             event.preventDefault();
             var countLastName = $('#lname input').length;
@@ -215,7 +226,7 @@
                 $('#addlastname').css('display', 'none');
         });
 
-        // Удаляет на форме фильтра текстовое поле Фамилия
+        // Удаляет на форме фильтра текстовое поле Фамилия сотрудника
         $('#removelastname').on('click', function (event) {
             event.preventDefault();
             var countLastName = $('#lname input').length;
@@ -227,16 +238,18 @@
                 $('#addlastname').css('display', 'block');
         });
 
-        // Добавляет на форму фильтра текстовое поле Премия
+        // Добавляет на форму фильтра текстовое поле Надбавка
         $('#addbonus').on('click', function (event) {
             event.preventDefault();
             var countBonus = $('#bns input').length;
             if (countBonus < 5) {
+                // Добавляем элемент input
                 $('input:first', '#bns').clone().attr({
                     style: 'margin-top:6px;',
                     id: 'Filter_Bonus_' + countBonus + '_',
                     name: 'Filter.Bonus[' + countBonus + ']'
                 }).val('').appendTo('#bns');
+                // Добавляем элемент span
                 $('span:first', '#bns').clone().appendTo('#bns');
             }
             if (countBonus === 1)
@@ -245,7 +258,7 @@
                 $('#addbonus').css('display', 'none');
         });
 
-        // Удаляет на форме фильтра текстовое поле Премия
+        // Удаляет на форме фильтра текстовое поле Надбавка
         $('#removebonus').on('click', function (event) {
             event.preventDefault();
             var countBonus = $('#bns input').length;
@@ -279,7 +292,7 @@
             }
         }
 
-        // Устанавливает значения в полей Премия на форме фильтра
+        // Устанавливает значения в полей Надбавка на форме фильтра
         @if (Model.Filter.Bonus != null) {
             double?[] bonuses = Model.Filter.Bonus.Where(x => x.HasValue).ToArray();
             if (bonuses.Length > 0) {
@@ -308,7 +321,7 @@
             }
         });
 
-        // Запрещает ввод цифр в полях Фамилия, Должность и Название отдела
+        // Запрещает ввод цифр в полях Фамилия сотрудника, Должность и Отдел
         var handlerOnlyLetters = function (event) {
             var $this = $(this);
             if (event.charCode > 47 && event.charCode < 58) {
@@ -322,7 +335,7 @@
         $('#lname').on('keypress', 'input', handlerOnlyLetters);
         $('#Filter_PostTitle, #Filter_DepartmentName').on('keypress', handlerOnlyLetters);
 
-        // Ограничивает диапазон значений в полях Зарплаты
+        // Ограничивает диапазон значений в поле Оклад
         $('#Filter_MinSalary, #Filter_MaxSalary').on('keyup', function (event) {
             $this = $(this);
             if ($this.val() < 0 || $this.val() > 9999999 || $this.val().length > 10) {
@@ -335,13 +348,13 @@
             }
         });
 
-        // Ограничивает диапазон значений в поле Премия
+        // Ограничивает диапазон значений в поле Надбавка
         $('#bns').on('keyup', 'input', function (event) {
             $this = $(this);
-            if ($this.val() < 0 || $this.val() > 1 || $this.val().length > 4) {
-                $this.next('span').text('Допустимый диапазон [0.00; 1.00]');
+            if ($this.val() < 0 || $this.val() > 500000 || $this.val().length > 10) {
+                $this.next('span').text('Допустимый диапазон [0; 500000]');
                 setTimeout(function () {
-                    $this.val('1');
+                    $this.val('500000');
                     $this.next('span').text('');
                 }, 2000);
                 return false;

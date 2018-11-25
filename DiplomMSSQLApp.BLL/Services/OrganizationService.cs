@@ -5,6 +5,7 @@ using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.Services {
@@ -85,6 +86,14 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         public override Task DeleteAllAsync() {
+            throw new NotImplementedException();
+        }
+
+        public override Task<int> CountAsync(Expression<Func<OrganizationDTO, bool>> predicate) {
+            throw new NotImplementedException();
+        }
+
+        public override Task<int> CountAsync() {
             throw new NotImplementedException();
         }
     }

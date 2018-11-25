@@ -3,10 +3,11 @@ using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
-using DiplomMSSQLApp.DAL.Repositories;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
@@ -35,7 +36,6 @@ namespace DiplomMSSQLApp.BLL.Services {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<PostDTO, Post>();
                 cfg.CreateMap<DepartmentDTO, Department>()
-                    .ForMember(d => d.Manager, opt => opt.Ignore())
                     .ForMember(d => d.Organization, opt => opt.Ignore())
                     .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeDTO, Employee>()
@@ -65,10 +65,19 @@ namespace DiplomMSSQLApp.BLL.Services {
                 throw new ValidationException("Требуется ввести надбавку", "Premium");
             if (pDto.Premium < 0 || pDto.Premium > 100000)
                 throw new ValidationException("Надбавка должна быть в диапазоне [0, 100000]", "Premium");
-            int employeesCount = await (Database.Employees as EFEmployeeRepository).GetEmployeesCountAsync(pDto.Id);
+            int employeesCount = await Database.Employees.CountAsync(e => e.PostId == pDto.Id);
             if (pDto.NumberOfUnits < employeesCount)
                 throw new ValidationException("Количество штатных единиц не может быть меньше, " +
                     "чем количество сотрудников, работающих в должности в данный момент [" + employeesCount + "]", "NumberOfUnits");
+            int postsCount = await Database.Posts.CountAsync(p => p.Title == pDto.Title && p.DepartmentId == pDto.DepartmentId && p.Id != pDto.Id);
+            if (postsCount > 0)
+                throw new ValidationException("Должность уже существует", "Title");
+            postsCount = await Database.Posts.CountAsync(p => p.Id == pDto.Id && p.Title != pDto.Title );
+            if (employeesCount > 0 && postsCount > 0)
+                throw new ValidationException("Нельзя изменить название должности, пока в данной должности работает хотя бы один сотрудник", "Title");
+            postsCount = await Database.Posts.CountAsync(p => p.Id == pDto.Id && p.DepartmentId != pDto.DepartmentId);
+            if (employeesCount > 0 && postsCount > 0)
+                throw new ValidationException("Нельзя изменить название отдела, пока в данной должности работает хотя бы один сотрудник", "DepartmentId");
         }
 
         // Обновление информации о должности
@@ -144,6 +153,16 @@ namespace DiplomMSSQLApp.BLL.Services {
                 sw.WriteLine(new JavaScriptSerializer().Serialize(transformPosts));
                 sw.WriteLine("}");
             }
+        }
+
+        public override async Task<int> CountAsync() {
+            return await Database.Posts.CountAsync();
+        }
+
+        public override async Task<int> CountAsync(Expression<Func<PostDTO, bool>> predicateDTO) {
+            Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, Post>());
+            var predicate = Mapper.Map<Expression<Func<PostDTO, bool>>, Expression<Func<Post, bool>>>(predicateDTO);
+            return await Database.Posts.CountAsync(predicate);
         }
 
         public override void Dispose() {

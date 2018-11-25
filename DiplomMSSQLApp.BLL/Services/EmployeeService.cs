@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,22 +33,20 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         private async Task<Employee> MapDTOAndDomainModelWithValidationAsync(EmployeeDTO eDto) {
+            eDto = SetAgeProperty(eDto);
             await ValidationEmployeeAsync(eDto);
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<EmployeeDTO, Employee>();
-                cfg.CreateMap<BaseBusinessTripDTO, BusinessTrip>();
-                cfg.CreateMap<DepartmentDTO, Department>()
-                   .ForMember(d => d.Posts, opt => opt.Ignore());
-                cfg.CreateMap<PostDTO, Post>()
-                   .ForMember(p => p.Employees, opt => opt.Ignore());
-
-                cfg.CreateMap<DTO.Birth, DAL.Entities.Birth>();
-                cfg.CreateMap<DTO.Passport, DAL.Entities.Passport>();
-                cfg.CreateMap<DTO.Contacts, DAL.Entities.Contacts>();
-                cfg.CreateMap<DTO.Education, DAL.Entities.Education>();
-            });
-            Employee employee = Mapper.Map<EmployeeDTO, Employee>(eDto);
+            Employee employee = MapDTOAndDomainModel(eDto);
             return employee;
+        }
+
+        private EmployeeDTO SetAgeProperty(EmployeeDTO eDto) {
+            // Рассчитываем свойство Age по дате рождения
+            DateTime birthdate = eDto.Birth.BirthDate;
+            DateTime today = DateTime.Today;
+            int age = today.Year - birthdate.Year;
+            if (birthdate > today.AddYears(-age)) age--;
+            eDto.Age = age;
+            return eDto;
         }
 
         private async Task ValidationEmployeeAsync(EmployeeDTO item) {
@@ -63,12 +62,34 @@ namespace DiplomMSSQLApp.BLL.Services {
                     throw new ValidationException("Некорректный email", "Email");
                 }
             }
+            if (item.Birth.BirthDate > DateTime.Today)
+                throw new ValidationException("Некорректная дата рождения", "Birth.BirthDate");
+            if (item.Age < 14)
+                throw new ValidationException("Нельзя принять сотрудника моложе 14 лет", "Birth.BirthDate");
             Post post = await Database.Posts.FindByIdAsync(item.PostId ?? 0);
             if (post == null)
                 throw new ValidationException("Должность не найдена", "");
-            //Department department = await Database.Departments.FindByIdAsync(item.Post.DepartmentId ?? 0);
-            //if (department == null)
-                //throw new ValidationException("Отдел не найден", "");
+            int employeesCount = await Database.Employees.CountAsync(e => e.PostId == item.PostId && e.Id != item.Id);
+            if (employeesCount >= post.NumberOfUnits)
+                throw new ValidationException("В данной должности нет свободных штатных единиц", "PostId");
+        }
+
+        private Employee MapDTOAndDomainModel(EmployeeDTO eDto) {
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<EmployeeDTO, Employee>();
+                cfg.CreateMap<BaseBusinessTripDTO, BusinessTrip>();
+                cfg.CreateMap<DepartmentDTO, Department>()
+                   .ForMember(d => d.Posts, opt => opt.Ignore());
+                cfg.CreateMap<PostDTO, Post>()
+                   .ForMember(p => p.Employees, opt => opt.Ignore());
+
+                cfg.CreateMap<DTO.Birth, DAL.Entities.Birth>();
+                cfg.CreateMap<DTO.Passport, DAL.Entities.Passport>();
+                cfg.CreateMap<DTO.Contacts, DAL.Entities.Contacts>();
+                cfg.CreateMap<DTO.Education, DAL.Entities.Education>();
+            });
+            Employee employee = Mapper.Map<EmployeeDTO, Employee>(eDto);
+            return employee;
         }
 
         // Обновление информации о сотруднике
@@ -245,6 +266,16 @@ namespace DiplomMSSQLApp.BLL.Services {
                 sw.WriteLine(new JavaScriptSerializer().Serialize(transformEmployees));
                 sw.WriteLine("}");
             }
+        }
+
+        public override async Task<int> CountAsync() {
+            return await Database.Employees.CountAsync();
+        }
+
+        public override async Task<int> CountAsync(Expression<Func<EmployeeDTO, bool>> predicateDTO) {
+            Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
+            var predicate = Mapper.Map<Expression<Func<EmployeeDTO, bool>>, Expression<Func<Employee, bool>>>(predicateDTO);
+            return await Database.Employees.CountAsync(predicate);
         }
 
         public override void Dispose() {

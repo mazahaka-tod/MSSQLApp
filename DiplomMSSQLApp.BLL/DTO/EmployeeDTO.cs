@@ -29,7 +29,7 @@ namespace DiplomMSSQLApp.BLL.DTO {
 
     [ComplexType]
     public class Birth {
-        public DateTime? BirthDate { get; set; }
+        public DateTime BirthDate { get; set; }
         public string BirthPlace { get; set; }
     }
 
