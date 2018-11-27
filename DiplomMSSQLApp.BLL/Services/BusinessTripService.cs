@@ -5,9 +5,12 @@ using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace DiplomMSSQLApp.BLL.Services {
     public class BusinessTripService : BaseService<BusinessTripDTO> {
@@ -120,6 +123,23 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task DeleteAllAsync() {
             await Database.BusinessTrips.RemoveAllAsync();
             await Database.SaveAsync();
+        }
+
+        // Запись информации о командировках в JSON-файл
+        public override async Task ExportJsonAsync(string fullPath) {
+            IEnumerable<BusinessTrip> businessTrips = await Database.BusinessTrips.GetAllAsync();
+            var transformBusinessTrips = businessTrips.Select(bt => new {
+                bt.DateEnd,
+                bt.DateStart,
+                bt.Destination,
+                bt.Name,
+                bt.Purpose
+            }).ToArray();
+            using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
+                sw.WriteLine("{\"BusinessTrips\":");
+                sw.WriteLine(new JavaScriptSerializer().Serialize(transformBusinessTrips));
+                sw.WriteLine("}");
+            }
         }
 
         // Количество командировок

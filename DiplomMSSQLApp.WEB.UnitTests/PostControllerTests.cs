@@ -27,7 +27,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
         protected ControllerContext MockingServerMapPathMethod() {
             Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
-            serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/Post/");
+            serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/");
             Mock<HttpContextBase> httpCtxStub = new Mock<HttpContextBase>();
             httpCtxStub.Setup(m => m.Server).Returns(serverMock.Object);
             ControllerContext controllerCtx = new ControllerContext {
@@ -98,40 +98,40 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         /// <summary>
-        /// // CreateAsync_Post method
+        /// // Create_Post method
         /// </summary>
         [Test]
         public async Task CreateAsync_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.CreateAsync(null)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.Create(null)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
         
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_AsksForCreateView() {
+        public async Task Create_Post_ModelStateIsNotValid_AsksForCreateView() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<PostDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
+            ViewResult result = (await controller.Create(null)) as ViewResult;
 
             Assert.AreEqual("Create", result.ViewName);
         }
         
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_RetrievesPostFromModel() {
+        public async Task Create_Post_ModelStateIsNotValid_RetrievesPostFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<PostDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.CreateAsync(new PostViewModel {
+            ViewResult result = (await controller.Create(new PostViewModel {
                 Id = 2,
                 Title = "Programmer"
             })) as ViewResult;
@@ -142,22 +142,22 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         /// <summary>
-        /// // EditAsync_Get method
+        /// // Edit_Get method
         /// </summary>
         [Test]
-        public async Task EditAsync_Get_ModelStateIsValid_AsksForEditView() {
+        public async Task Edit_Get_ModelStateIsValid_AsksForEditView() {
             Mock<PostService> mock = new Mock<PostService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
         
         [Test]
-        public async Task EditAsync_Get_ModelStateIsValid_RetrievesPostFromModel() {
+        public async Task Edit_Get_ModelStateIsValid_RetrievesPostFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new PostDTO {
                 Id = _id.Value,
@@ -167,7 +167,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.EditAsync(2)) as ViewResult;
+            ViewResult result = (await controller.Edit(2)) as ViewResult;
 
             PostViewModel model = result.ViewData.Model as PostViewModel;
             Assert.AreEqual(2, model.Id);
@@ -175,67 +175,67 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         [Test]
-        public async Task EditAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Edit_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
         
         [Test]
-        public async Task EditAsync_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Edit_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
         
         /// <summary>
-        /// // EditAsync_Post method
+        /// // Edit_Post method
         /// </summary>
         [Test]
-        public async Task EditAsync_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Edit_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.EditAsync(new PostViewModel())) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.Edit(new PostViewModel())) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
         
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_AsksForEditView() {
+        public async Task Edit_Post_ModelStateIsNotValid_AsksForEditView() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.EditAsync(It.IsAny<PostDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.EditAsync(new PostViewModel())) as ViewResult;
+            ViewResult result = (await controller.Edit(new PostViewModel())) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
         
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_RetrievesPostFromModel() {
+        public async Task Edit_Post_ModelStateIsNotValid_RetrievesPostFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.EditAsync(It.IsAny<PostDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { new DepartmentDTO { } });
             PostController controller = GetNewPostController(mock.Object, null, dmock.Object);
 
-            ViewResult result = (await controller.EditAsync(new PostViewModel {
+            ViewResult result = (await controller.Edit(new PostViewModel {
                 Id = 2,
                 Title = "Programmer"
             })) as ViewResult;
@@ -246,20 +246,20 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         /// <summary>
-        /// // DetailsAsync method
+        /// // Details method
         /// </summary>
         [Test]
-        public async Task DetailsAsync_ModelStateIsValid_AsksForDetailsView() {
+        public async Task Details_ModelStateIsValid_AsksForDetailsView() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             Assert.AreEqual("Details", result.ViewName);
         }
         
         [Test]
-        public async Task DetailsAsync_ModelStateIsValid_RetrievesPostFromModel() {
+        public async Task Details_ModelStateIsValid_RetrievesPostFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new PostDTO {
                 Id = _id.Value,
@@ -267,7 +267,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(2)) as ViewResult;
+            ViewResult result = (await controller.Details(2)) as ViewResult;
 
             PostViewModel model = result.ViewData.Model as PostViewModel;
             Assert.AreEqual(2, model.Id);
@@ -275,43 +275,43 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         [Test]
-        public async Task DetailsAsync_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Details_ModelStateIsNotValid_AsksForErrorView() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
         
         [Test]
-        public async Task DetailsAsync_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Details_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
         
         /// <summary>
-        /// // DeleteAsync_Get method
+        /// // Delete_Get method
         /// </summary>
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsValid_AsksForDeleteView() {
+        public async Task Delete_Get_ModelStateIsValid_AsksForDeleteView() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             Assert.AreEqual("Delete", result.ViewName);
         }
         
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsValid_RetrievesPostFromModel() {
+        public async Task Delete_Get_ModelStateIsValid_RetrievesPostFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new PostDTO {
                 Id = _id.Value,
@@ -319,7 +319,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(2)) as ViewResult;
+            ViewResult result = (await controller.Delete(2)) as ViewResult;
 
             PostViewModel model = result.ViewData.Model as PostViewModel;
             Assert.AreEqual(2, model.Id);
@@ -327,62 +327,62 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Delete_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Delete_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>
-        /// // DeleteConfirmedAsync_Post method
+        /// // DeleteConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteConfirmedAsync_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task DeleteConfirmed_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.DeleteConfirmedAsync(1)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.DeleteConfirmed(1)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         [Test]
-        public async Task DeleteConfirmedAsync_Post_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task DeleteConfirmed_Post_ModelStateIsNotValid_AsksForErrorView() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new Exception(""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteConfirmedAsync(1)) as ViewResult;
+            ViewResult result = (await controller.DeleteConfirmed(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task DeleteConfirmedAsync_Post_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task DeleteConfirmed_Post_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new Exception(""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteConfirmedAsync(1)) as ViewResult;
+            ViewResult result = (await controller.DeleteConfirmed(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
-            Assert.AreEqual("Нельзя удалить должность, пока в ней работает хотя бы один сотрудник.", model[0]);
+            Assert.AreEqual("Нельзя удалить должность, пока в ней работает хотя бы один сотрудник", model[0]);
         }
 
         /// <summary>
@@ -398,50 +398,50 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         /// <summary>
-        /// // DeleteAllAsync_Post method
+        /// // DeleteAllConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteAllAsync_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task DeleteAllConfirmed_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.DeleteAllAsync()) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.DeleteAllConfirmed()) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         [Test]
-        public async Task DeleteAllAsync_Post_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task DeleteAllConfirmed_Post_ModelStateIsNotValid_AsksForErrorView() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.DeleteAllAsync()).Throws(new Exception(""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAllAsync()) as ViewResult;
+            ViewResult result = (await controller.DeleteAllConfirmed()) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task DeleteAllAsync_Post_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task DeleteAllConfirmed_Post_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.DeleteAllAsync()).Throws(new Exception(""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAllAsync()) as ViewResult;
+            ViewResult result = (await controller.DeleteAllConfirmed()) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
-            Assert.AreEqual("Нельзя удалить должность, пока в ней работает хотя бы один сотрудник.", model[0]);
+            Assert.AreEqual("Нельзя удалить должность, пока в ней работает хотя бы один сотрудник", model[0]);
         }
         
         /// <summary>
-        /// // ExportJsonAsync method
+        /// // ExportJson method
         /// </summary>
         [Test]
-        public async Task ExportJsonAsync_RedirectToIndex() {
+        public async Task ExportJson_RedirectToIndex() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.ExportJsonAsync()) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }

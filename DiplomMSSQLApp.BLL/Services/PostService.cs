@@ -138,15 +138,15 @@ namespace DiplomMSSQLApp.BLL.Services {
             await Database.SaveAsync();
         }
 
-        // Запись информации о должностях в файл
-        public virtual async Task ExportJsonAsync(string fullPath) {
+        // Запись информации о должностях в JSON-файл
+        public override async Task ExportJsonAsync(string fullPath) {
             IEnumerable<Post> posts = await Database.Posts.GetAllAsync();
             var transformPosts = posts.Select(p => new {
-                p.Title,
+                p.DepartmentId,
                 p.NumberOfUnits,
-                p.Salary,
                 p.Premium,
-                p.Department?.DepartmentName
+                p.Salary,
+                p.Title
             }).ToArray();
             using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
                 sw.WriteLine("{\"Posts\":");
@@ -155,10 +155,12 @@ namespace DiplomMSSQLApp.BLL.Services {
             }
         }
 
+        // Количество должностей
         public override async Task<int> CountAsync() {
             return await Database.Posts.CountAsync();
         }
 
+        // Количество должностей, удовлетворяющих предикату
         public override async Task<int> CountAsync(Expression<Func<PostDTO, bool>> predicateDTO) {
             Mapper.Initialize(cfg => cfg.CreateMap<PostDTO, Post>());
             var predicate = Mapper.Map<Expression<Func<PostDTO, bool>>, Expression<Func<Post, bool>>>(predicateDTO);

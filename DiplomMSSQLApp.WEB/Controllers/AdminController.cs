@@ -11,7 +11,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize(Roles = "Administrators")]
     public class AdminController : Controller {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AppUserManager _userManager;
 
         public AppUserManager UserManager {
@@ -44,20 +44,20 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 AppUser user = new AppUser { UserName = model.Name, Email = model.Email };
                 IdentityResult result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded) {
-                    logger.Info("Succeeded");
+                    _logger.Info("Succeeded");
                     return RedirectToAction("Index");
                 }
                 else {
                     AddErrorsFromResult(result);
                 }
             }
-            logger.Warn("ModelState is invalid");
+            _logger.Warn("ModelState is invalid");
             return View("Create", model);
         }
 
         private void AddErrorsFromResult(IdentityResult result) {
             foreach (string error in result.Errors) {
-                logger.Warn(error);
+                _logger.Warn(error);
                 ModelState.AddModelError("", error);
             }
         }
@@ -71,7 +71,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 return View("Edit", new EditModel { Id = user.Id, Name = user.UserName, Email = user.Email });
             }
             else {
-                logger.Warn("User not found");
+                _logger.Warn("User not found");
                 return RedirectToAction("Index");
             }
         }
@@ -98,7 +98,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 if ((validUser.Succeeded && validPass == null) || (validUser.Succeeded && model.Password != string.Empty && validPass.Succeeded)) {
                     IdentityResult result = await UserManager.UpdateAsync(user);
                     if (result.Succeeded) {
-                        logger.Info("Succeeded");
+                        _logger.Info("Succeeded");
                         return RedirectToAction("Index");
                     }
                     else {
@@ -107,7 +107,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 }
             }
             else {
-                logger.Warn("User not found");
+                _logger.Warn("User not found");
                 return View("Error", new string[] { "Пользователь не найден" });
             }
             return View("Edit", new EditModel { Id = user.Id, Name = user.UserName, Email = user.Email });
@@ -122,18 +122,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             if (user != null) {
                 IdentityResult result = await UserManager.DeleteAsync(user);
                 if (result.Succeeded) {
-                    logger.Info("Succeeded");
+                    _logger.Info("Succeeded");
                     return RedirectToAction("Index");
                 }
                 else {
                     foreach (string error in result.Errors) {
-                        logger.Warn(error);
+                        _logger.Warn(error);
                     }
                     return View("Error", result.Errors);
                 }
             }
             else {
-                logger.Warn("User not found");
+                _logger.Warn("User not found");
                 return View("Error", new string[] { "Пользователь не найден" });
             }
         }

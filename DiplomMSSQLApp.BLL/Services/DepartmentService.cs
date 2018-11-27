@@ -5,8 +5,12 @@ using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace DiplomMSSQLApp.BLL.Services {
     public class DepartmentService : BaseService<DepartmentDTO> {
@@ -118,10 +122,28 @@ namespace DiplomMSSQLApp.BLL.Services {
             await Database.SaveAsync();
         }
 
+        // Запись информации об отделах в JSON-файл
+        public override async Task ExportJsonAsync(string fullPath) {
+            IEnumerable<Department> departments = await Database.Departments.GetAllAsync();
+            var transformDepartments = departments.Select(d => new {
+                d.Code,
+                d.DepartmentName,
+                d.ManagerId,
+                d.OrganizationId
+            }).ToArray();
+            using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
+                sw.WriteLine("{\"Departments\":");
+                sw.WriteLine(new JavaScriptSerializer().Serialize(transformDepartments));
+                sw.WriteLine("}");
+            }
+        }
+
+        // Количество отделов
         public override async Task<int> CountAsync() {
             return await Database.Departments.CountAsync();
         }
 
+        // Количество отделов, удовлетворяющих предикату
         public override async Task<int> CountAsync(Expression<Func<DepartmentDTO, bool>> predicateDTO) {
             Mapper.Initialize(cfg => cfg.CreateMap<DepartmentDTO, Department>());
             var predicate = Mapper.Map<Expression<Func<DepartmentDTO, bool>>, Expression<Func<Department, bool>>>(predicateDTO);

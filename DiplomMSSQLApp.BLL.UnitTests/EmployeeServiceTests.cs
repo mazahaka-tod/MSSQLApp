@@ -1105,7 +1105,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         /// </summary>
         [Test]
         public async Task ExportJsonAsync_CreatesJsonFile() {
-            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employee/Employees.json";
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Employees.json";
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.GetAllAsync()).ReturnsAsync(new Employee[] { });

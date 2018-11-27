@@ -5,8 +5,12 @@ using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace DiplomMSSQLApp.BLL.Services {
     public class OrganizationService : BaseService<OrganizationDTO> {
@@ -70,6 +74,27 @@ namespace DiplomMSSQLApp.BLL.Services {
             InitializeMapper();
             OrganizationDTO oDto = Mapper.Map<Organization, OrganizationDTO>(organization);
             return oDto;
+        }
+
+        // Запись информации об организации в JSON-файл
+        public override async Task ExportJsonAsync(string fullPath) {
+            IEnumerable<Organization> organizations = await Database.Organizations.GetAllAsync();
+            var transformOrganizations = organizations.Select(o => new {
+                o.ActualAddress,
+                o.Bank,
+                o.Email,
+                o.Fax,
+                o.LegalAddress,
+                o.Name,
+                o.Phone,
+                o.Requisites,
+                o.WWW
+            }).ToArray();
+            using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
+                sw.WriteLine("{\"Organizations\":");
+                sw.WriteLine(new JavaScriptSerializer().Serialize(transformOrganizations));
+                sw.WriteLine("}");
+            }
         }
 
         public override void Dispose() {

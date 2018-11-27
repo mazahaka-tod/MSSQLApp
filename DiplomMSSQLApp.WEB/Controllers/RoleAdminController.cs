@@ -14,7 +14,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize(Roles = "Administrators")]
     public class RoleAdminController : Controller {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private AppUserManager _userManager;
         private AppRoleManager _roleManager;
 
@@ -53,18 +53,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             if (ModelState.IsValid) {
                 IdentityResult result = await RoleManager.CreateAsync(new AppRole(name));
                 if (result.Succeeded) {
-                    logger.Info("Succeeded");
+                    _logger.Info("Succeeded");
                     return RedirectToAction("Index");
                 }
                 else {
                     foreach (string error in result.Errors) {
-                        logger.Warn(error);
+                        _logger.Warn(error);
                         ModelState.AddModelError("", error);
                     }
                     return View("Create", name);
                 }
             }
-            logger.Warn("ModelState is invalid");
+            _logger.Warn("ModelState is invalid");
             return View("Create", name);
         }
 
@@ -74,7 +74,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> Edit(string id) {
             AppRole role = await RoleManager.FindByIdAsync(id);
             if (role == null) {
-                logger.Warn("Role not found");
+                _logger.Warn("Role not found");
                 return View("Error", new string[] { "Роль не найдена" });
             }
             string[] memberIDs = role.Users.Select(x => x.UserId).ToArray();
@@ -94,7 +94,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     result = await UserManager.AddToRoleAsync(userId, model.RoleName);
                     if (!result.Succeeded) {
                         foreach (string error in result.Errors) {
-                            logger.Warn(error);
+                            _logger.Warn(error);
                         }
                         return View("Error", result.Errors);
                     }
@@ -103,15 +103,15 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     result = await UserManager.RemoveFromRoleAsync(userId, model.RoleName);
                     if (!result.Succeeded) {
                         foreach (string error in result.Errors) {
-                            logger.Warn(error);
+                            _logger.Warn(error);
                         }
                         return View("Error", result.Errors);
                     }
                 }
-                logger.Info("Succeeded");
+                _logger.Info("Succeeded");
                 return RedirectToAction("Index");
             }
-            logger.Warn("Role not found");
+            _logger.Warn("Role not found");
             return View("Error", new string[] { "Роль не найдена" });
         }
 
@@ -124,18 +124,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             if (role != null) {
                 IdentityResult result = await RoleManager.DeleteAsync(role);
                 if (result.Succeeded) {
-                    logger.Info("Succeeded");
+                    _logger.Info("Succeeded");
                     return RedirectToAction("Index");
                 }
                 else {
                     foreach (string error in result.Errors) {
-                        logger.Warn(error);
+                        _logger.Warn(error);
                     }
                     return View("Error", result.Errors);
                 }
             }
             else {
-                logger.Warn("Role not found");
+                _logger.Warn("Role not found");
                 return View("Error", new string[] { "Роль не найдена" });
             }
         }

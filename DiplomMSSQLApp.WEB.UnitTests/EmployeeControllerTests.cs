@@ -13,8 +13,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
-namespace DiplomMSSQLApp.WEB.UnitTests
-{
+namespace DiplomMSSQLApp.WEB.UnitTests {
     [TestFixture]
     public class EmployeeControllerTests {
         protected EmployeeController GetNewEmployeeController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
@@ -28,7 +27,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         protected ControllerContext MockingControllerContext(string XRequestedWith) {
             // mocking Server.MapPath method
             Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
-            serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/Employee/");
+            serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/");
             // mocking Request.Headers["X-Requested-With"]
             Mock<HttpRequestBase> requestMock = new Mock<HttpRequestBase>();
             requestMock.SetupGet(x => x.Headers).Returns(new System.Net.WebHeaderCollection {
@@ -144,119 +143,89 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         /// <summary>
-        /// // CreateAsync_Get method
+        /// // Create_Get method
         /// </summary>
         [Test]
-        public async Task CreateAsync_Get_AsksForCreateView() {
+        public async Task Create_Get_AsksForCreateView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
+            emock.Setup(m => m.CountAsync()).ReturnsAsync(2);
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
+            pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { new PostDTO { NumberOfUnits = 3 } });
             EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
+            ViewResult result = (await controller.Create()) as ViewResult;
 
             Assert.AreEqual("Create", result.ViewName);
         }
 
         [Test]
-        public async Task CreateAsync_Get_SetViewBagDepartments() {
+        public async Task Create_Get_NoVacancy_AsksForErrorView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
+            emock.Setup(m => m.CountAsync()).ReturnsAsync(2);
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] {
-                new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
-            });
             Mock<PostService> pmock = new Mock<PostService>();
+            pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { new PostDTO { NumberOfUnits = 2 } });
             EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
+            ViewResult result = (await controller.Create()) as ViewResult;
 
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("IT", item.Text);
-            Assert.AreEqual("2", item.Value);
+            Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task CreateAsync_Get_SetViewBagDepartmentsDefaultValue() {
+        public async Task Create_Get_SetViewBagPosts() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
-            Mock<PostService> pmock = new Mock<PostService>();
-            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
-        [Test]
-        public async Task CreateAsync_Get_SetViewBagPosts() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
+            emock.Setup(m => m.CountAsync()).ReturnsAsync(2);
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
-                new PostDTO() { Id = 2, Title = "Programmer" }
+                new PostDTO() { Id = 2, Title = "Programmer", NumberOfUnits = 3, Department = new DepartmentDTO { DepartmentName = "IT" } }
             });
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
+            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
+            ViewResult result = (await controller.Create()) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("Programmer", item.Text);
+            Assert.AreEqual("Programmer [IT]", item.Text);
             Assert.AreEqual("2", item.Value);
         }
 
-        [Test]
-        public async Task CreateAsync_Get_SetViewBagPostsDefaultValue() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            Mock<PostService> pmock = new Mock<PostService>();
-            pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
         /// <summary>
-        /// // CreateAsync_Post method
+        /// // Create_Post method
         /// </summary>
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Create_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.CreateAsync(null)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.Create(null)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_AsksForCreateView() {
+        public async Task Create_Post_ModelStateIsInvalid_AsksForCreateView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
+            ViewResult result = (await controller.Create(null)) as ViewResult;
 
             Assert.AreEqual("Create", result.ViewName);
         }
 
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_RetrievesEmployeeFromModel() {
+        public async Task Create_Post_ModelStateIsInvalid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.CreateAsync(new EmployeeViewModel {
+            ViewResult result = (await controller.Create(new EmployeeViewModel {
                 Id = 2,
                 LastName = "Brown",
                 Contacts = new Models.Contacts { Email = "Brown@mail.ru" }
@@ -269,90 +238,40 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_SetViewBagDepartments() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] {
-                new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
-            });
-            Mock<PostService> pmock = new Mock<PostService>();
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("IT", item.Text);
-            Assert.AreEqual("2", item.Value);
-        }
-
-        [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_SetViewBagDepartmentsDefaultValue() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
-            Mock<PostService> pmock = new Mock<PostService>();
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
-        [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_SetViewBagPosts() {
+        public async Task Create_Post_ModelStateIsInvalid_SetViewBagPosts() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
-                new PostDTO() { Id = 2, Title = "Programmer" }
+                new PostDTO() { Id = 2, Title = "Programmer", Department = new DepartmentDTO { DepartmentName = "IT" } }
             });
             EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
+            ViewResult result = (await controller.Create(null)) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("Programmer", item.Text);
+            Assert.AreEqual("Programmer [IT]", item.Text);
             Assert.AreEqual("2", item.Value);
         }
 
-        [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_SetViewBagPostsDefaultValue() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            Mock<PostService> pmock = new Mock<PostService>();
-            pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
         /// <summary>
-        /// // EditAsync_Get method
+        /// // Edit_Get method
         /// </summary>
         [Test]
-        public async Task EditAsync_Get_ModelStateIsValid_AsksForEditView() {
+        public async Task Edit_Get_ModelStateIsValid_AsksForEditView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
 
         [Test]
-        public async Task EditAsync_Get_ModelStateIsValid_RetrievesEmployeeFromModel() {
+        public async Task Edit_Get_ModelStateIsValid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
@@ -363,7 +282,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(1, model.Id);
@@ -372,131 +291,84 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task EditAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Edit_Get_ModelStateIsInvalid_AsksForErrorView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task EditAsync_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Edit_Get_ModelStateIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         [Test]
-        public async Task EditAsync_Get_SetViewBagDepartments() {
-            Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] {
-                new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
-            });
-            Mock<PostService> pmock = new Mock<PostService>();
-            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("IT", item.Text);
-            Assert.AreEqual("2", item.Value);
-        }
-
-        [Test]
-        public async Task EditAsync_Get_SetViewBagDepartmentsDefaultValue() {
-            Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
-            Mock<PostService> pmock = new Mock<PostService>();
-            EmployeeController controller = GetNewEmployeeController(emock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
-        [Test]
-        public async Task EditAsync_Get_SetViewBagPosts() {
+        public async Task Edit_Get_SetViewBagPosts() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
-                new PostDTO() { Id = 2, Title = "Programmer" }
+                new PostDTO() { Id = 2, Title = "Programmer", Department = new DepartmentDTO { DepartmentName = "IT" } }
             });
             EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("Programmer", item.Text);
+            Assert.AreEqual("Programmer [IT]", item.Text);
             Assert.AreEqual("2", item.Value);
         }
 
-        [Test]
-        public async Task EditAsync_Get_SetViewBagPostsDefaultValue() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            Mock<PostService> pmock = new Mock<PostService>();
-            pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
         /// <summary>
-        /// // EditAsync_Post method
+        /// // Edit_Post method
         /// </summary>
         [Test]
-        public async Task EditAsync_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Edit_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.EditAsync(new EmployeeViewModel())) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.Edit(new EmployeeViewModel())) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_AsksForEditView() {
+        public async Task Edit_Post_ModelStateIsInvalid_AsksForEditView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
+            ViewResult result = (await controller.Edit(new EmployeeViewModel())) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
 
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_RetrievesEmployeeFromModel() {
+        public async Task Edit_Post_ModelStateIsInvalid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(new EmployeeViewModel {
+            ViewResult result = (await controller.Edit(new EmployeeViewModel {
                 Id = 2,
                 LastName = "Brown",
                 Contacts = new Models.Contacts { Email = "Brown@mail.ru" }
@@ -509,88 +381,38 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_SetViewBagDepartments() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] {
-                new DepartmentDTO() { Id = 2, DepartmentName = "IT" }
-            });
-            Mock<PostService> pmock = new Mock<PostService>();
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("IT", item.Text);
-            Assert.AreEqual("2", item.Value);
-        }
-
-        [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_SetViewBagDepartmentsDefaultValue() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            dmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new DepartmentDTO[] { });
-            Mock<PostService> pmock = new Mock<PostService>();
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Departments as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
-        [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_SetViewBagPosts() {
+        public async Task Edit_Post_ModelStateIsInvalid_SetViewBagPosts() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
             pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] {
-                new PostDTO() { Id = 2, Title = "Programmer" }
+                new PostDTO() { Id = 2, Title = "Programmer", Department = new DepartmentDTO { DepartmentName = "IT" } }
             });
             EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
 
-            ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
+            ViewResult result = (await controller.Edit(new EmployeeViewModel())) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("Programmer", item.Text);
+            Assert.AreEqual("Programmer [IT]", item.Text);
             Assert.AreEqual("2", item.Value);
         }
 
-        [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_SetViewBagPostsDefaultValue() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
-            Mock<DepartmentService> dmock = new Mock<DepartmentService>();
-            Mock<PostService> pmock = new Mock<PostService>();
-            pmock.Setup(m => m.GetAllAsync()).ReturnsAsync(new PostDTO[] { });
-            EmployeeController controller = GetNewEmployeeController(mock.Object, dmock.Object, pmock.Object);
-
-            ViewResult result = (await controller.EditAsync(new EmployeeViewModel())) as ViewResult;
-
-            SelectListItem item = (result.ViewBag.Posts as SelectList).FirstOrDefault();
-            Assert.AreEqual("unknown", item.Text);
-            Assert.AreEqual("1", item.Value);
-        }
-
         /// <summary>
-        /// // DetailsAsync method
+        /// // Details method
         /// </summary>
         [Test]
-        public async Task DetailsAsync_ModelStateIsValid_AsksForDetailsView() {
+        public async Task Details_ModelStateIsValid_AsksForDetailsView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             Assert.AreEqual("Details", result.ViewName);
         }
 
         [Test]
-        public async Task DetailsAsync_ModelStateIsValid_RetrievesEmployeeFromModel() {
+        public async Task Details_ModelStateIsValid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
@@ -599,7 +421,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             });
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(1, model.Id);
@@ -608,43 +430,43 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task DetailsAsync_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Details_ModelStateIsNotValid_AsksForErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task DetailsAsync_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Details_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>
-        /// // DeleteAsync_Get method
+        /// // Delete_Get method
         /// </summary>
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsValid_AsksForDeleteView() {
+        public async Task Delete_Get_ModelStateIsValid_AsksForDeleteView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             Assert.AreEqual("Delete", result.ViewName);
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsValid_RetrievesEmployeeFromModel() {
+        public async Task Delete_Get_ModelStateIsValid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
@@ -653,7 +475,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests
             });
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             EmployeeViewModel model = result.ViewData.Model as EmployeeViewModel;
             Assert.AreEqual(1, model.Id);
@@ -662,37 +484,37 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Delete_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Delete_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>
-        /// // DeleteAsync_Post method
+        /// // DeleteConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteAsync_Post_RedirectToIndex() {
+        public async Task DeleteConfirmed_Post_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.DeleteConfirmedAsync(1)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.DeleteConfirmed(1)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
@@ -711,27 +533,27 @@ namespace DiplomMSSQLApp.WEB.UnitTests
         }
 
         /// <summary>
-        /// // DeleteAll_Post method
+        /// // DeleteAllConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteAll_Post_RedirectToIndex() {
+        public async Task DeleteAllConfirmed_Post_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.DeleteAllAsync()) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.DeleteAllConfirmed()) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         /// <summary>
-        /// // ExportJsonAsync method
+        /// // ExportJson method
         /// </summary>
         [Test]
-        public async Task ExportJsonAsync_RedirectToIndex() {
+        public async Task ExportJson_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.ExportJsonAsync()) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }

@@ -625,10 +625,10 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         /// </summary>
         [Test]
         public async Task ExportJsonAsync_CreatesJsonFile() {
-            string fullPath = "./DiplomMSSQLApp.WEB/Results/Post/Posts.json";
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Posts.json";
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.GetAllAsync()).ReturnsAsync(new Post[] { new Post() { Title = "1" } });
+            mock.Setup(m => m.Posts.GetAllAsync()).ReturnsAsync(new Post[] { });
             PostService postService = GetNewService(mock.Object);
 
             await postService.ExportJsonAsync(fullPath);

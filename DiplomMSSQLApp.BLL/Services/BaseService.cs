@@ -18,6 +18,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         public abstract Task DeleteAllAsync();
         public abstract void Dispose();
         public abstract Task EditAsync(T item);
+        public abstract Task ExportJsonAsync(string fullPath);
         public abstract Task<T> FindByIdAsync(int? id);
         public abstract Task<IEnumerable<T>> GetAllAsync();
         

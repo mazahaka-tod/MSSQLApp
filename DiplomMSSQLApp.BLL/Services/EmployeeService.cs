@@ -247,19 +247,21 @@ namespace DiplomMSSQLApp.BLL.Services {
         }
 
         // Запись информации о сотрудниках в JSON-файл
-        public virtual async Task ExportJsonAsync(string fullPath) {
+        public override async Task ExportJsonAsync(string fullPath) {
             IEnumerable<Employee> employees = await Database.Employees.GetAllAsync();
             var transformEmployees = employees.Select(e => new {
-                e.PersonnelNumber,
-                e.LastName,
-                e.FirstName,
-                e.Patronymic,
-                e.Gender,
                 e.Age,
-                HireDate = e.HireDate.ToShortDateString(),
-                Post = e.Post.Title,
-                Department = e.Post.Department.DepartmentName,
-                BusinessTrips = e.BusinessTrips.Select(bt => bt.Name)
+                e.Birth,
+                e.Contacts,
+                e.Education,
+                e.FirstName,
+                e.Gender,
+                e.HireDate,
+                e.LastName,
+                e.Passport,
+                e.Patronymic,
+                e.PersonnelNumber,
+                e.PostId
             }).ToArray();
             using (StreamWriter sw = new StreamWriter(fullPath, true, Encoding.UTF8)) {
                 sw.WriteLine("{\"Employees\":");
@@ -268,10 +270,12 @@ namespace DiplomMSSQLApp.BLL.Services {
             }
         }
 
+        // Количество сотрудников
         public override async Task<int> CountAsync() {
             return await Database.Employees.CountAsync();
         }
 
+        // Количество сотрудников, удовлетворяющих предикату
         public override async Task<int> CountAsync(Expression<Func<EmployeeDTO, bool>> predicateDTO) {
             Mapper.Initialize(cfg => cfg.CreateMap<EmployeeDTO, Employee>());
             var predicate = Mapper.Map<Expression<Func<EmployeeDTO, bool>>, Expression<Func<Employee, bool>>>(predicateDTO);

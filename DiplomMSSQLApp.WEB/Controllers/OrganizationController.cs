@@ -5,14 +5,14 @@ using DiplomMSSQLApp.BLL.Interfaces;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using NLog;
+using System.IO;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
-    public class OrganizationController : Controller
-    {
+    public class OrganizationController : Controller {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private IService<OrganizationDTO> _organizationService;
 
@@ -21,8 +21,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         // Отображение информации об организации
-        public async Task<ActionResult> Index()
-        {
+        public async Task<ActionResult> Index() {
             OrganizationDTO oDto = await (_organizationService as OrganizationService).GetFirstAsync();
             InitializeMapper();
             OrganizationViewModel organization = Mapper.Map<OrganizationDTO, OrganizationViewModel>(oDto);
@@ -67,6 +66,27 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             return View("Edit", organization);
+        }
+
+        // Запись информации об организации в JSON-файл
+        public async Task<ActionResult> ExportJson() {
+            string fullPath = CreateDirectoryToFile("Organizations.json");
+            System.IO.File.Delete(fullPath);
+            await _organizationService.ExportJsonAsync(fullPath);
+            return RedirectToAction("Index");
+        }
+
+        private string CreateDirectoryToFile(string filename) {
+            string dir = Server.MapPath("~/Results/");
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            string fullPath = dir + filename;
+            return fullPath;
+        }
+
+        protected override void Dispose(bool disposing) {
+            _organizationService.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

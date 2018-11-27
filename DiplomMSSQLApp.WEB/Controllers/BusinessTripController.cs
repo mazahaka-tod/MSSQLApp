@@ -6,6 +6,7 @@ using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using NLog;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -14,44 +15,43 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     public class BusinessTripController : Controller {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private IService<BusinessTripDTO> businessTripService;
-        private IService<EmployeeDTO> employeeService;
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private IService<BusinessTripDTO> _businessTripService;
+        private IService<EmployeeDTO> _employeeService;
 
         public BusinessTripController(IService<BusinessTripDTO> bs, IService<EmployeeDTO> es) {
-            businessTripService = bs;
-            employeeService = es;
+            _businessTripService = bs;
+            _employeeService = es;
         }
 
-        [ActionName("Index")]
-        public async Task<ActionResult> IndexAsync(int page = 1) {
-            IEnumerable<BusinessTripDTO> btDto = await businessTripService.GetAllAsync();
-            btDto = businessTripService.GetPage(btDto, page);     // Paging
+        public async Task<ActionResult> Index(int page = 1) {
+            IEnumerable<BusinessTripDTO> btDto = await _businessTripService.GetAllAsync();
+            btDto = _businessTripService.GetPage(btDto, page);     // Paging
             Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
                                         .ForMember(bt => bt.Employees, opt => opt.Ignore()));
             IEnumerable<BusinessTripViewModel> businessTrips = Mapper.Map<IEnumerable<BusinessTripDTO>, IEnumerable<BusinessTripViewModel>>(btDto);
-            return View("Index", new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = businessTripService.PageInfo });
+            return View("Index", new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = _businessTripService.PageInfo });
         }
 
         // Добавление новой командировки
-        [ActionName("Create")]
-        public async Task<ActionResult> CreateAsync() {
-            int employeesCount = await employeeService.CountAsync();
+        public async Task<ActionResult> Create() {
+            int employeesCount = await _employeeService.CountAsync();
             if (employeesCount == 0) {
-                logger.Warn("No employees");
+                _logger.Warn("No employees");
                 return View("Error", new string[] { "В организации нет сотрудников" });
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return View("Create");
         }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
-        public async Task<ActionResult> CreateAsync(BusinessTripViewModel bt) {
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create(BusinessTripViewModel bt) {
             try {
                 BusinessTripDTO btDto = MapViewModelWithDTO(bt);
-                await (businessTripService as BusinessTripService).CreateAsync(btDto);
+                await (_businessTripService as BusinessTripService).CreateAsync(btDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
@@ -59,7 +59,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         private async Task<SelectList> GetSelectListEmployeesAsync() {
-            IEnumerable<EmployeeDTO> employees = await employeeService.GetAllAsync();
+            IEnumerable<EmployeeDTO> employees = await _employeeService.GetAllAsync();
             IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
                 Value = e.Id.ToString(),
                 Text = e.LastName + " " + e.FirstName + " " + e.Patronymic
@@ -83,19 +83,19 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         // Обновление информации о командировке
-        [ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(int? id) {
+        public async Task<ActionResult> Edit(int? id) {
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return await GetViewAsync(id, "Edit");
         }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(BusinessTripViewModel bt) {
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(BusinessTripViewModel bt) {
             try {
                 BusinessTripDTO btDto = MapViewModelWithDTO(bt);
-                await (businessTripService as BusinessTripService).EditAsync(btDto);
+                await (_businessTripService as BusinessTripService).EditAsync(btDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
@@ -104,11 +104,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
-                BusinessTripDTO btDto = await businessTripService.FindByIdAsync(id);
+                BusinessTripDTO btDto = await _businessTripService.FindByIdAsync(id);
                 BusinessTripViewModel bt = MapDTOWithViewModel(btDto);
                 return View(viewName, bt);
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 return View("Error", new string[] { ex.Message });
             }
         }
@@ -129,19 +130,17 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         // Подробная информация о командировке
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(int? id) {
+        public async Task<ActionResult> Details(int? id) {
             return await GetViewAsync(id, "Details");
         }
 
         // Удаление командировки
-        [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(int? id) {
+        public async Task<ActionResult> Delete(int? id) {
             return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public async Task<ActionResult> DeleteConfirmedAsync(int id) {
-            await businessTripService.DeleteAsync(id);
+        public async Task<ActionResult> DeleteConfirmed(int id) {
+            await _businessTripService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -150,9 +149,25 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
-        public async Task<ActionResult> DeleteAllAsync() {
-            await businessTripService.DeleteAllAsync();
+        public async Task<ActionResult> DeleteAllConfirmed() {
+            await _businessTripService.DeleteAllAsync();
             return RedirectToAction("Index");
+        }
+
+        // Запись информации о командировках в JSON-файл
+        public async Task<ActionResult> ExportJson() {
+            string fullPath = CreateDirectoryToFile("BusinessTrips.json");
+            System.IO.File.Delete(fullPath);
+            await _businessTripService.ExportJsonAsync(fullPath);
+            return RedirectToAction("Index");
+        }
+
+        private string CreateDirectoryToFile(string filename) {
+            string dir = Server.MapPath("~/Results/");
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            string fullPath = dir + filename;
+            return fullPath;
         }
 
         // Частичное представление добавляет выпадающий список сотрудников
@@ -163,8 +178,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         protected override void Dispose(bool disposing) {
-            businessTripService.Dispose();
-            employeeService.Dispose();
+            _businessTripService.Dispose();
+            _employeeService.Dispose();
             base.Dispose(disposing);
         }
     }

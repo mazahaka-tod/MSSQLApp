@@ -5,6 +5,7 @@ using DiplomMSSQLApp.DAL.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -322,6 +323,22 @@ namespace DiplomMSSQLApp.BLL.UnitTests
             Assert.AreEqual("HR", result[0].DepartmentName);
             Assert.AreEqual("IT", result[1].DepartmentName);
             Assert.AreEqual("Management", result[2].DepartmentName);
+        }
+
+        /// <summary>
+        /// // ExportJsonAsync method
+        /// </summary>
+        [Test]
+        public async Task ExportJsonAsync_CreatesJsonFile() {
+            string fullPath = "./DiplomMSSQLApp.WEB/Results/Departments.json";
+            File.Delete(fullPath);
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Departments.GetAllAsync()).ReturnsAsync(new Department[] { });
+            DepartmentService departmentService = GetNewService(mock.Object);
+
+            await departmentService.ExportJsonAsync(fullPath);
+
+            Assert.IsTrue(File.Exists(fullPath));
         }
     }
 }

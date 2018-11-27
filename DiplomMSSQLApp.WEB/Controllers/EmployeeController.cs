@@ -16,25 +16,24 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     public class EmployeeController : Controller {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private IService<EmployeeDTO> employeeService;
-        private IService<DepartmentDTO> departmentService;
-        private IService<PostDTO> postService;
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private IService<EmployeeDTO> _employeeService;
+        private IService<DepartmentDTO> _departmentService;
+        private IService<PostDTO> _postService;
 
         public EmployeeController(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps) {
-            employeeService = es;
-            departmentService = ds;
-            postService = ps;
+            _employeeService = es;
+            _departmentService = ds;
+            _postService = ps;
         }
 
         public ActionResult Index(EmployeeFilter filter, string filterAsJsonString, int page = 1) {
-            logger.Info("Called action");
             // При использовании функции Paging передается строка filterAsJsonString, а аргумент EmployeeFilter filter == null,
             // поэтому производим декодирование строки filterAsJsonString в объект EmployeeFilter и присваиваем его переменной filter
             if (filterAsJsonString != null)
                 filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
-            IEnumerable<EmployeeDTO> eDto = (employeeService as EmployeeService).Get(filter);
-            eDto = employeeService.GetPage(eDto, page);     // Paging
+            IEnumerable<EmployeeDTO> eDto = (_employeeService as EmployeeService).Get(filter);
+            eDto = _employeeService.GetPage(eDto, page);     // Paging
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
@@ -49,35 +48,35 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<BLL.DTO.Education, Models.Education>();
             });
             IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
-            EmployeeListViewModel model = new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = employeeService.PageInfo };
+            EmployeeListViewModel model = new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = _employeeService.PageInfo };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
-                logger.Info("Executed async request");
+                _logger.Info("Executed async request");
                 return PartialView("GetEmployeesData", model);
             }
-            logger.Info("Executed sync request");
+            _logger.Info("Executed sync request");
             return View("Index", model);
         }
 
         // Добавление нового сотрудника
-        [ActionName("Create")]
-        public async Task<ActionResult> CreateAsync() {
-            int totalNumberOfUnits = (await postService.GetAllAsync()).Sum(p => p.NumberOfUnits).Value;
-            int employeesCount = await employeeService.CountAsync();
+        public async Task<ActionResult> Create() {
+            int totalNumberOfUnits = (await _postService.GetAllAsync()).Sum(p => p.NumberOfUnits).Value;
+            int employeesCount = await _employeeService.CountAsync();
             if (employeesCount >= totalNumberOfUnits) {
-                logger.Warn("No vacancy");
+                _logger.Warn("No vacancy");
                 return View("Error", new string[] { "Нельзя принять сотрудника, если нет свободных вакансий" });
             }
             ViewBag.Posts = await GetSelectListPostsAsync();
             return View("Create");
         }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
-        public async Task<ActionResult> CreateAsync(EmployeeViewModel e) {
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create(EmployeeViewModel e) {
             try {
                 var eDto = MapViewModelWithDTO(e);
-                await employeeService.CreateAsync(eDto);
+                await _employeeService.CreateAsync(eDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Posts = await GetSelectListPostsAsync();
@@ -85,7 +84,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         private async Task<SelectList> GetSelectListPostsAsync() {
-            IEnumerable<PostDTO> posts = await postService.GetAllAsync();
+            IEnumerable<PostDTO> posts = await _postService.GetAllAsync();
             IEnumerable<SelectListItem> items = posts.Select(p => new SelectListItem() {
                 Value = p.Id.ToString(),
                 Text = p.Title + " [" + p.Department.DepartmentName + "]"
@@ -112,19 +111,19 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         // Обновление информации о сотруднике
-        [ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(int? id) {
+        public async Task<ActionResult> Edit(int? id) {
             ViewBag.Posts = await GetSelectListPostsAsync();
             return await GetViewAsync(id, "Edit");
         }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(EmployeeViewModel e) {
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(EmployeeViewModel e) {
             try {
                 EmployeeDTO eDto = MapViewModelWithDTO(e);
-                await employeeService.EditAsync(eDto);
+                await _employeeService.EditAsync(eDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Posts = await GetSelectListPostsAsync();
@@ -133,11 +132,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
-                EmployeeDTO eDto = await employeeService.FindByIdAsync(id);
+                EmployeeDTO eDto = await _employeeService.FindByIdAsync(id);
                 EmployeeViewModel e = MapDTOWithViewModel(eDto);
                 return View(viewName, e);
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 return View("Error", new string[] { ex.Message });
             }
         }
@@ -161,19 +161,17 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         // Подробная информация о сотруднике
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(int? id) {
+        public async Task<ActionResult> Details(int? id) {
             return await GetViewAsync(id, "Details");
         }
 
         // Удаление сотрудника
-        [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(int? id) {
+        public async Task<ActionResult> Delete(int? id) {
             return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public async Task<ActionResult> DeleteConfirmedAsync(int id) {
-            await employeeService.DeleteAsync(id);
+        public async Task<ActionResult> DeleteConfirmed(int id) {
+            await _employeeService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
@@ -182,22 +180,21 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
-        public async Task<ActionResult> DeleteAllAsync() {
-            await employeeService.DeleteAllAsync();
+        public async Task<ActionResult> DeleteAllConfirmed() {
+            await _employeeService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 
-        // Запись информации о сотрудниках в файл
-        [ActionName("ExportJson")]
-        public async Task<ActionResult> ExportJsonAsync() {
+        // Запись информации о сотрудниках в JSON-файл
+        public async Task<ActionResult> ExportJson() {
             string fullPath = CreateDirectoryToFile("Employees.json");
             System.IO.File.Delete(fullPath);
-            await (employeeService as EmployeeService).ExportJsonAsync(fullPath);
+            await _employeeService.ExportJsonAsync(fullPath);
             return RedirectToAction("Index");
         }
 
         private string CreateDirectoryToFile(string filename) {
-            string dir = Server.MapPath("~/Results/Employee/");
+            string dir = Server.MapPath("~/Results/");
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             string fullPath = dir + filename;
@@ -213,9 +210,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         protected override void Dispose(bool disposing) {
-            employeeService.Dispose();
-            postService.Dispose();
-            departmentService.Dispose();
+            _employeeService.Dispose();
+            _departmentService.Dispose();
+            _postService.Dispose();
             base.Dispose(disposing);
         }
     }

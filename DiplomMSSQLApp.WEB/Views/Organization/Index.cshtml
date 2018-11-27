@@ -5,9 +5,13 @@
 }
 
 <h2>Информация об организации</h2>
+<hr />
+
+<p>
+    @Html.ActionLink("Экспортировать данные в JSON файл", "ExportJson", null, new { @class = "btn btn-default" })
+</p>
 
 <div>
-    <hr />
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Name)
@@ -197,22 +201,22 @@
 
 @section scripts {
     <script>
-    $(document).ready(function () {
-        // Показывает или скрывает блок с реквизитами
-        $('#requisitesToggle').on('click', function (event) {
-            var $this = $(this);
-            $('#requisites').slideToggle('slow', function () {
-                $this.html('Реквизиты <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+        $(document).ready(function () {
+            // Показывает или скрывает блок с реквизитами
+            $('#requisitesToggle').on('click', function (event) {
+                var $this = $(this);
+                $('#requisites').slideToggle('slow', function () {
+                    $this.html('Реквизиты <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+                });
             });
-        });
 
-        // Показывает или скрывает блок с информацией о банке
-        $('#bankToggle').on('click', function (event) {
-            var $this = $(this);
-            $('#bank').slideToggle('slow', function () {
-                $this.html('Банк <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+            // Показывает или скрывает блок с информацией о банке
+            $('#bankToggle').on('click', function (event) {
+                var $this = $(this);
+                $('#bank').slideToggle('slow', function () {
+                    $this.html('Банк <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+                });
             });
-        });
-    })
+        })
     </script>
 }

@@ -4,6 +4,7 @@ using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,21 +16,22 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     public class PostController : Controller {
-        private IService<EmployeeDTO> employeeService;
-        private IService<PostDTO> postService;
-        private IService<DepartmentDTO> departmentService;
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private IService<EmployeeDTO> _employeeService;
+        private IService<PostDTO> _postService;
+        private IService<DepartmentDTO> _departmentService;
 
         public PostController(IService<EmployeeDTO> es, IService<PostDTO> ps, IService<DepartmentDTO> ds) {
-            employeeService = es;
-            postService = ps;
-            departmentService = ds;
+            _employeeService = es;
+            _postService = ps;
+            _departmentService = ds;
         }
 
         public async Task<ActionResult> Index(int page = 1) {
-            IEnumerable<PostDTO> pDto = await postService.GetAllAsync();
+            IEnumerable<PostDTO> pDto = await _postService.GetAllAsync();
             ViewBag.TotalNumberOfUnits = pDto.Sum(p => p.NumberOfUnits);
             ViewBag.TotalSalary = pDto.Sum(p => p.TotalSalary);
-            pDto = postService.GetPage(pDto, page);     // Paging
+            pDto = _postService.GetPage(pDto, page);     // Paging
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
@@ -38,25 +40,28 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             });
             IEnumerable<PostViewModel> posts = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
 
-            return View("Index", new PostListViewModel { Posts = posts, PageInfo = postService.PageInfo });
+            return View("Index", new PostListViewModel { Posts = posts, PageInfo = _postService.PageInfo });
         }
 
         // Добавление новой должности
         public async Task<ActionResult> Create() {
-            IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
-            if (departments.Count() == 0)
+            IEnumerable<DepartmentDTO> departments = await _departmentService.GetAllAsync();
+            if (departments.Count() == 0) {
+                _logger.Warn("No departments");
                 return View("Error", new string[] { "Нельзя добавить должность, если нет ни одного отдела" });
+            }
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             return View("Create");
         }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Create")]
-        public async Task<ActionResult> CreateAsync(PostViewModel p) {
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create(PostViewModel p) {
             try {
                 PostDTO pDto = MapViewModelWithDTO(p);
-                await postService.CreateAsync(pDto);
+                await _postService.CreateAsync(pDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
@@ -64,12 +69,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         private async Task<SelectList> GetSelectListDepartmentsAsync() {
-            IEnumerable<DepartmentDTO> departments = await departmentService.GetAllAsync();
-            //if (departments.Count() == 0) {
-            //    DepartmentDTO btDto = new DepartmentDTO { Id = 1, DepartmentName = "unknown" };
-            //    await departmentService.CreateAsync(btDto);
-            //    departments = new List<DepartmentDTO> { btDto };
-            //}
+            IEnumerable<DepartmentDTO> departments = await _departmentService.GetAllAsync();
             return new SelectList(departments.OrderBy(d => d.DepartmentName), "Id", "DepartmentName");
         }
 
@@ -86,19 +86,19 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         // Обновление информации о должности
-        [ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(int? id) {
+        public async Task<ActionResult> Edit(int? id) {
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
             return await GetViewAsync(id, "Edit");
         }
-        [HttpPost, ValidateAntiForgeryToken, ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(PostViewModel p) {
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(PostViewModel p) {
             try {
                 PostDTO pDto = MapViewModelWithDTO(p);
-                await postService.EditAsync(pDto);
+                await _postService.EditAsync(pDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Departments = await GetSelectListDepartmentsAsync();
@@ -107,11 +107,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
 
         private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
-                PostDTO pDto = await postService.FindByIdAsync(id);
+                PostDTO pDto = await _postService.FindByIdAsync(id);
                 PostViewModel p = MapDTOWithViewModel(pDto);
                 return View(viewName, p);
             }
             catch (ValidationException ex) {
+                _logger.Warn(ex.Message);
                 return View("Error", new string[] { ex.Message });
             }
         }
@@ -136,23 +137,22 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         // Подробная информация о должности
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(int? id) {
+        public async Task<ActionResult> Details(int? id) {
             return await GetViewAsync(id, "Details");
         }
 
         // Удаление должности
-        [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(int? id) {
+        public async Task<ActionResult> Delete(int? id) {
             return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
-        public async Task<ActionResult> DeleteConfirmedAsync(int id) {
+        public async Task<ActionResult> DeleteConfirmed(int id) {
             try {
-                await postService.DeleteAsync(id);
+                await _postService.DeleteAsync(id);
             }
             catch (Exception) {
-                return View("Error", new string[] { "Нельзя удалить должность, пока в ней работает хотя бы один сотрудник." });
+                _logger.Warn("Failed to delete post");
+                return View("Error", new string[] { "Нельзя удалить должность, пока в ней работает хотя бы один сотрудник" });
             }
             return RedirectToAction("Index");
         }
@@ -162,27 +162,27 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
-        public async Task<ActionResult> DeleteAllAsync() {
+        public async Task<ActionResult> DeleteAllConfirmed() {
             try {
-                await postService.DeleteAllAsync();
+                await _postService.DeleteAllAsync();
             }
             catch (Exception) {
-                return View("Error", new string[] { "Нельзя удалить должность, пока в ней работает хотя бы один сотрудник." });
+                _logger.Warn("Failed to delete post");
+                return View("Error", new string[] { "Нельзя удалить должность, пока в ней работает хотя бы один сотрудник" });
             }
             return RedirectToAction("Index");
         }
 
-        // Запись информации о должностях в файл
-        [ActionName("ExportJson")]
-        public async Task<ActionResult> ExportJsonAsync() {
+        // Запись информации о должностях в JSON-файл
+        public async Task<ActionResult> ExportJson() {
             string fullPath = CreateDirectoryToFile("Posts.json");
             System.IO.File.Delete(fullPath);
-            await (postService as PostService).ExportJsonAsync(fullPath);
+            await _postService.ExportJsonAsync(fullPath);
             return RedirectToAction("Index");
         }
 
         private string CreateDirectoryToFile(string filename) {
-            string dir = Server.MapPath("~/Results/Post/");
+            string dir = Server.MapPath("~/Results/");
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             string fullPath = dir + filename;
@@ -190,9 +190,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         protected override void Dispose(bool disposing) {
-            employeeService.Dispose();
-            postService.Dispose();
-            departmentService.Dispose();
+            _employeeService.Dispose();
+            _postService.Dispose();
+            _departmentService.Dispose();
             base.Dispose(disposing);
         }
     }

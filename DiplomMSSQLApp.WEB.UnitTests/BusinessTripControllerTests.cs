@@ -20,20 +20,20 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         /// <summary>
-        /// // IndexAsync method
+        /// // Index method
         /// </summary>
         [Test]
-        public async Task IndexAsync_AsksForIndexView() {
+        public async Task Index_AsksForIndexView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.IndexAsync()) as ViewResult;
+            ViewResult result = (await controller.Index()) as ViewResult;
 
             Assert.AreEqual("Index", result.ViewName);
         }
 
         [Test]
-        public async Task IndexAsync_RetrievesBusinessTripsPropertyFromModel() {
+        public async Task Index_RetrievesBusinessTripsPropertyFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<BusinessTripDTO>>(), It.IsAny<int>())).Returns(new BusinessTripDTO[] {
                 new BusinessTripDTO {
@@ -43,7 +43,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.IndexAsync()) as ViewResult;
+            ViewResult result = (await controller.Index()) as ViewResult;
 
             BusinessTripListViewModel model = result.ViewData.Model as BusinessTripListViewModel;
             Assert.AreEqual(1, model.BusinessTrips.Count());
@@ -52,12 +52,12 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task IndexAsync_RetrievesPageInfoPropertyFromModel() {
+        public async Task Index_RetrievesPageInfoPropertyFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.IndexAsync()) as ViewResult;
+            ViewResult result = (await controller.Index()) as ViewResult;
 
             BusinessTripListViewModel model = result.ViewData.Model as BusinessTripListViewModel;
             Assert.AreEqual(9, model.PageInfo.TotalItems);
@@ -67,21 +67,21 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         /// <summary>
-        /// // CreateAsync_Get method
+        /// // Create_Get method
         /// </summary>
         [Test]
-        public async Task CreateAsync_Get_ExistsEmployees_AsksForCreateView() {
+        public async Task Create_Get_ExistsEmployees_AsksForCreateView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CountAsync()).ReturnsAsync(1);
             BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
 
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
+            ViewResult result = (await controller.Create()) as ViewResult;
 
             Assert.AreEqual("Create", result.ViewName);
         }
 
         [Test]
-        public async Task CreateAsync_Get_ExistsEmployees_SetViewBagEmployees() {
+        public async Task Create_Get_ExistsEmployees_SetViewBagEmployees() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CountAsync()).ReturnsAsync(1);
             mock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
@@ -89,7 +89,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
 
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
+            ViewResult result = (await controller.Create()) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
             Assert.AreEqual("Петров Петр Петрович", item.Text);
@@ -97,49 +97,49 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task CreateAsync_Get_NoEmployees_AsksForErrorView() {
+        public async Task Create_Get_NoEmployees_AsksForErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CountAsync()).ReturnsAsync(0);
             BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
 
-            ViewResult result = (await controller.CreateAsync()) as ViewResult;
+            ViewResult result = (await controller.Create()) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         /// <summary>
-        /// // CreateAsync_Post method
+        /// // Create_Post method
         /// </summary>
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Create_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.CreateAsync(null)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.Create(null)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_AsksForCreateView() {
+        public async Task Create_Post_ModelStateIsNotValid_AsksForCreateView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
+            ViewResult result = (await controller.Create(null)) as ViewResult;
 
             Assert.AreEqual("Create", result.ViewName);
         }
 
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
+        public async Task Create_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.CreateAsync(new BusinessTripViewModel {
+            ViewResult result = (await controller.Create(new BusinessTripViewModel {
                 Id = 2,
                 Name = "02.09.2018_026"
             })) as ViewResult;
@@ -150,7 +150,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task CreateAsync_Post_ModelStateIsInvalid_SetViewBagEmployees() {
+        public async Task Create_Post_ModelStateIsInvalid_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -159,7 +159,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.CreateAsync(null)) as ViewResult;
+            ViewResult result = (await controller.Create(null)) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
             Assert.AreEqual("Петров Петр Петрович", item.Text);
@@ -167,21 +167,21 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         /// <summary>
-        /// // EditAsync_Get method
+        /// // Edit_Get method
         /// </summary>
         [Test]
-        public async Task EditAsync_Get_ModelStateIsValid_AsksForEditView() {
+        public async Task Edit_Get_ModelStateIsValid_AsksForEditView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
 
         [Test]
-        public async Task EditAsync_Get_ModelStateIsValid_RetrievesBusinessTripFromModel() {
+        public async Task Edit_Get_ModelStateIsValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
                 Id = _id.Value,
@@ -190,7 +190,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(2)) as ViewResult;
+            ViewResult result = (await controller.Edit(2)) as ViewResult;
 
             BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
             Assert.AreEqual(2, model.Id);
@@ -198,32 +198,32 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task EditAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Edit_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task EditAsync_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Edit_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         [Test]
-        public async Task EditAsync_Get_SetViewBagEmployees() {
+        public async Task Edit_Get_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
@@ -231,7 +231,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Edit(1)) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
             Assert.AreEqual("Петров Петр Петрович", item.Text);
@@ -239,38 +239,38 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         /// <summary>
-        /// // EditAsync_Post method
+        /// // Edit_Post method
         /// </summary>
         [Test]
-        public async Task EditAsync_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Edit_Post_ModelStateIsValid_RedirectToIndex() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.EditAsync(new BusinessTripViewModel())) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.Edit(new BusinessTripViewModel())) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_AsksForEditView() {
+        public async Task Edit_Post_ModelStateIsNotValid_AsksForEditView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(new BusinessTripViewModel())) as ViewResult;
+            ViewResult result = (await controller.Edit(new BusinessTripViewModel())) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
 
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
+        public async Task Edit_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(new BusinessTripViewModel {
+            ViewResult result = (await controller.Edit(new BusinessTripViewModel {
                 Id = 2,
                 Name = "02.09.2018_026"
             })) as ViewResult;
@@ -281,7 +281,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task EditAsync_Post_ModelStateIsNotValid_SetViewBagEmployees() {
+        public async Task Edit_Post_ModelStateIsNotValid_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -290,7 +290,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
 
-            ViewResult result = (await controller.EditAsync(new BusinessTripViewModel())) as ViewResult;
+            ViewResult result = (await controller.Edit(new BusinessTripViewModel())) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
             Assert.AreEqual("Петров Петр Петрович", item.Text);
@@ -298,20 +298,20 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         /// <summary>
-        /// // DetailsAsync method
+        /// // Details method
         /// </summary>
         [Test]
-        public async Task DetailsAsync_ModelStateIsValid_AsksForDetailsView() {
+        public async Task Details_ModelStateIsValid_AsksForDetailsView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             Assert.AreEqual("Details", result.ViewName);
         }
 
         [Test]
-        public async Task DetailsAsync_ModelStateIsValid_RetrievesBusinessTripFromModel() {
+        public async Task Details_ModelStateIsValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
                 Id = _id.Value,
@@ -319,7 +319,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DetailsAsync(2)) as ViewResult;
+            ViewResult result = (await controller.Details(2)) as ViewResult;
 
             BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
             Assert.AreEqual(2, model.Id);
@@ -327,43 +327,43 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task DetailsAsync_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Details_ModelStateIsNotValid_AsksForErrorView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task DetailsAsync_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Details_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DetailsAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Details(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>
-        /// // DeleteAsync_Get method
+        /// // Delete_Get method
         /// </summary>
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsValid_AsksForDeleteView() {
+        public async Task Delete_Get_ModelStateIsValid_AsksForDeleteView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             Assert.AreEqual("Delete", result.ViewName);
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsValid_RetrievesBusinessTripFromModel() {
+        public async Task Delete_Get_ModelStateIsValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
                 Id = _id.Value,
@@ -371,7 +371,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DeleteAsync(2)) as ViewResult;
+            ViewResult result = (await controller.Delete(2)) as ViewResult;
 
             BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
             Assert.AreEqual(2, model.Id);
@@ -379,37 +379,37 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Delete_Get_ModelStateIsNotValid_AsksForErrorView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             Assert.AreEqual("Error", result.ViewName);
         }
 
         [Test]
-        public async Task DeleteAsync_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Delete_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.DeleteAsync(1)) as ViewResult;
+            ViewResult result = (await controller.Delete(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("FindByIdAsync method throws Exception", model[0]);
         }
 
         /// <summary>
-        /// // DeleteConfirmedAsync_Post method
+        /// // DeleteConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteConfirmedAsync_Post_RedirectToIndex() {
+        public async Task DeleteConfirmed_Post_RedirectToIndex() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.DeleteConfirmedAsync(1)) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.DeleteConfirmed(1)) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
@@ -428,14 +428,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         /// <summary>
-        /// // DeleteAllAsync_Post method
+        /// // DeleteAllConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteAllAsync_Post_RedirectToIndex() {
+        public async Task DeleteAllConfirmed_Post_RedirectToIndex() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.DeleteAllAsync()) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.DeleteAllConfirmed()) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }

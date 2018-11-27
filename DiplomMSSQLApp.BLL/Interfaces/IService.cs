@@ -15,6 +15,7 @@ namespace DiplomMSSQLApp.BLL.Interfaces {
         Task DeleteAllAsync();
         void Dispose();
         Task EditAsync(TEntity item);
+        Task ExportJsonAsync(string fullPath);
         Task<TEntity> FindByIdAsync(int? id);
         Task<IEnumerable<TEntity>> GetAllAsync();
         IEnumerable<TEntity> GetPage(IEnumerable<TEntity> col, int page);

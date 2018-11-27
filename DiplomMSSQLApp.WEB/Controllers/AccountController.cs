@@ -13,7 +13,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     public class AccountController : Controller {
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private IAuthenticationManager _authManager;
         private AppUserManager _userManager;
 
@@ -40,7 +40,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         [AllowAnonymous]
         public ActionResult Login(string returnUrl) {
             if (HttpContext.User.Identity.IsAuthenticated) {
-                logger.Warn("Access Denied");
+                _logger.Warn("Access Denied");
                 return View("Error", new string[] { "Доступ закрыт" });
             }
             ViewBag.returnUrl = returnUrl;
@@ -53,18 +53,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             if (ModelState.IsValid) {
                 AppUser user = await UserManager.FindAsync(model.Name, model.Password);
                 if (user == null) {
-                    logger.Warn("Invalid name or password");
+                    _logger.Warn("Invalid name or password");
                     ModelState.AddModelError("", "Неверное имя или пароль");
                 }
                 else {
                     ClaimsIdentity ident = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
                     AuthManager.SignOut();
                     AuthManager.SignIn(new AuthenticationProperties { IsPersistent = false }, ident);
-                    logger.Info("Succeeded");
+                    _logger.Info("Succeeded");
                     return Redirect(returnUrl);
                 }
             }
-            logger.Warn("ModelState is invalid");
+            _logger.Warn("ModelState is invalid");
             ViewBag.returnUrl = returnUrl;
             return View("Login", model);
         }

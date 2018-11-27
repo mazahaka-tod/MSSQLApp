@@ -11,7 +11,7 @@
 <p>
     @Html.ActionLink("Добавить должность", "Create", null, new { @class = "btn btn-default" })
     @Html.ActionLink("Удалить все должности", "DeleteAll", null, new { @class = "btn btn-default" })
-    @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Экспортировать данные в JSON файл", "ExportJson", null, new { @class = "btn btn-default" })
 </p>
 
 @if (Model.Posts.Count() > 0) {
@@ -71,22 +71,22 @@
                 </td>
             </tr>
         }
-            <tr>
-                <td></td>
-                <td></td>
-                <td>
-                    <b>Итого</b>
-                </td>
-                <td>
-                    <b>@ViewBag.TotalNumberOfUnits</b>
-                </td>
-                <td></td>
-                <td></td>
-                <td>
-                    <b>@ViewBag.TotalSalary</b>
-                </td>
-                <td></td>
-            </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>
+                <b>Итого</b>
+            </td>
+            <td>
+                <b>@ViewBag.TotalNumberOfUnits</b>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <b>@ViewBag.TotalSalary</b>
+            </td>
+            <td></td>
+        </tr>
     </table>
 }
 

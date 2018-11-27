@@ -119,11 +119,11 @@
                                     new { label = "По окладу", value = "Salary" },
                                     new { label = "По надбавке", value = "Bonus" },
                                     new { label = "По должности", value = "Post" },
-                                    new { label = "По отделу", value = "DepartmentName" } }, "value", "label"), 
+                                    new { label = "По отделу", value = "DepartmentName" } }, "value", "label"),
                                     new { @class = "form-control", style = "margin-bottom: 12px" })
                                 @Html.DropDownListFor(m => m.Filter.SortOrder, new SelectList(new[] {
                                     new { label = "По возрастанию", value = "Asc" },
-                                    new { label = "По убыванию", value = "Desc" } }, "value", "label"), 
+                                    new { label = "По убыванию", value = "Desc" } }, "value", "label"),
                                     new { @class = "form-control", style = "margin-bottom: 12px" })
                             </dd>
 
@@ -185,7 +185,7 @@
 <p>
     @Html.ActionLink("Добавить сотрудника", "Create", null, new { @class = "btn btn-default" })
     @Html.ActionLink("Удалить всех сотрудников", "DeleteAll", null, new { @class = "btn btn-default" })
-    @Html.ActionLink("Преобразовать данные в Json", "ExportJson", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Экспортировать данные в JSON файл", "ExportJson", null, new { @class = "btn btn-default" })
 </p>
 
 <div id="employeesTable">
@@ -193,7 +193,7 @@
 </div>
 
 @section scripts {
-<script>
+    <script>
     $(document).ready(function () {
         // ajax paging
         $(document).on("click", "#contentPager a[href]", function () {
@@ -385,5 +385,5 @@
             $('#removelastname, #removebonus').css('display', 'none');
         });
     })
-</script>
+    </script>
 }
