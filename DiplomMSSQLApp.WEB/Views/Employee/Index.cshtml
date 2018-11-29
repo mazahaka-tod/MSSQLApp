@@ -274,7 +274,7 @@
         var columns = ('@String.Concat(Model.Filter.Columns)').split('');
         $('input[name="Filter.Columns"]').val(columns);
 
-        // Устанавливает значения в полей Фамилия на форме фильтра
+        // Устанавливает значения в полях Фамилия на форме фильтра
         @if (Model.Filter.LastName != null) {
             string[] lastnames = Model.Filter.LastName.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             if (lastnames.Length > 0) {
@@ -292,7 +292,7 @@
             }
         }
 
-        // Устанавливает значения в полей Надбавка на форме фильтра
+        // Устанавливает значения в полях Надбавка на форме фильтра
         @if (Model.Filter.Bonus != null) {
             double?[] bonuses = Model.Filter.Bonus.Where(x => x.HasValue).ToArray();
             if (bonuses.Length > 0) {

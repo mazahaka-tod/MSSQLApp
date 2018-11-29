@@ -44,7 +44,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(o => o.Bank, opt => opt.Ignore());
             });
             IEnumerable<DepartmentViewModel> departments = Mapper.Map<IEnumerable<DepartmentDTO>, IEnumerable<DepartmentViewModel>>(dDto);
-            return View("Index", new DepartmentListViewModel { Departments = departments, PageInfo = _departmentService.PageInfo });
+            DepartmentListViewModel model = new DepartmentListViewModel { Departments = departments, PageInfo = _departmentService.PageInfo };
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
+                _logger.Info("Executed async request");
+                return PartialView("GetDepartmentsData", model);
+            }
+            _logger.Info("Executed sync request");
+            return View("Index", model);
         }
 
         // Добавление нового отдела

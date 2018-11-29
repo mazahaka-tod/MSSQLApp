@@ -2,7 +2,6 @@
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
-using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using NLog;
 using System;
@@ -39,8 +38,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(d => d.Posts, opt => opt.Ignore());
             });
             IEnumerable<PostViewModel> posts = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
-
-            return View("Index", new PostListViewModel { Posts = posts, PageInfo = _postService.PageInfo });
+            PostListViewModel model = new PostListViewModel { Posts = posts, PageInfo = _postService.PageInfo };
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
+                _logger.Info("Executed async request");
+                return PartialView("GetPostsData", model);
+            }
+            _logger.Info("Executed sync request");
+            return View("Index", model);
         }
 
         // Добавление новой должности

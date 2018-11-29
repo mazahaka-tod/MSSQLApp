@@ -114,5 +114,5 @@
 </p>
 
 <div id="contentPager" class="btn-group">
-    @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { filterAsJsonString = Html.Raw(Json.Encode(Model.Filter)), page = x }))
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { filterAsJsonString = Json.Encode(Model.Filter), page = x }))
 </div>

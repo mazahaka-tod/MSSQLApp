@@ -30,7 +30,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
                                         .ForMember(bt => bt.Employees, opt => opt.Ignore()));
             IEnumerable<BusinessTripViewModel> businessTrips = Mapper.Map<IEnumerable<BusinessTripDTO>, IEnumerable<BusinessTripViewModel>>(btDto);
-            return View("Index", new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = _businessTripService.PageInfo });
+            BusinessTripListViewModel model = new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = _businessTripService.PageInfo };
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
+                _logger.Info("Executed async request");
+                return PartialView("GetBusinessTripsData", model);
+            }
+            _logger.Info("Executed sync request");
+            return View("Index", model);
         }
 
         // Добавление новой командировки

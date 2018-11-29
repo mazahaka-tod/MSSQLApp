@@ -231,7 +231,6 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Results\Employee\Employees.json" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -307,11 +306,14 @@
     <Content Include="Views\RoleAdmin\Index.cshtml" />
     <Content Include="Views\RoleAdmin\Create.cshtml" />
     <Content Include="Views\RoleAdmin\Edit.cshtml" />
+    <Content Include="Views\BusinessTrip\GetBusinessTripsData.cshtml" />
+    <Content Include="Views\Department\GetDepartmentsData.cshtml" />
+    <Content Include="Views\Post\GetPostsData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Logs\" />
-    <Folder Include="Results\Post\" />
+    <Folder Include="Results\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
