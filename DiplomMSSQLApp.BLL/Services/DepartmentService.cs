@@ -46,9 +46,11 @@ namespace DiplomMSSQLApp.BLL.Services {
             departmentsCount = await Database.Departments.CountAsync(d => d.DepartmentName == department.DepartmentName && d.Id != department.Id);
             if (departmentsCount > 0)
                 throw new ValidationException("Отдел с таким названием уже существует", "DepartmentName");
-            departmentsCount = await Database.Departments.CountAsync(d => d.ManagerId == department.ManagerId && d.Id != department.Id);
-            if (departmentsCount > 0)
-                throw new ValidationException("Сотрудник уже является начальником другого отдела", "ManagerId");
+            if (department.ManagerId != null) {
+                departmentsCount = await Database.Departments.CountAsync(d => d.ManagerId == department.ManagerId && d.Id != department.Id);
+                if (departmentsCount > 0)
+                    throw new ValidationException("Сотрудник уже является начальником другого отдела", "ManagerId");
+            }
         }
 
         // Обновление информации об отделе

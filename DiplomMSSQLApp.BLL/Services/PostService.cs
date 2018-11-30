@@ -167,6 +167,27 @@ namespace DiplomMSSQLApp.BLL.Services {
             return await Database.Posts.CountAsync(predicate);
         }
 
+        // Добавление должностей для тестирования
+        public async Task TestCreateAsync() {
+            string[] titles = { "Accountant", "Actuary", "Biologist", "Chemist", "Ecologist", "Economist", "Geophysicist", "Investigator", "Meteorologist", "Microbiologist",
+                "Administrator", "Analyst", "Specialist", "Manager", "Statistician", "Team Leader", "Coordinator", "Writer", "Agent", "Outreach", "Educator", "Scientist",
+                "Engineer", "Clerk", "Appraiser", "Intern", "Officer", "Cost Account", "Evaluator", "Technologist" };
+            int[] departmentIds = (await Database.Departments.GetAllAsync()).Select(d => d.Id).ToArray();
+            if (departmentIds.Length == 0)
+                throw new ValidationException("Сначала нужно добавить хотя бы один отдел", "");
+            for (int i = 0; i < 100; i++) {
+                Post post = new Post {
+                    Title = titles[i % titles.Length],
+                    NumberOfUnits = Convert.ToInt32(1 + Math.Round(new Random(i).NextDouble() * 100)),
+                    Salary = Convert.ToInt32(50000 + Math.Round(new Random(i).NextDouble() * 100) * 400),
+                    Premium = Convert.ToInt32(10000 + Math.Round(new Random(i).NextDouble() * 100) * 400),
+                    DepartmentId = departmentIds[i % departmentIds.Length]
+                };
+                Database.Posts.Create(post);
+            }
+            await Database.SaveAsync();
+        }
+
         public override void Dispose() {
             Database.Dispose();
         }

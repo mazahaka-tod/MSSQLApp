@@ -217,6 +217,8 @@
     <Compile Include="Models\OrganizationViewModel.cs" />
     <Compile Include="Models\PostListViewModel.cs" />
     <Compile Include="Models\PostViewModel.cs" />
+    <Compile Include="Modules\DebugModule.cs" />
+    <Compile Include="Modules\TimerModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\NinjectDependencyResolver.cs" />
   </ItemGroup>

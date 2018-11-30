@@ -2,6 +2,7 @@
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
+using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using NLog;
 using System;
@@ -191,6 +192,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 Directory.CreateDirectory(dir);
             string fullPath = dir + filename;
             return fullPath;
+        }
+
+        // Добавление должностей для тестирования
+        public async Task<ActionResult> TestCreate() {
+            try {
+                await (_postService as PostService).TestCreateAsync();
+            }
+            catch (ValidationException ex) {
+                _logger.Warn("No departments");
+                return View("Error", new string[] { ex.Message });
+            }
+            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing) {
