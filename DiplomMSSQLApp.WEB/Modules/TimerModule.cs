@@ -4,6 +4,7 @@ using System.Web;
 
 namespace DiplomMSSQLApp.WEB.Modules {
     public class TimerModule : IHttpModule {
+        static private TimeSpan time;
         private Stopwatch timer;
 
         public void Init(HttpApplication app) {
@@ -17,7 +18,8 @@ namespace DiplomMSSQLApp.WEB.Modules {
                 timer = Stopwatch.StartNew();
             }
             else {
-                ctx.Response.Write($"<div class='alert alert-success'>Elapsed: {((float)timer.ElapsedTicks) / Stopwatch.Frequency:F5} seconds</div>");
+                Debug.WriteLine("Elapsed: " + ((float)timer.ElapsedTicks) / Stopwatch.Frequency + " seconds");
+                //ctx.Response.Write($"<div class='alert alert-success'>Elapsed: {((float)timer.ElapsedTicks) / Stopwatch.Frequency:F5} seconds</div>");
             }
         }
 

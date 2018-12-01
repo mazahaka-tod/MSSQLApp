@@ -282,6 +282,35 @@ namespace DiplomMSSQLApp.BLL.Services {
             return await Database.Employees.CountAsync(predicate);
         }
 
+        // Добавление сотрудников для тестирования
+        public async Task TestCreateAsync() {
+            int[] postIds = (await Database.Posts.GetAllAsync()).Select(p => p.Id).ToArray();
+            if (postIds.Length == 0)
+                throw new ValidationException("Сначала нужно добавить хотя бы одну должность", "");
+            string[] lastNames = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson",
+                "White", "Harris", "Martin", "Thompson", "Wood", "Lewis", "Scott", "Cooper", "King", "Green", "Walker", "Edwards", "Turner", "Morgan", "Baker", "Hill" };
+            string[] firstNames = { "James", "Alex", "Ben", "Daniel", "Tom", "Ryan", "Sam", "Lewis", "Joe", "David", "Harry", "George", "Jamie", "Dan", "Matt", "Robert" };
+            string[] emails = { "@mail.ru", "@yandex.ru", "@gmail.com" };
+            string[] phones = { "+7-935-456-31-01", "+7-935-742-25-02", "+7-935-788-08-03", "+7-935-412-77-04", "+7-935-224-39-05", "+7-935-941-85-06", "+7-935-254-56-07" };
+            for (int i = 0; i < 100; i++) {
+                Employee employee = new Employee {
+                    LastName = lastNames[i % lastNames.Length],
+                    FirstName = firstNames[i % firstNames.Length],
+                    Contacts = new DAL.Entities.Contacts {
+                        Email = lastNames[i % lastNames.Length] + emails[i % emails.Length],
+                        MobilePhone = phones[i % phones.Length]
+                    },
+                    HireDate = new DateTime(i % 18 + 2000, i % 12 + 1, i % 28 + 1),
+                    PostId = postIds[i % postIds.Length],
+                    Birth = new DAL.Entities.Birth { BirthDate = new DateTime(i % 18 + 1970, i % 12 + 1, i % 28 + 1) },
+                    Passport = new DAL.Entities.Passport(),
+                    Education = new DAL.Entities.Education()
+                };
+                Database.Employees.Create(employee);
+            }
+            await Database.SaveAsync();
+        }
+
         public override void Dispose() {
             Database.Dispose();
         }

@@ -51,7 +51,24 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             EmployeeListViewModel model = new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = _employeeService.PageInfo };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 _logger.Info("Executed async request");
-                return PartialView("GetEmployeesData", model);
+                //return PartialView("GetEmployeesData", model);
+                var transformModel = new {
+                    Employees = model.Employees.Select(e => new {
+                        e.Id,
+                        e.LastName,
+                        e.FirstName,
+                        ContactsEmail = e.Contacts.Email,
+                        ContactsMobilePhone = e.Contacts.MobilePhone,
+                        HireDate = e.HireDate.ToString("dd MMMM yyyy"),
+                        PostSalary = e.Post.Salary,
+                        PostPremium = e.Post.Premium,
+                        PostTitle = e.Post.Title,
+                        DepartmentName = e.Post.Department.DepartmentName
+                    }).ToArray(),
+                    model.Filter,
+                    model.PageInfo
+                };
+                return Json(transformModel, JsonRequestBehavior.AllowGet);
             }
             _logger.Info("Executed sync request");
             return View("Index", model);
@@ -199,6 +216,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 Directory.CreateDirectory(dir);
             string fullPath = dir + filename;
             return fullPath;
+        }
+
+        // Добавление сотрудников для тестирования
+        public async Task<ActionResult> TestCreate() {
+            try {
+                await (_employeeService as EmployeeService).TestCreateAsync();
+            }
+            catch (ValidationException ex) {
+                _logger.Warn("No posts");
+                return View("Error", new string[] { ex.Message });
+            }
+            return RedirectToAction("Index");
         }
 
         public ActionResult About() {

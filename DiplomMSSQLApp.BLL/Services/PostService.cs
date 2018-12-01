@@ -169,12 +169,12 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Добавление должностей для тестирования
         public async Task TestCreateAsync() {
-            string[] titles = { "Accountant", "Actuary", "Biologist", "Chemist", "Ecologist", "Economist", "Geophysicist", "Investigator", "Meteorologist", "Microbiologist",
-                "Administrator", "Analyst", "Specialist", "Manager", "Statistician", "Team Leader", "Coordinator", "Writer", "Agent", "Outreach", "Educator", "Scientist",
-                "Engineer", "Clerk", "Appraiser", "Intern", "Officer", "Cost Account", "Evaluator", "Technologist" };
             int[] departmentIds = (await Database.Departments.GetAllAsync()).Select(d => d.Id).ToArray();
             if (departmentIds.Length == 0)
                 throw new ValidationException("Сначала нужно добавить хотя бы один отдел", "");
+            string[] titles = { "Accountant", "Actuary", "Biologist", "Chemist", "Ecologist", "Economist", "Geophysicist", "Investigator", "Meteorologist", "Microbiologist",
+                "Administrator", "Analyst", "Specialist", "Manager", "Statistician", "Team Leader", "Coordinator", "Writer", "Agent", "Outreach", "Educator", "Scientist",
+                "Engineer", "Clerk", "Appraiser", "Intern", "Officer", "Cost Account", "Evaluator", "Technologist" };
             for (int i = 0; i < 100; i++) {
                 Post post = new Post {
                     Title = titles[i % titles.Length],

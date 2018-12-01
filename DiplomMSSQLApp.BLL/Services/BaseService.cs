@@ -9,7 +9,7 @@ using System;
 namespace DiplomMSSQLApp.BLL.Services {
     public abstract class BaseService<T> : IService<T> where T : class {
         public virtual PageInfo PageInfo { get; set; }
-        public int NumberOfObjectsPerPage { get; set; } = 8;
+        public int NumberOfObjectsPerPage { get; set; } = 10;
 
         public abstract Task<int> CountAsync();
         public abstract Task<int> CountAsync(Expression<Func<T, bool>> predicate);

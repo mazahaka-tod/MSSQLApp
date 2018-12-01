@@ -42,7 +42,21 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             PostListViewModel model = new PostListViewModel { Posts = posts, PageInfo = _postService.PageInfo };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 _logger.Info("Executed async request");
-                return PartialView("GetPostsData", model);
+                //return PartialView("GetPostsData", model);
+                var transformModel = new {
+                    Posts = model.Posts.Select(p => new {
+                        p.Id,
+                        DepartmentCode = p.Department.Code,
+                        DepartmentName = p.Department.DepartmentName,
+                        p.Title,
+                        p.NumberOfUnits,
+                        p.Salary,
+                        p.Premium,
+                        p.TotalSalary
+                    }).ToArray(),
+                    model.PageInfo
+                };
+                return Json(transformModel, JsonRequestBehavior.AllowGet);
             }
             _logger.Info("Executed sync request");
             return View("Index", model);
