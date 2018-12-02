@@ -1,5 +1,4 @@
 ﻿namespace DiplomMSSQLApp.BLL.BusinessModels {
-    // бизнес-модель для реализации фильтра выборки сотрудников
     public class EmployeeFilter {
         public string[] LastName { get; set; }
         public bool IsMatchAnyLastName { get; set; }

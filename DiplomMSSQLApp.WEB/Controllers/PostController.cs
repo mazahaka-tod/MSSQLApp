@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
@@ -27,10 +28,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             _departmentService = ds;
         }
 
-        public async Task<ActionResult> Index(int page = 1) {
-            IEnumerable<PostDTO> pDto = await _postService.GetAllAsync();
-            ViewBag.TotalNumberOfUnits = pDto.Sum(p => p.NumberOfUnits);
-            ViewBag.TotalSalary = pDto.Sum(p => p.TotalSalary);
+        public ActionResult Index(PostFilter filter, string filterAsJsonString, int page = 1) {
+            if (filterAsJsonString != null)
+                filter = System.Web.Helpers.Json.Decode<PostFilter>(filterAsJsonString);
+            IEnumerable<PostDTO> pDto = (_postService as PostService).Get(filter);  // Filter
+            int totalNumberOfUnits = pDto.Sum(p => p.NumberOfUnits).Value;
+            double totalSalary = pDto.Sum(p => p.TotalSalary);
             pDto = _postService.GetPage(pDto, page);     // Paging
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<PostDTO, PostViewModel>()
@@ -39,10 +42,17 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(d => d.Posts, opt => opt.Ignore());
             });
             IEnumerable<PostViewModel> posts = Mapper.Map<IEnumerable<PostDTO>, IEnumerable<PostViewModel>>(pDto);
-            PostListViewModel model = new PostListViewModel { Posts = posts, PageInfo = _postService.PageInfo };
+            PostListViewModel model = new PostListViewModel {
+                Posts = posts,
+                Filter = filter,
+                PageInfo = _postService.PageInfo,
+                NumberOfUnitsOnPage = pDto.Sum(p => p.NumberOfUnits).Value,
+                SalaryOnPage = pDto.Sum(p => p.TotalSalary),
+                TotalNumberOfUnits = totalNumberOfUnits,
+                TotalSalary = totalSalary
+            };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 _logger.Info("Executed async request");
-                //return PartialView("GetPostsData", model);
                 var transformModel = new {
                     Posts = model.Posts.Select(p => new {
                         p.Id,
@@ -54,7 +64,12 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                         p.Premium,
                         p.TotalSalary
                     }).ToArray(),
-                    model.PageInfo
+                    model.Filter,
+                    model.PageInfo,
+                    model.NumberOfUnitsOnPage,
+                    model.SalaryOnPage,
+                    model.TotalNumberOfUnits,
+                    model.TotalSalary
                 };
                 return Json(transformModel, JsonRequestBehavior.AllowGet);
             }

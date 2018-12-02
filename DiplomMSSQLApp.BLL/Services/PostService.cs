@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.DAL.Entities;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
@@ -122,6 +124,121 @@ namespace DiplomMSSQLApp.BLL.Services {
             InitializeMapper();
             IEnumerable<PostDTO> collection = Mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(posts);
             return collection;
+        }
+
+        // Получение списка должностей по фильтру
+        public virtual IEnumerable<PostDTO> Get(PostFilter filter) {
+            Func<Post, bool> predicate = CreatePredicate(filter);
+            IEnumerable<Post> filteredSortedCollection = FilterAndSortPosts(filter, predicate);
+            InitializeMapper();
+            IEnumerable<PostDTO> collection = Mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(filteredSortedCollection);
+            return collection;
+        }
+
+        private Func<Post, bool> CreatePredicate(PostFilter filter) {
+            bool predicate(Post post) {
+                bool returnValue = false;
+                if (filter.IsAntiFilter)            // Если флаг установлен, то выбираются записи несоответствующие фильтру
+                    returnValue = true;
+                
+                // Фильтр по коду отдела
+                if (filter.DepartmentCode != null) {
+                    int?[] departmentCodeArray = filter.DepartmentCode.Where(x => x != null).ToArray();   // Удаляем пустые элементы из массива
+                    if (departmentCodeArray.Length > 0) {
+                        bool flag = true;
+                        foreach (int? departmentCode in departmentCodeArray) {
+                            if (post.Department.Code == departmentCode.Value) {
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if (flag)
+                            return returnValue;     // Проверяемая запись не соответствует фильтру по коду отдела
+                    }
+                }
+
+                // Фильтр по названию отдела
+                if (filter.DepartmentName != null) {
+                    string[] departmentNameArray = filter.DepartmentName.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();   // Удаляем пустые элементы из массива
+                    if (departmentNameArray.Length > 0) {
+                        bool flag = true;
+                        foreach (string departmentName in departmentNameArray) {
+                            if (Regex.IsMatch(post.Department.DepartmentName, departmentName, RegexOptions.IgnoreCase)) {
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if (flag)
+                            return returnValue;     // Проверяемая запись не соответствует фильтру по названию отдела
+                    }
+                }
+
+                // Фильтр по названию должности
+                if (filter.PostTitle != null) {
+                    string[] postTitleArray = filter.PostTitle.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();   // Удаляем пустые элементы из массива
+                    if (postTitleArray.Length > 0) {
+                        bool flag = true;
+                        foreach (string postTitle in postTitleArray) {
+                            if (Regex.IsMatch(post.Title, postTitle, RegexOptions.IgnoreCase)) {
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if (flag)
+                            return returnValue;     // Проверяемая запись не соответствует фильтру по названию должности
+                    }
+                }
+
+                // Фильтры по количеству штатных единиц
+                if (filter.MinNumberOfUnits.HasValue && post.NumberOfUnits < filter.MinNumberOfUnits.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по количеству штатных единиц
+                if (filter.MaxNumberOfUnits.HasValue && post.NumberOfUnits > filter.MaxNumberOfUnits.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по количеству штатных единиц
+
+                // Фильтры по окладу
+                if (filter.MinSalary.HasValue && post.Salary < filter.MinSalary.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по окладу
+                if (filter.MaxSalary.HasValue && post.Salary > filter.MaxSalary.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по окладу
+
+                // Фильтры по надбавке
+                if (filter.MinPremium.HasValue && post.Premium < filter.MinPremium.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по надбавке
+                if (filter.MaxPremium.HasValue && post.Premium > filter.MaxPremium.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по надбавке
+
+                // Фильтры по TotalSalary
+                double totalSalary = (post.Salary + post.Premium) * post.NumberOfUnits;
+                if (filter.MinTotalSalary.HasValue && totalSalary < filter.MinTotalSalary.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по TotalSalary
+                if (filter.MaxTotalSalary.HasValue && totalSalary > filter.MaxTotalSalary.Value)
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по TotalSalary
+
+                return !returnValue;                // Если дошли до сюда, значит проверяемая запись соответствует фильтру
+            }
+            return predicate;
+        }
+
+        private IEnumerable<Post> FilterAndSortPosts(PostFilter filter, Func<Post, bool> predicate) {
+            IEnumerable<Post> filteredSortedCollection;
+            // Параметры сортировки
+            string sortField = filter.SortField ?? "Default";
+            string order = filter.SortOrder ?? "Asc";
+            // Компараторы сортировки по возрастанию или по убыванию
+            IComparer<string> stringComparer = Comparer<string>.Create((x, y) => order.Equals("Asc") ? (x ?? "").CompareTo(y ?? "") : (y ?? "").CompareTo(x ?? ""));
+            IComparer<double> doubleComparer = Comparer<double>.Create((x, y) => order.Equals("Asc") ? x.CompareTo(y) : y.CompareTo(x));
+            IComparer<int> intComparer =          Comparer<int>.Create((x, y) => order.Equals("Asc") ? x.CompareTo(y) : y.CompareTo(x));
+            switch (sortField) {
+                case "DepartmentCode": filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => p.Department.Code, intComparer); break;
+                case "DepartmentName": filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => p.Department.DepartmentName, stringComparer); break;
+                case "PostTitle":      filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => p.Title, stringComparer); break;
+                case "NumberOfUnits":  filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => p.NumberOfUnits, intComparer); break;
+                case "Salary":         filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => p.Salary, doubleComparer); break;
+                case "Premium":        filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => p.Premium, doubleComparer); break;
+                case "TotalSalary":    filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => (p.Salary + p.Premium) * p.NumberOfUnits, doubleComparer); break;
+                default:               filteredSortedCollection = Database.Posts.Get(predicate).OrderBy(p => p.Title); break;
+            }
+            return filteredSortedCollection;
         }
 
         // Удаление должности

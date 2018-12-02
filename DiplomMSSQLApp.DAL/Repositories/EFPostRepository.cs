@@ -1,6 +1,8 @@
 ﻿using DiplomMSSQLApp.DAL.Entities;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.DAL.Repositories {
@@ -13,6 +15,10 @@ namespace DiplomMSSQLApp.DAL.Repositories {
 
         public override async Task<Post> FindByIdAsync(int id) {
             return await _dbSet.Include(p => p.Department).FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public override IEnumerable<Post> Get(Func<Post, bool> predicate) {
+            return _dbSet.Include(p => p.Department).Where(predicate).ToList();
         }
 
         public override async Task<IEnumerable<Post>> GetAllAsync() {
