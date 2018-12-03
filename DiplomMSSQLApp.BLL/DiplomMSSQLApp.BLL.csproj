@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessModels\BusinessTripFilter.cs" />
     <Compile Include="BusinessModels\EmployeeFilter.cs" />
     <Compile Include="BusinessModels\PageInfo.cs" />
     <Compile Include="BusinessModels\PostFilter.cs" />

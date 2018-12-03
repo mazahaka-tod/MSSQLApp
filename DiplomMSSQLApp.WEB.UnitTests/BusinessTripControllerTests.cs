@@ -23,17 +23,17 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Index method
         /// </summary>
         [Test]
-        public async Task Index_AsksForIndexView() {
+        public void Index_AsksForIndexView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.Index()) as ViewResult;
+            ViewResult result = controller.Index(null, null) as ViewResult;
 
             Assert.AreEqual("Index", result.ViewName);
         }
 
         [Test]
-        public async Task Index_RetrievesBusinessTripsPropertyFromModel() {
+        public void Index_RetrievesBusinessTripsPropertyFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<BusinessTripDTO>>(), It.IsAny<int>())).Returns(new BusinessTripDTO[] {
                 new BusinessTripDTO {
@@ -43,7 +43,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.Index()) as ViewResult;
+            ViewResult result = controller.Index(null, null) as ViewResult;
 
             BusinessTripListViewModel model = result.ViewData.Model as BusinessTripListViewModel;
             Assert.AreEqual(1, model.BusinessTrips.Count());
@@ -52,12 +52,12 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Index_RetrievesPageInfoPropertyFromModel() {
+        public void Index_RetrievesPageInfoPropertyFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
-            ViewResult result = (await controller.Index()) as ViewResult;
+            ViewResult result = controller.Index(null, null) as ViewResult;
 
             BusinessTripListViewModel model = result.ViewData.Model as BusinessTripListViewModel;
             Assert.AreEqual(9, model.PageInfo.TotalItems);

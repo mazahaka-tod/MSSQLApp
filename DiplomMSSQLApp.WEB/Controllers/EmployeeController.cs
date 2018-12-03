@@ -28,11 +28,9 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         public ActionResult Index(EmployeeFilter filter, string filterAsJsonString, int page = 1) {
-            // При использовании функции Paging передается строка filterAsJsonString, а аргумент EmployeeFilter filter == null,
-            // поэтому производим декодирование строки filterAsJsonString в объект EmployeeFilter и присваиваем его переменной filter
             if (filterAsJsonString != null)
                 filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
-            IEnumerable<EmployeeDTO> eDto = (_employeeService as EmployeeService).Get(filter);
+            IEnumerable<EmployeeDTO> eDto = (_employeeService as EmployeeService).Get(filter);      // Filter
             eDto = _employeeService.GetPage(eDto, page);     // Paging
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
@@ -48,10 +46,13 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 cfg.CreateMap<BLL.DTO.Education, Models.Education>();
             });
             IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
-            EmployeeListViewModel model = new EmployeeListViewModel { Employees = employees, Filter = filter, PageInfo = _employeeService.PageInfo };
+            EmployeeListViewModel model = new EmployeeListViewModel {
+                Employees = employees,
+                Filter = filter,
+                PageInfo = _employeeService.PageInfo
+            };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 _logger.Info("Executed async request");
-                //return PartialView("GetEmployeesData", model);
                 var transformModel = new {
                     Employees = model.Employees.Select(e => new {
                         e.Id,

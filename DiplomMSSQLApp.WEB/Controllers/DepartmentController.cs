@@ -44,10 +44,23 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                     .ForMember(o => o.Bank, opt => opt.Ignore());
             });
             IEnumerable<DepartmentViewModel> departments = Mapper.Map<IEnumerable<DepartmentDTO>, IEnumerable<DepartmentViewModel>>(dDto);
-            DepartmentListViewModel model = new DepartmentListViewModel { Departments = departments, PageInfo = _departmentService.PageInfo };
+            DepartmentListViewModel model = new DepartmentListViewModel {
+                Departments = departments,
+                PageInfo = _departmentService.PageInfo
+            };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 _logger.Info("Executed async request");
-                return PartialView("GetDepartmentsData", model);
+                var transformModel = new {
+                    Departments = model.Departments.Select(d => new {
+                        d.Id,
+                        d.Code,
+                        d.DepartmentName,
+                        OrganizationName = d.Organization.Name,
+                        Manager = d.Manager != null ? d.Manager.LastName + " " + d.Manager.FirstName + " " + d.Manager.Patronymic : ""
+                    }).ToArray(),
+                    model.PageInfo
+                };
+                return Json(transformModel, JsonRequestBehavior.AllowGet);
             }
             _logger.Info("Executed sync request");
             return View("Index", model);

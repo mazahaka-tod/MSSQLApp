@@ -5,7 +5,7 @@ namespace DiplomMSSQLApp.WEB.Models {
     public class BaseBusinessTripViewModel {
         public int Id { get; set; }
         [Required(ErrorMessage = "Требуется ввести код командировки")]
-        [Display(Name = "Код")]
+        [Display(Name = "Код командировки")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Требуется ввести дату начала командировки")]
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]

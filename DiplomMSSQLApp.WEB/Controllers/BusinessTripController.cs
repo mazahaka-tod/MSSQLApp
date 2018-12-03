@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DiplomMSSQLApp.BLL.BusinessModels;
 using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
@@ -24,16 +25,33 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             _employeeService = es;
         }
 
-        public async Task<ActionResult> Index(int page = 1) {
-            IEnumerable<BusinessTripDTO> btDto = await _businessTripService.GetAllAsync();
+        public ActionResult Index(BusinessTripFilter filter, string filterAsJsonString, int page = 1) {
+            if (filterAsJsonString != null)
+                filter = System.Web.Helpers.Json.Decode<BusinessTripFilter>(filterAsJsonString);
+            IEnumerable<BusinessTripDTO> btDto = (_businessTripService as BusinessTripService).Get(filter);  // Filter
             btDto = _businessTripService.GetPage(btDto, page);     // Paging
             Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
                                         .ForMember(bt => bt.Employees, opt => opt.Ignore()));
             IEnumerable<BusinessTripViewModel> businessTrips = Mapper.Map<IEnumerable<BusinessTripDTO>, IEnumerable<BusinessTripViewModel>>(btDto);
-            BusinessTripListViewModel model = new BusinessTripListViewModel { BusinessTrips = businessTrips, PageInfo = _businessTripService.PageInfo };
+            BusinessTripListViewModel model = new BusinessTripListViewModel {
+                BusinessTrips = businessTrips,
+                Filter = filter,
+                PageInfo = _businessTripService.PageInfo
+            };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 _logger.Info("Executed async request");
-                return PartialView("GetBusinessTripsData", model);
+                var transformModel = new {
+                    BusinessTrips = model.BusinessTrips.Select(bt => new {
+                        bt.Id,
+                        Code = bt.Name,
+                        DateStart = bt.DateStart.ToString("dd MMMM yyyy"),
+                        DateEnd = bt.DateEnd.ToString("dd MMMM yyyy"),
+                        bt.Destination
+                    }).ToArray(),
+                    model.Filter,
+                    model.PageInfo
+                };
+                return Json(transformModel, JsonRequestBehavior.AllowGet);
             }
             _logger.Info("Executed sync request");
             return View("Index", model);
@@ -174,6 +192,18 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 Directory.CreateDirectory(dir);
             string fullPath = dir + filename;
             return fullPath;
+        }
+
+        // Добавление командировок для тестирования
+        public async Task<ActionResult> TestCreate() {
+            try {
+                await (_businessTripService as BusinessTripService).TestCreateAsync();
+            }
+            catch (ValidationException ex) {
+                _logger.Warn("No employees");
+                return View("Error", new string[] { ex.Message });
+            }
+            return RedirectToAction("Index");
         }
 
         // Частичное представление добавляет выпадающий список сотрудников

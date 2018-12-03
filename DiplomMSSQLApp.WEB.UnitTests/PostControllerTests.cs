@@ -40,17 +40,17 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Index method
         /// </summary>
         [Test]
-        public async Task Index_AsksForIndexView() {
+        public void Index_AsksForIndexView() {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.Index()) as ViewResult;
+            ViewResult result = controller.Index(null, null) as ViewResult;
 
             Assert.AreEqual("Index", result.ViewName);
         }
         
         [Test]
-        public async Task Index_RetrievesPostsPropertyFromModel() {
+        public void Index_RetrievesPostsPropertyFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<PostDTO>>(), It.IsAny<int>())).Returns(new PostDTO[] {
                 new PostDTO {
@@ -60,7 +60,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             });
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.Index()) as ViewResult;
+            ViewResult result = controller.Index(null, null) as ViewResult;
 
             PostListViewModel model = result.ViewData.Model as PostListViewModel;
             Assert.AreEqual(1, model.Posts.Count());
@@ -69,12 +69,12 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         [Test]
-        public async Task Index_RetrievesPageInfoPropertyFromModel() {
+        public void Index_RetrievesPageInfoPropertyFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
             PostController controller = GetNewPostController(mock.Object, null, null);
 
-            ViewResult result = (await controller.Index()) as ViewResult;
+            ViewResult result = controller.Index(null, null) as ViewResult;
 
             PostListViewModel model = result.ViewData.Model as PostListViewModel;
             Assert.AreEqual(9, model.PageInfo.TotalItems);

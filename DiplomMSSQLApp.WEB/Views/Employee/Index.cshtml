@@ -13,7 +13,7 @@
         Поиск по фильтру <i>(Показать)</i>
     </div>
     <div id="filter" style="display:none;">
-        @using (Ajax.BeginForm("Index", null, new AjaxOptions { OnSuccess = "processData", @*UpdateTargetId = "employeesTable",*@ Url = Url.Action("Index") }, new { id = "filterform" })) {
+        @using (Ajax.BeginForm("Index", null, new AjaxOptions { OnSuccess = "processData", Url = Url.Action("Index") }, new { id = "filterform" })) {
             <table>
                 <tr>
                     <td>
@@ -189,10 +189,6 @@
     @Html.ActionLink("Экспортировать данные в JSON файл", "ExportJson", null, new { @class = "btn btn-default" })
     @Html.ActionLink("Добавить 100 сотрудников (для тестирования)", "TestCreate", null, new { @class = "btn btn-default" })
 </p>
-
-@*<div id="employeesTable">
-        @Html.Partial("GetEmployeesData", Model)
-    </div>*@
 
 @if (Model.Employees.Count() > 0) {
     <table class="table table-striped table-hover">
@@ -376,9 +372,9 @@
                 if (data.Filter.Columns.indexOf('8') != -1)
                     target.append('<td>' + employee.DepartmentName + '</td>');
 
-                target.append('<td><a href="/Employee/Edit/'    + employee.Id + '">Edit</a> | '
-                                + '<a href="/Employee/Details/' + employee.Id + '">Details</a> | '
-                                + '<a href="/Employee/Delete/'  + employee.Id + '">Delete</a></td>');
+                target.append('<td><a href="/Employee/Edit/' + employee.Id + '">Edit</a> | '
+                    + '<a href="/Employee/Details/' + employee.Id + '">Details</a> | '
+                    + '<a href="/Employee/Delete/' + employee.Id + '">Delete</a></td>');
             }
 
             // Обновляем кнопки навигации
@@ -423,19 +419,6 @@
 
     <script>
     $(document).ready(function () {
-        // ajax paging
-        //$(document).on("click", "#contentPager a[href]", function () {
-        //    $.ajax({
-        //        url: $(this).attr("href"),
-        //        type: 'GET',
-        //        cache: false,
-        //        success: function (result) {
-        //            $('#employeesTable').html(result);
-        //        }
-        //    });
-        //    return false;
-        //});
-
         // Добавляет на форму фильтра текстовое поле Фамилия сотрудника
         $('#addlastname').on('click', function (event) {
             event.preventDefault();
