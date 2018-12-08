@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DiplomMSSQLApp.BLL.UnitTests {
@@ -332,14 +331,14 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         /// // DeleteAllAsync method
         /// </summary>
         [Test]
-        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce() {
+        public async Task DeleteAllAsync_Calls_RemoveSeriesMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Posts.RemoveAllAsync()).Returns(Task.CompletedTask);
+            mock.Setup(m => m.Posts.RemoveSeries(It.IsAny<IEnumerable<Post>>()));
             PostService ps = GetNewService(mock.Object);
 
             await ps.DeleteAllAsync();
 
-            mock.Verify(m => m.Posts.RemoveAllAsync(), Times.Once);
+            mock.Verify(m => m.Posts.RemoveSeries(It.IsAny<IEnumerable<Post>>()), Times.Once);
         }
 
         [Test]
@@ -624,7 +623,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         /// // ExportJsonAsync method
         /// </summary>
         [Test]
-        public async Task ExportJsonAsync_CreatesJsonFile() {
+        public override async Task ExportJsonAsync_CreatesJsonFile() {
             string fullPath = "./DiplomMSSQLApp.WEB/Results/Posts.json";
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();

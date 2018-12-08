@@ -164,9 +164,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             OrganizationController controller = GetNewOrganizationControllerWithControllerContext(mock.Object);
 
-            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
+            FilePathResult result = (await controller.ExportJson()) as FilePathResult;
 
-            Assert.AreEqual("Index", result.RouteValues["action"]);
+            Assert.AreEqual("application/json", result.ContentType);
+            Assert.AreEqual("Organizations.json", result.FileDownloadName);
+            Assert.AreEqual("./DiplomMSSQLApp.WEB/Results/Organizations.json", result.FileName);
         }
     }
 }

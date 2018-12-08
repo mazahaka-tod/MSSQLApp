@@ -581,9 +581,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
+            FilePathResult result = (await controller.ExportJson()) as FilePathResult;
 
-            Assert.AreEqual("Index", result.RouteValues["action"]);
+            Assert.AreEqual("application/json", result.ContentType);
+            Assert.AreEqual("Employees.json", result.FileDownloadName);
+            Assert.AreEqual("./DiplomMSSQLApp.WEB/Results/Employees.json", result.FileName);
         }
 
         /// <summary>

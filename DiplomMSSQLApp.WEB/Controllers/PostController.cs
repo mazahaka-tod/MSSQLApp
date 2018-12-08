@@ -6,7 +6,6 @@ using DiplomMSSQLApp.BLL.Interfaces;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
 using NLog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -184,26 +183,20 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             try {
                 await _postService.DeleteAsync(id);
             }
-            catch (Exception) {
+            catch (ValidationException ex) {
                 _logger.Warn("Failed to delete post");
-                return View("Error", new string[] { "Нельзя удалить должность, пока в ней работает хотя бы один сотрудник" });
+                return View("Error", new string[] { ex.Message });
             }
             return RedirectToAction("Index");
         }
 
-        // Удаление всех должностей
+        // Удаление всех свободных должностей
         public ActionResult DeleteAll() {
             return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllConfirmed() {
-            try {
-                await _postService.DeleteAllAsync();
-            }
-            catch (Exception) {
-                _logger.Warn("Failed to delete post");
-                return View("Error", new string[] { "Нельзя удалить должность, пока в ней работает хотя бы один сотрудник" });
-            }
+            await _postService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 
@@ -212,7 +205,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             string fullPath = CreateDirectoryToFile("Posts.json");
             System.IO.File.Delete(fullPath);
             await _postService.ExportJsonAsync(fullPath);
-            return RedirectToAction("Index");
+            return File(fullPath, "application/json", "Posts.json");
         }
 
         private string CreateDirectoryToFile(string filename) {

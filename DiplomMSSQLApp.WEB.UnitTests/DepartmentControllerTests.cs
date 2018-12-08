@@ -7,7 +7,6 @@ using DiplomMSSQLApp.WEB.Controllers;
 using DiplomMSSQLApp.WEB.Models;
 using Moq;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -570,29 +569,6 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
-        [Test]
-        public async Task DeleteAllConfirmed_Post_ModelStateIsNotValid_AsksForErrorView() {
-            Mock<DepartmentService> mock = new Mock<DepartmentService>();
-            mock.Setup(m => m.DeleteAllAsync()).Throws(new Exception(""));
-            DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
-
-            ViewResult result = (await controller.DeleteAllConfirmed()) as ViewResult;
-
-            Assert.AreEqual("Error", result.ViewName);
-        }
-
-        [Test]
-        public async Task DeleteAllConfirmed_Post_ModelStateIsInvalid_RetrievesExceptionMessageFromModel() {
-            Mock<DepartmentService> mock = new Mock<DepartmentService>();
-            mock.Setup(m => m.DeleteAllAsync()).Throws(new Exception(""));
-            DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
-
-            ViewResult result = (await controller.DeleteAllConfirmed()) as ViewResult;
-
-            string[] model = result.ViewData.Model as string[];
-            Assert.AreEqual("Нельзя удалить отдел, пока в нем есть хотя бы одна должность", model[0]);
-        }
-
         /// <summary>
         /// // ExportJson method
         /// </summary>
@@ -601,9 +577,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             DepartmentController controller = GetNewDepartmentControllerWithControllerContext(null, mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
+            FilePathResult result = (await controller.ExportJson()) as FilePathResult;
 
-            Assert.AreEqual("Index", result.RouteValues["action"]);
+            Assert.AreEqual("application/json", result.ContentType);
+            Assert.AreEqual("Departments.json", result.FileDownloadName);
+            Assert.AreEqual("./DiplomMSSQLApp.WEB/Results/Departments.json", result.FileName);
         }
     }
 }

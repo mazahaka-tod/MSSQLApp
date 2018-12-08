@@ -4,7 +4,6 @@ using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
 using DiplomMSSQLApp.WEB.Models;
 using NLog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -180,25 +179,19 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 await _departmentService.DeleteAsync(id);
             }
             catch (ValidationException ex) {
-                _logger.Warn(ex.Message);
+                _logger.Warn("Failed to delete department");
                 return View("Error", new string[] { ex.Message });
             }
             return RedirectToAction("Index");
         }
 
-        // Удаление всех отделов
+        // Удаление отделов, для которых еще не создано штатное расписание
         public ActionResult DeleteAll() {
             return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllConfirmed() {
-            try {
-                await _departmentService.DeleteAllAsync();
-            }
-            catch (Exception) {
-                _logger.Warn("Failed to delete department");
-                return View("Error", new string[] { "Нельзя удалить отдел, пока в нем есть хотя бы одна должность" });
-            }
+            await _departmentService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 
@@ -207,7 +200,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             string fullPath = CreateDirectoryToFile("Departments.json");
             System.IO.File.Delete(fullPath);
             await _departmentService.ExportJsonAsync(fullPath);
-            return RedirectToAction("Index");
+            return File(fullPath, "application/json", "Departments.json");
         }
 
         private string CreateDirectoryToFile(string filename) {

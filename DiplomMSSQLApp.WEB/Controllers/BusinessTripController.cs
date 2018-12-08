@@ -183,7 +183,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             string fullPath = CreateDirectoryToFile("BusinessTrips.json");
             System.IO.File.Delete(fullPath);
             await _businessTripService.ExportJsonAsync(fullPath);
-            return RedirectToAction("Index");
+            return File(fullPath, "application/json", "BusinessTrips.json");
         }
 
         private string CreateDirectoryToFile(string filename) {

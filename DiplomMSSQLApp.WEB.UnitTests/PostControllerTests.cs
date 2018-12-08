@@ -7,7 +7,6 @@ using DiplomMSSQLApp.WEB.Controllers;
 using DiplomMSSQLApp.WEB.Models;
 using Moq;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -416,7 +415,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         [Test]
         public async Task DeleteConfirmed_Post_ModelStateIsNotValid_AsksForErrorView() {
             Mock<PostService> mock = new Mock<PostService>();
-            mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new Exception(""));
+            mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new ValidationException("DeleteAsync method throws Exception", ""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
             ViewResult result = (await controller.DeleteConfirmed(1)) as ViewResult;
@@ -427,13 +426,13 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         [Test]
         public async Task DeleteConfirmed_Post_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
-            mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new Exception(""));
+            mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new ValidationException("DeleteAsync method throws Exception", ""));
             PostController controller = GetNewPostController(mock.Object, null, null);
 
             ViewResult result = (await controller.DeleteConfirmed(1)) as ViewResult;
 
             string[] model = result.ViewData.Model as string[];
-            Assert.AreEqual("Нельзя удалить должность, пока в ней работает хотя бы один сотрудник", model[0]);
+            Assert.AreEqual("DeleteAsync method throws Exception", model[0]);
         }
 
         /// <summary>
@@ -460,29 +459,6 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
-
-        [Test]
-        public async Task DeleteAllConfirmed_Post_ModelStateIsNotValid_AsksForErrorView() {
-            Mock<PostService> mock = new Mock<PostService>();
-            mock.Setup(m => m.DeleteAllAsync()).Throws(new Exception(""));
-            PostController controller = GetNewPostController(mock.Object, null, null);
-
-            ViewResult result = (await controller.DeleteAllConfirmed()) as ViewResult;
-
-            Assert.AreEqual("Error", result.ViewName);
-        }
-
-        [Test]
-        public async Task DeleteAllConfirmed_Post_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
-            Mock<PostService> mock = new Mock<PostService>();
-            mock.Setup(m => m.DeleteAllAsync()).Throws(new Exception(""));
-            PostController controller = GetNewPostController(mock.Object, null, null);
-
-            ViewResult result = (await controller.DeleteAllConfirmed()) as ViewResult;
-
-            string[] model = result.ViewData.Model as string[];
-            Assert.AreEqual("Нельзя удалить должность, пока в ней работает хотя бы один сотрудник", model[0]);
-        }
         
         /// <summary>
         /// // ExportJson method
@@ -492,9 +468,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<PostService> mock = new Mock<PostService>();
             PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
 
-            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
+            FilePathResult result = (await controller.ExportJson()) as FilePathResult;
 
-            Assert.AreEqual("Index", result.RouteValues["action"]);
+            Assert.AreEqual("application/json", result.ContentType);
+            Assert.AreEqual("Posts.json", result.FileDownloadName);
+            Assert.AreEqual("./DiplomMSSQLApp.WEB/Results/Posts.json", result.FileName);
         }
     }
 }

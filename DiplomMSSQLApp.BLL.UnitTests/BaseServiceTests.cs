@@ -18,11 +18,12 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         public abstract Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce();
         public abstract Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce();
 
-        public abstract Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce();
         public abstract Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce();
 
         public abstract Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe();
         public abstract Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe();
+
+        public abstract Task ExportJsonAsync_CreatesJsonFile();
 
         public abstract void FindByIdAsync_IdParameterIsNull_Throws();
         public abstract Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2();

@@ -290,7 +290,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         /// // DeleteAllAsync method
         /// </summary>
         [Test]
-        public override async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce() {
+        public async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Employees.RemoveAllAsync()).Returns(Task.CompletedTask);
             EmployeeService es = GetNewService(mock.Object);
@@ -1104,7 +1104,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         /// // ExportJsonAsync method
         /// </summary>
         [Test]
-        public async Task ExportJsonAsync_CreatesJsonFile() {
+        public override async Task ExportJsonAsync_CreatesJsonFile() {
             string fullPath = "./DiplomMSSQLApp.WEB/Results/Employees.json";
             File.Delete(fullPath);
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();

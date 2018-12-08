@@ -18,7 +18,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         }
 
         public override IEnumerable<Post> Get(Func<Post, bool> predicate) {
-            return _dbSet.Include(p => p.Department).Where(predicate).ToList();
+            return _dbSet.Include(p => p.Department).Include(p => p.Employees).Where(predicate).ToList();
         }
 
         public override async Task<IEnumerable<Post>> GetAllAsync() {

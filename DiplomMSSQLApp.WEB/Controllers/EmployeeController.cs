@@ -208,7 +208,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             string fullPath = CreateDirectoryToFile("Employees.json");
             System.IO.File.Delete(fullPath);
             await _employeeService.ExportJsonAsync(fullPath);
-            return RedirectToAction("Index");
+            return File(fullPath, "application/json", "Employees.json");
         }
 
         private string CreateDirectoryToFile(string filename) {

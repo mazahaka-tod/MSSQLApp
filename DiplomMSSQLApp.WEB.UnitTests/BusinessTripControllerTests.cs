@@ -507,9 +507,11 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
+            FilePathResult result = (await controller.ExportJson()) as FilePathResult;
 
-            Assert.AreEqual("Index", result.RouteValues["action"]);
+            Assert.AreEqual("application/json", result.ContentType);
+            Assert.AreEqual("BusinessTrips.json", result.FileDownloadName);
+            Assert.AreEqual("./DiplomMSSQLApp.WEB/Results/BusinessTrips.json", result.FileName);
         }
     }
 }

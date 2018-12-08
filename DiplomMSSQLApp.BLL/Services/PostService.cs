@@ -245,13 +245,16 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task DeleteAsync(int id) {
             Post post = await Database.Posts.FindByIdAsync(id);
             if (post == null) return;
+            if (post.Employees.Count > 0)
+                throw new ValidationException("Нельзя удалить должность, пока в ней работает хотя бы один сотрудник", "");
             Database.Posts.Remove(post);
             await Database.SaveAsync();
         }
 
-        // Удаление всех должностей
+        // Удаление всех свободных должностей
         public override async Task DeleteAllAsync() {
-            await Database.Posts.RemoveAllAsync();
+            IEnumerable<Post> posts = Database.Posts.Get(e => e.Employees.Count == 0);
+            Database.Posts.RemoveSeries(posts);
             await Database.SaveAsync();
         }
 

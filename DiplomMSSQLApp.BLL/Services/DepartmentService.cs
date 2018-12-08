@@ -118,9 +118,10 @@ namespace DiplomMSSQLApp.BLL.Services {
             await Database.SaveAsync();
         }
 
-        // Удаление всех отделов
+        // Удаление отделов, для которых еще не создано штатное расписание
         public override async Task DeleteAllAsync() {
-            await Database.Departments.RemoveAllAsync();
+            IEnumerable<Department> departments = Database.Departments.Get(d => d.Posts.Count == 0);
+            Database.Departments.RemoveSeries(departments);
             await Database.SaveAsync();
         }
 
