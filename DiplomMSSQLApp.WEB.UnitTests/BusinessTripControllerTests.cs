@@ -9,7 +9,9 @@ using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.UnitTests {
@@ -19,13 +21,40 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             return new BusinessTripController(bs, es);
         }
 
+        protected BusinessTripController GetNewBusinessTripControllerWithControllerContext(IService<BusinessTripDTO> bs, IService<EmployeeDTO> es, bool isXRequestedWith = false) {
+            return new BusinessTripController(bs, es) { ControllerContext = MockingControllerContext(isXRequestedWith) };
+        }
+
+        protected ControllerContext MockingControllerContext(bool isXRequestedWith) {
+            // mocking Server.MapPath method
+            Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
+            serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/");
+            // mocking Request.Headers["X-Requested-With"]
+            Mock<HttpRequestBase> requestMock = new Mock<HttpRequestBase>();
+            if (isXRequestedWith)
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection {
+                    {"X-Requested-With", "XMLHttpRequest"}
+                });
+            else
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection());
+            // mocking HttpContext
+            Mock<HttpContextBase> httpContextMock = new Mock<HttpContextBase>();
+            httpContextMock.SetupGet(m => m.Server).Returns(serverMock.Object);
+            httpContextMock.SetupGet(m => m.Request).Returns(requestMock.Object);
+            // mocking ControllerContext
+            ControllerContext controllerContextMock = new ControllerContext {
+                HttpContext = httpContextMock.Object
+            };
+            return controllerContextMock;
+        }
+
         /// <summary>
         /// // Index method
         /// </summary>
         [Test]
-        public void Index_AsksForIndexView() {
+        public void Index_SyncRequest_AsksForIndexView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -33,7 +62,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_RetrievesBusinessTripsPropertyFromModel() {
+        public void Index_SyncRequest_RetrievesBusinessTripsPropertyFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<BusinessTripDTO>>(), It.IsAny<int>())).Returns(new BusinessTripDTO[] {
                 new BusinessTripDTO {
@@ -41,7 +70,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
                     Name = "02.09.2018_026"
                 }
             });
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -52,10 +81,10 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_RetrievesPageInfoPropertyFromModel() {
+        public void Index_SyncRequest_RetrievesPageInfoPropertyFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -64,6 +93,36 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Assert.AreEqual(3, model.PageInfo.PageSize);
             Assert.AreEqual(3, model.PageInfo.PageNumber);
             Assert.AreEqual(3, model.PageInfo.TotalPages);
+        }
+
+        [Test]
+        public void Index_AsyncRequest_RetrievesBusinessTripsPropertyFromModel() {
+            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<BusinessTripDTO>>(), It.IsAny<int>())).Returns(new BusinessTripDTO[] {
+                new BusinessTripDTO {
+                    Id = 1,
+                    Name = "02.09.2018_026"
+                }
+            });
+            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null, true);
+
+            JsonResult result = controller.Index(null, null) as JsonResult;
+            object businessTrip = (result.Data.GetType().GetProperty("BusinessTrips").GetValue(result.Data) as object[])[0];
+            int id = (int)businessTrip.GetType().GetProperty("Id").GetValue(businessTrip);
+            string code = businessTrip.GetType().GetProperty("Code").GetValue(businessTrip).ToString();
+
+            Assert.AreEqual(1, id);
+            Assert.AreEqual("02.09.2018_026", code);
+        }
+
+        [Test]
+        public void Index_AsyncRequest_JsonRequestBehaviorEqualsAllowGet() {
+            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null, true);
+
+            JsonResult result = controller.Index(null, null) as JsonResult;
+
+            Assert.AreEqual(JsonRequestBehavior.AllowGet, result.JsonRequestBehavior);
         }
 
         /// <summary>
@@ -436,6 +495,19 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
             RedirectToRouteResult result = (await controller.DeleteAllConfirmed()) as RedirectToRouteResult;
+
+            Assert.AreEqual("Index", result.RouteValues["action"]);
+        }
+
+        /// <summary>
+        /// // ExportJson method
+        /// </summary>
+        [Test]
+        public async Task ExportJson_RedirectToIndex() {
+            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
+
+            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }

@@ -7,6 +7,7 @@ using DiplomMSSQLApp.WEB.Models;
 using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.UnitTests {
@@ -14,6 +15,24 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
     public class OrganizationControllerTests {
         protected OrganizationController GetNewOrganizationController(IService<OrganizationDTO> os) {
             return new OrganizationController(os);
+        }
+
+        protected OrganizationController GetNewOrganizationControllerWithControllerContext(IService<OrganizationDTO> os) {
+            return new OrganizationController(os) { ControllerContext = MockingControllerContext() };
+        }
+
+        protected ControllerContext MockingControllerContext() {
+            // mocking Server.MapPath method
+            Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
+            serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/");
+            // mocking HttpContext
+            Mock<HttpContextBase> httpContextMock = new Mock<HttpContextBase>();
+            httpContextMock.SetupGet(m => m.Server).Returns(serverMock.Object);
+            // mocking ControllerContext
+            ControllerContext controllerContextMock = new ControllerContext {
+                HttpContext = httpContextMock.Object
+            };
+            return controllerContextMock;
         }
 
         /// <summary>
@@ -135,6 +154,19 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             OrganizationViewModel model = result.ViewData.Model as OrganizationViewModel;
             Assert.AreEqual(2, model.Id);
             Assert.AreEqual("GazProm", model.Name);
+        }
+
+        /// <summary>
+        /// // ExportJson method
+        /// </summary>
+        [Test]
+        public async Task ExportJson_RedirectToIndex() {
+            Mock<OrganizationService> mock = new Mock<OrganizationService>();
+            OrganizationController controller = GetNewOrganizationControllerWithControllerContext(mock.Object);
+
+            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
+
+            Assert.AreEqual("Index", result.RouteValues["action"]);
         }
     }
 }

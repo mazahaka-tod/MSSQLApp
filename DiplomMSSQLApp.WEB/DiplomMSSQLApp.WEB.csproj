@@ -292,7 +292,6 @@
     <Content Include="Views\BusinessTrip\DeleteAll.cshtml" />
     <Content Include="Views\Department\DeleteAll.cshtml" />
     <Content Include="Views\Post\DeleteAll.cshtml" />
-    <Content Include="Views\Employee\GetEmployeesData.cshtml" />
     <Content Include="Views\Organization\Index.cshtml" />
     <Content Include="Views\Organization\Edit.cshtml" />
     <Content Include="Views\Post\Create.cshtml" />
@@ -308,9 +307,6 @@
     <Content Include="Views\RoleAdmin\Index.cshtml" />
     <Content Include="Views\RoleAdmin\Create.cshtml" />
     <Content Include="Views\RoleAdmin\Edit.cshtml" />
-    <Content Include="Views\BusinessTrip\GetBusinessTripsData.cshtml" />
-    <Content Include="Views\Department\GetDepartmentsData.cshtml" />
-    <Content Include="Views\Post\GetPostsData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

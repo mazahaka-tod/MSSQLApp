@@ -10,6 +10,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -21,28 +22,40 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             return new PostController(es, ps, ds);
         }
 
-        protected PostController GetNewPostControllerWithControllerContext(IService<PostDTO> ps, IService<EmployeeDTO> es, IService<DepartmentDTO> ds) {
-            return new PostController(es, ps, ds) { ControllerContext = MockingServerMapPathMethod() };
+        protected PostController GetNewPostControllerWithControllerContext(IService<PostDTO> ps, IService<EmployeeDTO> es, IService<DepartmentDTO> ds, bool isXRequestedWith = false) {
+            return new PostController(es, ps, ds) { ControllerContext = MockingControllerContext(isXRequestedWith) };
         }
 
-        protected ControllerContext MockingServerMapPathMethod() {
+        protected ControllerContext MockingControllerContext(bool isXRequestedWith) {
+            // mocking Server.MapPath method
             Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
             serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/");
-            Mock<HttpContextBase> httpCtxStub = new Mock<HttpContextBase>();
-            httpCtxStub.Setup(m => m.Server).Returns(serverMock.Object);
-            ControllerContext controllerCtx = new ControllerContext {
-                HttpContext = httpCtxStub.Object
+            // mocking Request.Headers["X-Requested-With"]
+            Mock<HttpRequestBase> requestMock = new Mock<HttpRequestBase>();
+            if (isXRequestedWith)
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection {
+                    {"X-Requested-With", "XMLHttpRequest"}
+                });
+            else
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection());
+            // mocking HttpContext
+            Mock<HttpContextBase> httpContextMock = new Mock<HttpContextBase>();
+            httpContextMock.SetupGet(m => m.Server).Returns(serverMock.Object);
+            httpContextMock.SetupGet(m => m.Request).Returns(requestMock.Object);
+            // mocking ControllerContext
+            ControllerContext controllerContextMock = new ControllerContext {
+                HttpContext = httpContextMock.Object
             };
-            return controllerCtx;
+            return controllerContextMock;
         }
 
         /// <summary>
         /// // Index method
         /// </summary>
         [Test]
-        public void Index_AsksForIndexView() {
+        public void Index_SyncRequest_AsksForIndexView() {
             Mock<PostService> mock = new Mock<PostService>();
-            PostController controller = GetNewPostController(mock.Object, null, null);
+            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -50,15 +63,19 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         [Test]
-        public void Index_RetrievesPostsPropertyFromModel() {
+        public void Index_SyncRequest_RetrievesPostsPropertyFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<PostDTO>>(), It.IsAny<int>())).Returns(new PostDTO[] {
                 new PostDTO {
                     Id = 2,
-                    Title = "Programmer"
+                    Title = "Programmer",
+                    Department = new DepartmentDTO { Code = 123 },
+                    NumberOfUnits = 1,
+                    Salary = 100000,
+                    Premium = 20000
                 }
             });
-            PostController controller = GetNewPostController(mock.Object, null, null);
+            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -69,10 +86,10 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
         
         [Test]
-        public void Index_RetrievesPageInfoPropertyFromModel() {
+        public void Index_SyncRequest_RetrievesPageInfoPropertyFromModel() {
             Mock<PostService> mock = new Mock<PostService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
-            PostController controller = GetNewPostController(mock.Object, null, null);
+            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -82,7 +99,41 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Assert.AreEqual(3, model.PageInfo.PageNumber);
             Assert.AreEqual(3, model.PageInfo.TotalPages);
         }
-        
+
+        [Test]
+        public void Index_AsyncRequest_RetrievesPostsPropertyFromModel() {
+            Mock<PostService> mock = new Mock<PostService>();
+            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<PostDTO>>(), It.IsAny<int>())).Returns(new PostDTO[] {
+                new PostDTO {
+                    Id = 1,
+                    Title = "Programmer",
+                    Department = new DepartmentDTO { Code = 123 },
+                    NumberOfUnits = 1,
+                    Salary = 100000,
+                    Premium = 20000
+                }
+            });
+            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null, true);
+
+            JsonResult result = controller.Index(null, null) as JsonResult;
+            object post = (result.Data.GetType().GetProperty("Posts").GetValue(result.Data) as object[])[0];
+            int id = (int)post.GetType().GetProperty("Id").GetValue(post);
+            string title = post.GetType().GetProperty("Title").GetValue(post).ToString();
+
+            Assert.AreEqual(1, id);
+            Assert.AreEqual("Programmer", title);
+        }
+
+        [Test]
+        public void Index_AsyncRequest_JsonRequestBehaviorEqualsAllowGet() {
+            Mock<PostService> mock = new Mock<PostService>();
+            PostController controller = GetNewPostControllerWithControllerContext(mock.Object, null, null, true);
+
+            JsonResult result = controller.Index(null, null) as JsonResult;
+
+            Assert.AreEqual(JsonRequestBehavior.AllowGet, result.JsonRequestBehavior);
+        }
+
         /// <summary>
         /// // Create_Get method
         /// </summary>

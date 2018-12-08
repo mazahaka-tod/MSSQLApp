@@ -10,7 +10,9 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.UnitTests {
@@ -20,13 +22,40 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             return new DepartmentController(es, ds, os);
         }
 
+        protected DepartmentController GetNewDepartmentControllerWithControllerContext(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<OrganizationDTO> os, bool isXRequestedWith = false) {
+            return new DepartmentController(es, ds, os) { ControllerContext = MockingControllerContext(isXRequestedWith) };
+        }
+
+        protected ControllerContext MockingControllerContext(bool isXRequestedWith) {
+            // mocking Server.MapPath method
+            Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
+            serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/");
+            // mocking Request.Headers["X-Requested-With"]
+            Mock<HttpRequestBase> requestMock = new Mock<HttpRequestBase>();
+            if (isXRequestedWith)
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection {
+                    {"X-Requested-With", "XMLHttpRequest"}
+                });
+            else
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection());
+            // mocking HttpContext
+            Mock<HttpContextBase> httpContextMock = new Mock<HttpContextBase>();
+            httpContextMock.SetupGet(m => m.Server).Returns(serverMock.Object);
+            httpContextMock.SetupGet(m => m.Request).Returns(requestMock.Object);
+            // mocking ControllerContext
+            ControllerContext controllerContextMock = new ControllerContext {
+                HttpContext = httpContextMock.Object
+            };
+            return controllerContextMock;
+        }
+
         /// <summary>
         /// // Index method
         /// </summary>
         [Test]
-        public async Task Index_AsksForIndexView() {
+        public async Task Index_SyncRequest_AsksForIndexView() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
-            DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
+            DepartmentController controller = GetNewDepartmentControllerWithControllerContext(null, mock.Object, null);
 
             ViewResult result = (await controller.Index()) as ViewResult;
 
@@ -34,7 +63,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Index_RetrievesDepartmentsPropertyFromModel() {
+        public async Task Index_SyncRequest_RetrievesDepartmentsPropertyFromModel() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<DepartmentDTO>>(), It.IsAny<int>())).Returns(new DepartmentDTO[] {
                 new DepartmentDTO {
@@ -43,7 +72,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
                     DepartmentName = "IT"
                 }
             });
-            DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
+            DepartmentController controller = GetNewDepartmentControllerWithControllerContext(null, mock.Object, null);
 
             ViewResult result = (await controller.Index()) as ViewResult;
 
@@ -55,10 +84,10 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Index_RetrievesPageInfoPropertyFromModel() {
+        public async Task Index_SyncRequest_RetrievesPageInfoPropertyFromModel() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
-            DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
+            DepartmentController controller = GetNewDepartmentControllerWithControllerContext(null, mock.Object, null);
 
             ViewResult result = (await controller.Index()) as ViewResult;
 
@@ -67,6 +96,37 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Assert.AreEqual(3, model.PageInfo.PageSize);
             Assert.AreEqual(3, model.PageInfo.PageNumber);
             Assert.AreEqual(3, model.PageInfo.TotalPages);
+        }
+
+        [Test]
+        public async Task Index_AsyncRequest_RetrievesDepartmentsPropertyFromModel() {
+            Mock<DepartmentService> mock = new Mock<DepartmentService>();
+            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<DepartmentDTO>>(), It.IsAny<int>())).Returns(new DepartmentDTO[] {
+                new DepartmentDTO {
+                    Id = 1,
+                    DepartmentName = "IT",
+                    Organization = new OrganizationDTO()
+                }
+            });
+            DepartmentController controller = GetNewDepartmentControllerWithControllerContext(null, mock.Object, null, true);
+
+            JsonResult result = (await controller.Index()) as JsonResult;
+            object department = (result.Data.GetType().GetProperty("Departments").GetValue(result.Data) as object[])[0];
+            int id = (int)department.GetType().GetProperty("Id").GetValue(department);
+            string departmentName = department.GetType().GetProperty("DepartmentName").GetValue(department).ToString();
+
+            Assert.AreEqual(1, id);
+            Assert.AreEqual("IT", departmentName);
+        }
+
+        [Test]
+        public async Task Index_AsyncRequest_JsonRequestBehaviorEqualsAllowGet() {
+            Mock<DepartmentService> mock = new Mock<DepartmentService>();
+            DepartmentController controller = GetNewDepartmentControllerWithControllerContext(null, mock.Object, null, true);
+
+            JsonResult result = (await controller.Index()) as JsonResult;
+
+            Assert.AreEqual(JsonRequestBehavior.AllowGet, result.JsonRequestBehavior);
         }
 
         /// <summary>
@@ -531,6 +591,19 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
             string[] model = result.ViewData.Model as string[];
             Assert.AreEqual("Нельзя удалить отдел, пока в нем есть хотя бы одна должность", model[0]);
+        }
+
+        /// <summary>
+        /// // ExportJson method
+        /// </summary>
+        [Test]
+        public async Task ExportJson_RedirectToIndex() {
+            Mock<DepartmentService> mock = new Mock<DepartmentService>();
+            DepartmentController controller = GetNewDepartmentControllerWithControllerContext(null, mock.Object, null);
+
+            RedirectToRouteResult result = (await controller.ExportJson()) as RedirectToRouteResult;
+
+            Assert.AreEqual("Index", result.RouteValues["action"]);
         }
     }
 }

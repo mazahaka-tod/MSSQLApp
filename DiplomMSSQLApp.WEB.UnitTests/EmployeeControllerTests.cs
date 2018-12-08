@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -20,35 +21,38 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             return new EmployeeController(es, ds, ps);
         }
 
-        protected EmployeeController GetNewEmployeeControllerWithControllerContext(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps, string XRequestedWith = "") {
-            return new EmployeeController(es, ds, ps) { ControllerContext = MockingControllerContext(XRequestedWith) };
+        protected EmployeeController GetNewEmployeeControllerWithControllerContext(IService<EmployeeDTO> es, IService<DepartmentDTO> ds, IService<PostDTO> ps, bool isXRequestedWith = false) {
+            return new EmployeeController(es, ds, ps) { ControllerContext = MockingControllerContext(isXRequestedWith) };
         }
 
-        protected ControllerContext MockingControllerContext(string XRequestedWith) {
+        protected ControllerContext MockingControllerContext(bool isXRequestedWith) {
             // mocking Server.MapPath method
             Mock<HttpServerUtilityBase> serverMock = new Mock<HttpServerUtilityBase>();
             serverMock.Setup(m => m.MapPath(It.IsAny<string>())).Returns("./DiplomMSSQLApp.WEB/Results/");
             // mocking Request.Headers["X-Requested-With"]
             Mock<HttpRequestBase> requestMock = new Mock<HttpRequestBase>();
-            requestMock.SetupGet(x => x.Headers).Returns(new System.Net.WebHeaderCollection {
-                {"X-Requested-With", XRequestedWith}
-            });
-
-            Mock<HttpContextBase> httpCtxStub = new Mock<HttpContextBase>();
-            httpCtxStub.SetupGet(m => m.Server).Returns(serverMock.Object);
-            httpCtxStub.SetupGet(m => m.Request).Returns(requestMock.Object);
-
-            ControllerContext controllerCtx = new ControllerContext {
-                HttpContext = httpCtxStub.Object
+            if (isXRequestedWith)
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection {
+                    {"X-Requested-With", "XMLHttpRequest"}
+                });
+            else
+                requestMock.SetupGet(x => x.Headers).Returns(new WebHeaderCollection());
+            // mocking HttpContext
+            Mock<HttpContextBase> httpContextMock = new Mock<HttpContextBase>();
+            httpContextMock.SetupGet(m => m.Server).Returns(serverMock.Object);
+            httpContextMock.SetupGet(m => m.Request).Returns(requestMock.Object);
+            // mocking ControllerContext
+            ControllerContext controllerContextMock = new ControllerContext {
+                HttpContext = httpContextMock.Object
             };
-            return controllerCtx;
+            return controllerContextMock;
         }
 
         /// <summary>
         /// // Index method
         /// </summary>
         [Test]
-        public void Index_AsksForIndexView() {
+        public void Index_SyncRequest_AsksForIndexView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
@@ -58,17 +62,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_AsksForGetEmployeesDataPartialView() {
-            Mock<EmployeeService> mock = new Mock<EmployeeService>();
-            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null, "XMLHttpRequest");
-
-            PartialViewResult result = controller.Index(null, null) as PartialViewResult;
-
-            Assert.AreEqual("GetEmployeesData", result.ViewName);
-        }
-
-        [Test]
-        public void Index_RetrievesEmployeesPropertyFromModel() {
+        public void Index_SyncRequest_RetrievesEmployeesPropertyFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<EmployeeDTO>>(), It.IsAny<int>())).Returns(new EmployeeDTO[] {
                 new EmployeeDTO {
@@ -95,7 +89,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_RetrievesFilterPropertyFromModel() {
+        public void Index_SyncRequest_RetrievesFilterPropertyFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
@@ -116,7 +110,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_SetFilterAsJsonString_RetrievesFilterPropertyFromModel() {
+        public void Index_SyncRequest_SetFilterAsJsonString_RetrievesFilterPropertyFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
 
@@ -128,7 +122,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_RetrievesPageInfoPropertyFromModel() {
+        public void Index_SyncRequest_RetrievesPageInfoPropertyFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
             EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null);
@@ -140,6 +134,40 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             Assert.AreEqual(3, model.PageInfo.PageSize);
             Assert.AreEqual(3, model.PageInfo.PageNumber);
             Assert.AreEqual(3, model.PageInfo.TotalPages);
+        }
+
+        [Test]
+        public void Index_AsyncRequest_RetrievesEmployeesPropertyFromModel() {
+            Mock<EmployeeService> mock = new Mock<EmployeeService>();
+            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<EmployeeDTO>>(), It.IsAny<int>())).Returns(new EmployeeDTO[] {
+                new EmployeeDTO {
+                    Id = 1,
+                    LastName = "Brown",
+                    Contacts = new BLL.DTO.Contacts(),
+                    Post = new PostDTO {
+                        Department = new DepartmentDTO()
+                    }
+                }
+            });
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null, true);
+
+            JsonResult result = controller.Index(null, null) as JsonResult;
+            object employee = (result.Data.GetType().GetProperty("Employees").GetValue(result.Data) as object[])[0];
+            int id = (int)employee.GetType().GetProperty("Id").GetValue(employee);
+            string lastname = employee.GetType().GetProperty("LastName").GetValue(employee).ToString();
+
+            Assert.AreEqual(1, id);
+            Assert.AreEqual("Brown", lastname);
+        }
+
+        [Test]
+        public void Index_AsyncRequest_JsonRequestBehaviorEqualsAllowGet() {
+            Mock<EmployeeService> mock = new Mock<EmployeeService>();
+            EmployeeController controller = GetNewEmployeeControllerWithControllerContext(mock.Object, null, null, true);
+
+            JsonResult result = controller.Index(null, null) as JsonResult;
+
+            Assert.AreEqual(JsonRequestBehavior.AllowGet, result.JsonRequestBehavior);
         }
 
         /// <summary>
