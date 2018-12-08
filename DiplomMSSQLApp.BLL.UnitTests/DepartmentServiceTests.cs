@@ -10,18 +10,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DiplomMSSQLApp.BLL.UnitTests
-{
+namespace DiplomMSSQLApp.BLL.UnitTests {
     [TestFixture]
-    public class DepartmentServiceTests : BaseServiceTests<DepartmentService>
-    {
-        protected override DepartmentService GetNewService()
-        {
+    public class DepartmentServiceTests : BaseServiceTests<DepartmentService> {
+        protected override DepartmentService GetNewService() {
             return new DepartmentService();
         }
 
-        protected override DepartmentService GetNewService(IUnitOfWork uow)
-        {
+        protected override DepartmentService GetNewService(IUnitOfWork uow) {
             return new DepartmentService(uow);
         }
 
@@ -29,8 +25,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // GetPage method
         /// </summary>
         [Test]
-        public override void GetPage_CallsWithGoodParams_FillsPageInfoProperty()
-        {
+        public override void GetPage_CallsWithGoodParams_FillsPageInfoProperty() {
             DepartmentService ds = GetNewService();
             ds.NumberOfObjectsPerPage = 2;
             DepartmentDTO[] col = new DepartmentDTO[] {
@@ -47,8 +42,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_RequestedPageLessThan1_ReturnsFirstPage()
-        {
+        public override void GetPage_RequestedPageLessThan1_ReturnsFirstPage() {
             DepartmentService ds = GetNewService();
 
             ds.GetPage(new DepartmentDTO[0], -5);
@@ -57,8 +51,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_RequestedPageMoreThanTotalPages_ReturnsLastPage()
-        {
+        public override void GetPage_RequestedPageMoreThanTotalPages_ReturnsLastPage() {
             DepartmentService ds = GetNewService();
             ds.NumberOfObjectsPerPage = 3;
             DepartmentDTO[] col = new DepartmentDTO[] {
@@ -74,8 +67,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override void GetPage_CallsExistingPage_ReturnsSpecifiedPage()
-        {
+        public override void GetPage_CallsExistingPage_ReturnsSpecifiedPage() {
             DepartmentService ds = GetNewService();
             ds.NumberOfObjectsPerPage = 3;
             DepartmentDTO[] col = new DepartmentDTO[] {
@@ -99,8 +91,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // CreateAsync method
         /// </summary>
         [Test]
-        public void CreateAsync_DepartmentNamePropertyIsNull_Throws()
-        {
+        public void CreateAsync_DepartmentNamePropertyIsNull_Throws() {
             DepartmentService ds = GetNewService();
             DepartmentDTO item = new DepartmentDTO {
                 DepartmentName = null
@@ -112,8 +103,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public async Task CreateAsync_CallsWithGoodParameter_CallsCreateMethodOnсe()
-        {
+        public async Task CreateAsync_CallsWithGoodParameter_CallsCreateMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.Create(It.IsAny<Department>()));
             DepartmentService ds = GetNewService(mock.Object);
@@ -127,8 +117,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public async Task CreateAsync_CallsWithGoodParameter_CallsSaveAsyncMethodOnсe()
-        {
+        public async Task CreateAsync_CallsWithGoodParameter_CallsSaveAsyncMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.Create(It.IsAny<Department>()));
             DepartmentService ds = GetNewService(mock.Object);
@@ -145,8 +134,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // DeleteAsync method
         /// </summary>
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_RemoveMethodIsNeverCalled() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
             DepartmentService ds = GetNewService(mock.Object);
@@ -157,8 +145,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsNull_SaveAsyncMethodIsNeverCalled() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
             DepartmentService ds = GetNewService(mock.Object);
@@ -169,8 +156,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             DepartmentService ds = GetNewService(mock.Object);
@@ -181,8 +167,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Department());
             DepartmentService ds = GetNewService(mock.Object);
@@ -196,8 +181,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // DeleteAllAsync method
         /// </summary>
         [Test]
-        public async Task DeleteAllAsync_Calls_RemoveSeriesMethodIsCalledOnce()
-        {
+        public async Task DeleteAllAsync_Calls_RemoveSeriesMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.RemoveSeries(It.IsAny<IEnumerable<Department>>()));
             DepartmentService ds = GetNewService(mock.Object);
@@ -208,8 +192,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce()
-        {
+        public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.RemoveAllAsync()).Returns(Task.CompletedTask);
             DepartmentService ds = GetNewService(mock.Object);
@@ -223,8 +206,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // EditAsync method
         /// </summary>
         [Test]
-        public void EditAsync_DepartmentNamePropertyIsNull_Throws()
-        {
+        public void EditAsync_DepartmentNamePropertyIsNull_Throws() {
             DepartmentService ds = GetNewService();
             DepartmentDTO item = new DepartmentDTO {
                 DepartmentName = null
@@ -236,8 +218,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe()
-        {
+        public override async Task EditAsync_CallsWithGoodParams_CallsUpdateMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.Update(It.IsAny<Department>()));
             DepartmentService ds = GetNewService(mock.Object);
@@ -251,8 +232,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe()
-        {
+        public override async Task EditAsync_CallsWithGoodParams_CallsSaveAsyncMethodOnсe() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.Update(It.IsAny<Department>()));
             DepartmentService ds = GetNewService(mock.Object);
@@ -269,8 +249,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // FindByIdAsync method
         /// </summary>
         [Test]
-        public override void FindByIdAsync_IdParameterIsNull_Throws()
-        {
+        public override void FindByIdAsync_IdParameterIsNull_Throws() {
             DepartmentService ds = GetNewService();
 
             Exception ex = Assert.CatchAsync(async () => await ds.FindByIdAsync(null));
@@ -279,8 +258,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public void FindByIdAsync_DepartmentNotFound_Throws()
-        {
+        public void FindByIdAsync_DepartmentNotFound_Throws() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).Returns(Task.FromResult<Department>(null));
             DepartmentService ds = GetNewService(mock.Object);
@@ -291,8 +269,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         }
 
         [Test]
-        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2()
-        {
+        public override async Task FindByIdAsync_IdEqualTo2_ReturnsObjectWithIdEqualTo2() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.FindByIdAsync(It.IsAny<int>())).ReturnsAsync((int item_id) => new Department() { Id = item_id });
             DepartmentService ds = GetNewService(mock.Object);
@@ -306,8 +283,7 @@ namespace DiplomMSSQLApp.BLL.UnitTests
         /// // GetAllAsync method
         /// </summary>
         [Test]
-        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray()
-        {
+        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
             mock.Setup(m => m.Departments.GetAllAsync()).ReturnsAsync(() => new Department[] {
                 new Department() { Id = 1, DepartmentName = "HR" },

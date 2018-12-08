@@ -1,4 +1,5 @@
-﻿using DiplomMSSQLApp.BLL.DTO;
+﻿using DiplomMSSQLApp.BLL.BusinessModels;
+using DiplomMSSQLApp.BLL.DTO;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.DAL.Entities;
 using DiplomMSSQLApp.DAL.Interfaces;
@@ -594,6 +595,426 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
             PostDTO result = await ps.FindByIdAsync(2);
 
             Assert.AreEqual(2, result.Id);
+        }
+
+        /// <summary>
+        /// // Get method
+        /// </summary>
+        [TestCase(123456, null, null, null, null, null, null, null, null, null, null)]              // DepartmentCode
+        [TestCase(null, "IT", null, null, null, null, null, null, null, null, null)]                // DepartmentName
+        [TestCase(null, null, "Programmer", null, null, null, null, null, null, null, null)]        // PostTitle
+        [TestCase(null, null, null, 5, null, null, null, null, null, null, null)]                   // MinNumberOfUnits
+        [TestCase(null, null, null, null, null, 12000, null, null, null, null, null)]               // MinSalary
+        [TestCase(null, null, null, null, null, null, null, 5000, null, null, null)]                // MinPremium
+        [TestCase(null, null, null, null, null, null, null, null, null, 100000, null)]              // MinTotalSalary
+        public void Get_OneFilterParameterIsSet_ReturnsFilteredArray(int? code, string name, string title, 
+                int? minNumberOfUnits, int? maxNumberOfUnits, double? minSalary, double? maxSalary, 
+                double? minPremium, double? maxPremium, double? minTotalSalary, double? maxTotalSalary) {
+            PostFilter filter = new PostFilter {
+                DepartmentCode = new int?[] { code, null },
+                DepartmentName = new string[] { name, null, "" },
+                PostTitle = new string[] { title, null, "" },
+                MinNumberOfUnits = minNumberOfUnits,
+                MaxNumberOfUnits = maxNumberOfUnits,
+                MinSalary = minSalary,
+                MaxSalary = maxSalary,
+                MinPremium = minPremium,
+                MaxPremium = maxPremium,
+                MinTotalSalary = minTotalSalary,
+                MaxTotalSalary = maxTotalSalary
+            };
+            Post[] posts = new Post[] {
+                new Post() {
+                    Id = 1,
+                    Department = new Department { Code = 123456, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 6,
+                    Salary = 100000,
+                    Premium = 25000
+                },
+                new Post() {
+                    Id = 2,
+                    Department = new Department { Code = 123456, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 6,
+                    Salary = 80000,
+                    Premium = 15000
+                },
+                new Post() {
+                    Id = 3,
+                    Department = new Department { Code = 7654, DepartmentName = "Management" },
+                    Title = "Manager",
+                    NumberOfUnits = 2,
+                    Salary = 10000,
+                    Premium = 1000
+                },
+                new Post() {
+                    Id = 4,
+                    Department = new Department { Code = 7654, DepartmentName = "Management" },
+                    Title = "Engineer",
+                    NumberOfUnits = 4,
+                    Salary = 9000,
+                    Premium = 0
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Get(It.IsAny<Func<Post, bool>>()))
+                .Returns((Func<Post, bool> predicate) => posts.Where(predicate));
+            PostService postService = GetNewService(mock.Object);
+
+            PostDTO[] result = postService.Get(filter).ToArray();
+
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
+            Assert.AreEqual("Programmer", result[0].Title);
+            Assert.AreEqual("Programmer", result[1].Title);
+        }
+
+        [TestCase(123456, null, null, null, null, null, null, null, null, null, null)]              // DepartmentCode
+        [TestCase(null, "IT", null, null, null, null, null, null, null, null, null)]                // DepartmentName
+        [TestCase(null, null, "Programmer", null, null, null, null, null, null, null, null)]        // PostTitle
+        [TestCase(null, null, null, 5, null, null, null, null, null, null, null)]                   // MinNumberOfUnits
+        [TestCase(null, null, null, null, null, 12000, null, null, null, null, null)]               // MinSalary
+        [TestCase(null, null, null, null, null, null, null, 5000, null, null, null)]                // MinPremium
+        [TestCase(null, null, null, null, null, null, null, null, null, 100000, null)]              // MinTotalSalary
+        public void Get_OneFilterParameterAndIsAntiFilterIsSet_ReturnsFilteredArray(int? code, string name, string title,
+                int? minNumberOfUnits, int? maxNumberOfUnits, double? minSalary, double? maxSalary,
+                double? minPremium, double? maxPremium, double? minTotalSalary, double? maxTotalSalary) {
+            PostFilter filter = new PostFilter {
+                DepartmentCode = new int?[] { code, null },
+                DepartmentName = new string[] { name, null, "" },
+                PostTitle = new string[] { title, null, "" },
+                MinNumberOfUnits = minNumberOfUnits,
+                MaxNumberOfUnits = maxNumberOfUnits,
+                MinSalary = minSalary,
+                MaxSalary = maxSalary,
+                MinPremium = minPremium,
+                MaxPremium = maxPremium,
+                MinTotalSalary = minTotalSalary,
+                MaxTotalSalary = maxTotalSalary,
+                IsAntiFilter = true
+            };
+            Post[] posts = new Post[] {
+                new Post() {
+                    Id = 1,
+                    Department = new Department { Code = 123456, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 6,
+                    Salary = 100000,
+                    Premium = 25000
+                },
+                new Post() {
+                    Id = 2,
+                    Department = new Department { Code = 123456, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 6,
+                    Salary = 80000,
+                    Premium = 15000
+                },
+                new Post() {
+                    Id = 3,
+                    Department = new Department { Code = 7654, DepartmentName = "Management" },
+                    Title = "Engineer",
+                    NumberOfUnits = 2,
+                    Salary = 10000,
+                    Premium = 1000
+                },
+                new Post() {
+                    Id = 4,
+                    Department = new Department { Code = 7654, DepartmentName = "Management" },
+                    Title = "Manager",
+                    NumberOfUnits = 4,
+                    Salary = 9000,
+                    Premium = 0
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Get(It.IsAny<Func<Post, bool>>()))
+                .Returns((Func<Post, bool> predicate) => posts.Where(predicate));
+            PostService postService = GetNewService(mock.Object);
+
+            PostDTO[] result = postService.Get(filter).ToArray();
+
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(3, result[0].Id);
+            Assert.AreEqual(4, result[1].Id);
+            Assert.AreEqual("Engineer", result[0].Title);
+            Assert.AreEqual("Manager", result[1].Title);
+        }
+
+        [TestCase(101, 102, null, null, null, null, null, null, null, null, null, null, null, null)]                    // DepartmentCode1, DepartmentCode2
+        [TestCase(null, null, "IT", "HR", null, null, null, null, null, null, null, null, null, null)]                  // DepartmentName1, DepartmentName2
+        [TestCase(null, null, null, null, "Programmer", "Manager", null, null, null, null, null, null, null, null)]     // PostTitle1, PostTitle2
+        [TestCase(null, null, null, null, null, null, 5, 10, null, null, null, null, null, null)]                       // MinNumberOfUnits, MaxNumberOfUnits
+        [TestCase(null, null, null, null, null, null, null, null, 12000, 300000, null, null, null, null)]               // MinSalary, MaxSalary
+        [TestCase(null, null, null, null, null, null, null, null, null, null, 5000, 50000, null, null)]                 // MinPremium, MaxPremium
+        [TestCase(null, null, null, null, null, null, null, null, null, null, null, null, 100000, 2000000)]             // MinTotalSalary, MaxTotalSalary
+        public void Get_TwoFilterParametersAreSet_ReturnsFilteredArray(int? code1, int? code2, 
+                string name1, string name2, string title1, string title2,
+                int? minNumberOfUnits, int? maxNumberOfUnits, double? minSalary, double? maxSalary,
+                double? minPremium, double? maxPremium, double? minTotalSalary, double? maxTotalSalary) {
+            PostFilter filter = new PostFilter {
+                DepartmentCode = new int?[] { code1, null, code2 },
+                DepartmentName = new string[] { name1, null, "", name2 },
+                PostTitle = new string[] { title1, null, "", title2 },
+                MinNumberOfUnits = minNumberOfUnits,
+                MaxNumberOfUnits = maxNumberOfUnits,
+                MinSalary = minSalary,
+                MaxSalary = maxSalary,
+                MinPremium = minPremium,
+                MaxPremium = maxPremium,
+                MinTotalSalary = minTotalSalary,
+                MaxTotalSalary = maxTotalSalary
+            };
+            Post[] posts = new Post[] {
+                new Post() {
+                    Id = 1,
+                    Department = new Department { Code = 101, DepartmentName = "HR" },
+                    Title = "Manager",
+                    NumberOfUnits = 6,
+                    Salary = 100000,
+                    Premium = 25000
+                },
+                new Post() {
+                    Id = 2,
+                    Department = new Department { Code = 102, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 8,
+                    Salary = 80000,
+                    Premium = 15000
+                },
+                new Post() {
+                    Id = 3,
+                    Department = new Department { Code = 103, DepartmentName = "Administration" },
+                    Title = "Director",
+                    NumberOfUnits = 4,
+                    Salary = 400000,
+                    Premium = 110000
+                },
+                new Post() {
+                    Id = 4,
+                    Department = new Department { Code = 104, DepartmentName = "Management" },
+                    Title = "Secretary",
+                    NumberOfUnits = 4,
+                    Salary = 9000,
+                    Premium = 0
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Get(It.IsAny<Func<Post, bool>>()))
+                .Returns((Func<Post, bool> predicate) => posts.Where(predicate));
+            PostService postService = GetNewService(mock.Object);
+
+            PostDTO[] result = postService.Get(filter).ToArray();
+
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
+            Assert.AreEqual("Manager", result[0].Title);
+            Assert.AreEqual("Programmer", result[1].Title);
+        }
+
+        [TestCase(101, 102, null, null, null, null, null, null, null, null, null, null, null, null)]                    // DepartmentCode1, DepartmentCode2
+        [TestCase(null, null, "IT", "HR", null, null, null, null, null, null, null, null, null, null)]                  // DepartmentName1, DepartmentName2
+        [TestCase(null, null, null, null, "Programmer", "Manager", null, null, null, null, null, null, null, null)]     // PostTitle1, PostTitle2
+        [TestCase(null, null, null, null, null, null, 5, 10, null, null, null, null, null, null)]                       // MinNumberOfUnits, MaxNumberOfUnits
+        [TestCase(null, null, null, null, null, null, null, null, 12000, 300000, null, null, null, null)]               // MinSalary, MaxSalary
+        [TestCase(null, null, null, null, null, null, null, null, null, null, 5000, 50000, null, null)]                 // MinPremium, MaxPremium
+        [TestCase(null, null, null, null, null, null, null, null, null, null, null, null, 100000, 2000000)]             // MinTotalSalary, MaxTotalSalary
+        public void Get_TwoFilterParametersAndIsAntiFilterAreSet_ReturnsFilteredArray(int? code1, int? code2,
+                string name1, string name2, string title1, string title2,
+                int? minNumberOfUnits, int? maxNumberOfUnits, double? minSalary, double? maxSalary,
+                double? minPremium, double? maxPremium, double? minTotalSalary, double? maxTotalSalary) {
+            PostFilter filter = new PostFilter {
+                DepartmentCode = new int?[] { code1, null, code2 },
+                DepartmentName = new string[] { name1, null, "", name2 },
+                PostTitle = new string[] { title1, null, "", title2 },
+                MinNumberOfUnits = minNumberOfUnits,
+                MaxNumberOfUnits = maxNumberOfUnits,
+                MinSalary = minSalary,
+                MaxSalary = maxSalary,
+                MinPremium = minPremium,
+                MaxPremium = maxPremium,
+                MinTotalSalary = minTotalSalary,
+                MaxTotalSalary = maxTotalSalary,
+                IsAntiFilter = true
+            };
+            Post[] posts = new Post[] {
+                new Post() {
+                    Id = 1,
+                    Department = new Department { Code = 101, DepartmentName = "HR" },
+                    Title = "Manager",
+                    NumberOfUnits = 6,
+                    Salary = 100000,
+                    Premium = 25000
+                },
+                new Post() {
+                    Id = 2,
+                    Department = new Department { Code = 102, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 8,
+                    Salary = 80000,
+                    Premium = 15000
+                },
+                new Post() {
+                    Id = 3,
+                    Department = new Department { Code = 103, DepartmentName = "Administration" },
+                    Title = "Director",
+                    NumberOfUnits = 4,
+                    Salary = 400000,
+                    Premium = 110000
+                },
+                new Post() {
+                    Id = 4,
+                    Department = new Department { Code = 104, DepartmentName = "Management" },
+                    Title = "Secretary",
+                    NumberOfUnits = 4,
+                    Salary = 9000,
+                    Premium = 0
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Get(It.IsAny<Func<Post, bool>>()))
+                .Returns((Func<Post, bool> predicate) => posts.Where(predicate));
+            PostService postService = GetNewService(mock.Object);
+
+            PostDTO[] result = postService.Get(filter).ToArray();
+
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(3, result[0].Id);
+            Assert.AreEqual(4, result[1].Id);
+            Assert.AreEqual("Director", result[0].Title);
+            Assert.AreEqual("Secretary", result[1].Title);
+        }
+
+        [TestCase(null)]
+        [TestCase("DepartmentCode")]
+        [TestCase("DepartmentName")]
+        [TestCase("PostTitle")]
+        [TestCase("NumberOfUnits")]
+        [TestCase("Salary")]
+        [TestCase("Premium")]
+        [TestCase("TotalSalary")]
+        public void Get_AscSortIsSet_ReturnsSortedArray(string field) {
+            PostFilter filter = new PostFilter {
+                SortField = field,
+                SortOrder = "Asc"
+            };
+            Post[] posts = new Post[] {
+                new Post() {
+                    Id = 1,
+                    Department = new Department { Code = 104, DepartmentName = "Management" },
+                    Title = "Secretary",
+                    NumberOfUnits = 26,
+                    Salary = 100000,
+                    Premium = 25000
+                },
+                new Post() {
+                    Id = 2,
+                    Department = new Department { Code = 103, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 18,
+                    Salary = 80000,
+                    Premium = 15000
+                },
+                new Post() {
+                    Id = 3,
+                    Department = new Department { Code = 102, DepartmentName = "HR" },
+                    Title = "Manager",
+                    NumberOfUnits = 8,
+                    Salary = 40000,
+                    Premium = 11000
+                },
+                new Post() {
+                    Id = 4,
+                    Department = new Department { Code = 101, DepartmentName = "Administration" },
+                    Title = "Director",
+                    NumberOfUnits = 4,
+                    Salary = 9000,
+                    Premium = 0
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Get(It.IsAny<Func<Post, bool>>()))
+                .Returns((Func<Post, bool> predicate) => posts.Where(predicate));
+            PostService postService = GetNewService(mock.Object);
+
+            PostDTO[] result = postService.Get(filter).ToArray();
+
+            Assert.AreEqual(4, result.Length);
+            Assert.AreEqual(4, result[0].Id);
+            Assert.AreEqual(3, result[1].Id);
+            Assert.AreEqual(2, result[2].Id);
+            Assert.AreEqual(1, result[3].Id);
+            Assert.AreEqual("Director", result[0].Title);
+            Assert.AreEqual("Manager", result[1].Title);
+            Assert.AreEqual("Programmer", result[2].Title);
+            Assert.AreEqual("Secretary", result[3].Title);
+        }
+
+        [TestCase("DepartmentCode")]
+        [TestCase("DepartmentName")]
+        [TestCase("PostTitle")]
+        [TestCase("NumberOfUnits")]
+        [TestCase("Salary")]
+        [TestCase("Premium")]
+        [TestCase("TotalSalary")]
+        public void Get_DescSortIsSet_ReturnsSortedArray(string field) {
+            PostFilter filter = new PostFilter {
+                SortField = field,
+                SortOrder = "Desc"
+            };
+            Post[] posts = new Post[] {
+                new Post() {
+                    Id = 1,
+                    Department = new Department { Code = 101, DepartmentName = "Administration" },
+                    Title = "Director",
+                    NumberOfUnits = 4,
+                    Salary = 9000,
+                    Premium = 0
+                },
+                new Post() {
+                    Id = 2,
+                    Department = new Department { Code = 102, DepartmentName = "HR" },
+                    Title = "Manager",
+                    NumberOfUnits = 8,
+                    Salary = 40000,
+                    Premium = 11000
+                },
+                new Post() {
+                    Id = 3,
+                    Department = new Department { Code = 103, DepartmentName = "IT" },
+                    Title = "Programmer",
+                    NumberOfUnits = 18,
+                    Salary = 80000,
+                    Premium = 15000
+                },
+                new Post() {
+                    Id = 4,
+                    Department = new Department { Code = 104, DepartmentName = "Management" },
+                    Title = "Secretary",
+                    NumberOfUnits = 26,
+                    Salary = 100000,
+                    Premium = 25000
+                }
+            };
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.Posts.Get(It.IsAny<Func<Post, bool>>()))
+                .Returns((Func<Post, bool> predicate) => posts.Where(predicate));
+            PostService postService = GetNewService(mock.Object);
+
+            PostDTO[] result = postService.Get(filter).ToArray();
+
+            Assert.AreEqual(4, result.Length);
+            Assert.AreEqual(4, result[0].Id);
+            Assert.AreEqual(3, result[1].Id);
+            Assert.AreEqual(2, result[2].Id);
+            Assert.AreEqual(1, result[3].Id);
+            Assert.AreEqual("Secretary", result[0].Title);
+            Assert.AreEqual("Programmer", result[1].Title);
+            Assert.AreEqual("Manager", result[2].Title);
+            Assert.AreEqual("Director", result[3].Title);
         }
 
         /// <summary>

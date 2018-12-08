@@ -497,29 +497,6 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         }
 
         /// <summary>
-        /// // GetAllAsync method
-        /// </summary>
-        [Test]
-        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray() {
-            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.GetAllAsync()).ReturnsAsync(() => new Employee[] {
-                new Employee() { Id = 1, LastName = "Petrov" },
-                new Employee() { Id = 2, LastName = "Popov" },
-                new Employee() { Id = 3, LastName = "Ivanov" }
-            });
-            EmployeeService es = GetNewService(mock.Object);
-
-            EmployeeDTO[] result = (await es.GetAllAsync()).ToArray();
-
-            Assert.AreEqual(1, result[0].Id);
-            Assert.AreEqual(2, result[1].Id);
-            Assert.AreEqual(3, result[2].Id);
-            Assert.AreEqual("Petrov", result[0].LastName);
-            Assert.AreEqual("Popov", result[1].LastName);
-            Assert.AreEqual("Ivanov", result[2].LastName);
-        }
-
-        /// <summary>
         /// // Get method
         /// </summary>
         [TestCase("P", false, null, false, null, null, null, null, false, null, null)]          // LastName
@@ -1088,16 +1065,27 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
             Assert.AreEqual("Ivanov", result[3].LastName);
         }
 
+        /// <summary>
+        /// // GetAllAsync method
+        /// </summary>
         [Test]
-        public void Get_SortFieldPropertyIsEqualToLastName_CallsGetMethodOnce() {
-            EmployeeFilter filter = new EmployeeFilter { SortField = "LastName" };
+        public override async Task GetAllAsync_GetAsyncMethodReturnsArray_ReturnsSameArray() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
-            mock.Setup(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>())).Returns(new Employee[] { });
-            EmployeeService employeeService = GetNewService(mock.Object);
+            mock.Setup(m => m.Employees.GetAllAsync()).ReturnsAsync(() => new Employee[] {
+                new Employee() { Id = 1, LastName = "Petrov" },
+                new Employee() { Id = 2, LastName = "Popov" },
+                new Employee() { Id = 3, LastName = "Ivanov" }
+            });
+            EmployeeService es = GetNewService(mock.Object);
 
-            employeeService.Get(filter);
+            EmployeeDTO[] result = (await es.GetAllAsync()).ToArray();
 
-            mock.Verify(m => m.Employees.Get(It.IsAny<Func<Employee, bool>>()), Times.Once());
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
+            Assert.AreEqual(3, result[2].Id);
+            Assert.AreEqual("Petrov", result[0].LastName);
+            Assert.AreEqual("Popov", result[1].LastName);
+            Assert.AreEqual("Ivanov", result[2].LastName);
         }
 
         /// <summary>
