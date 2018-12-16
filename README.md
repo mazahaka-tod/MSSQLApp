@@ -1,7 +1,7 @@
-The project is intended to be used by the human resources department.
+The project is intended to be used by the human resources department.  
 The project is under active development.
 
-The main functions implemented in the project:
+**The main functions implemented in the project**:
 1. View and edit organization information.
 2. Working with departments:
 - add new department;
@@ -40,14 +40,14 @@ The main functions implemented in the project:
 8. Export data to JSON file.
 9. Authentication and authorization of users in the system.
 
-Used Framework: ASP.NET MVC 5.
-Used DBMS: MS SQL Server.
-Used packages: Entity Framework, AspNet.Identity, AutoMapper, Ninject, Bootstrap, jQuery, NLog, NUnit, Moq.
+**Used Framework**: ASP.NET MVC 5.  
+**Used DBMS**: MS SQL Server.  
+**Used packages**: Entity Framework, AspNet.Identity, AutoMapper, Ninject, Bootstrap, jQuery, NLog, NUnit, Moq.  
 
-P.S.
-Login: Admin
-Password: MySecret
+**P.S.**  
+**Login**: Admin  
+**Password**: MySecret  
 
-ER-diagram of the database:
+**ER-diagram of the database**:
 
 ![alt text](https://raw.githubusercontent.com/mazahaka-tod/MSSQLApp/master/ER-diagram.png)

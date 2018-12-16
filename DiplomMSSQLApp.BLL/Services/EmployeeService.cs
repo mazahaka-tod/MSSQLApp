@@ -79,10 +79,6 @@ namespace DiplomMSSQLApp.BLL.Services {
                 cfg.CreateMap<EmployeeDTO, Employee>()
                     .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
-                //cfg.CreateMap<AnnualLeave, AnnualLeaveDTO>()
-                //    .ForMember(al => al.Employee, opt => opt.Ignore())
-                //    .ForMember(al => al.LeaveSchedule, opt => opt.Ignore());
-                //cfg.CreateMap<BaseBusinessTripDTO, BusinessTrip>();
                 cfg.CreateMap<PostDTO, Post>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
                 cfg.CreateMap<DepartmentDTO, Department>()
@@ -245,6 +241,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task DeleteAsync(int id) {
             Employee employee = await Database.Employees.FindByIdAsync(id);
             if (employee == null) return;
+            Database.BusinessTrips.RemoveSeries(employee.BusinessTrips.Where(bt => bt.Employees.Count == 1));
             Database.AnnualLeaves.RemoveSeries(employee.AnnualLeaves);
             Database.Employees.Remove(employee);
             await Database.SaveAsync();
@@ -253,6 +250,7 @@ namespace DiplomMSSQLApp.BLL.Services {
         // Удаление всех сотрудников
         public override async Task DeleteAllAsync() {
             await Database.AnnualLeaves.RemoveAllAsync();
+            await Database.BusinessTrips.RemoveAllAsync();
             await Database.Employees.RemoveAllAsync();
             await Database.SaveAsync();
         }
@@ -304,19 +302,22 @@ namespace DiplomMSSQLApp.BLL.Services {
             string[] emails = { "@mail.ru", "@yandex.ru", "@gmail.com" };
             string[] phones = { "+7-935-456-31-01", "+7-935-742-25-02", "+7-935-788-08-03", "+7-935-412-77-04", "+7-935-224-39-05", "+7-935-941-85-06", "+7-935-254-56-07" };
             for (int i = 0; i < 100; i++) {
-                Employee employee = new Employee {
+                EmployeeDTO eDto = new EmployeeDTO {
+                    PersonnelNumber = 4000 + i,
                     LastName = lastNames[i % lastNames.Length],
                     FirstName = firstNames[i % firstNames.Length],
-                    Contacts = new DAL.Entities.Contacts {
+                    Contacts = new DTO.Contacts {
                         Email = lastNames[i % lastNames.Length] + emails[i % emails.Length],
                         MobilePhone = phones[i % phones.Length]
                     },
                     HireDate = new DateTime(i % 18 + 2000, i % 12 + 1, i % 28 + 1),
                     PostId = postIds[i % postIds.Length],
-                    Birth = new DAL.Entities.Birth { BirthDate = new DateTime(i % 18 + 1970, i % 12 + 1, i % 28 + 1) },
-                    Passport = new DAL.Entities.Passport(),
-                    Education = new DAL.Entities.Education()
+                    Birth = new DTO.Birth { BirthDate = new DateTime(i % 18 + 1970, i % 12 + 1, i % 28 + 1) },
+                    Passport = new DTO.Passport(),
+                    Education = new DTO.Education()
                 };
+                eDto = SetAgeProperty(eDto);
+                Employee employee = MapDTOAndDomainModel(eDto);
                 Database.Employees.Create(employee);
             }
             await Database.SaveAsync();

@@ -22,7 +22,7 @@ namespace DiplomMSSQLApp.DAL.Repositories {
         }
 
         public override async Task<IEnumerable<AnnualLeave>> GetAllAsync() {
-            return await _dbSet.Include(al => al.Employee).ToListAsync();
+            return await _dbSet.Include(al => al.Employee).Include(al => al.Employee.Post).Include(al => al.Employee.Post.Department).Include(al => al.LeaveSchedule).ToListAsync();
         }
     }
 }

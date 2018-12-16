@@ -80,11 +80,13 @@ namespace DiplomMSSQLApp.BLL.Services {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Department, DepartmentDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
                     .ForMember(e => e.Education, opt => opt.Ignore())
-                    .ForMember(e => e.Passport, opt => opt.Ignore());
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
                 cfg.CreateMap<Organization, OrganizationDTO>()
                     .ForMember(o => o.Requisites, opt => opt.Ignore())
                     .ForMember(o => o.Bank, opt => opt.Ignore());

@@ -28,20 +28,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         public async Task<ActionResult> Index(int page = 1) {
             IEnumerable<DepartmentDTO> dDto = await _departmentService.GetAllAsync();
             dDto = _departmentService.GetPage(dDto, page);     // Paging
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                    .ForMember(d => d.Posts, opt => opt.Ignore());
-                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore())
-                    .ForMember(e => e.Birth, opt => opt.Ignore())
-                    .ForMember(e => e.Contacts, opt => opt.Ignore())
-                    .ForMember(e => e.Education, opt => opt.Ignore())
-                    .ForMember(e => e.Passport, opt => opt.Ignore());
-                cfg.CreateMap<OrganizationDTO, OrganizationViewModel>()
-                    .ForMember(o => o.Requisites, opt => opt.Ignore())
-                    .ForMember(o => o.Bank, opt => opt.Ignore());
-            });
+            InitializeMapper();
             IEnumerable<DepartmentViewModel> departments = Mapper.Map<IEnumerable<DepartmentDTO>, IEnumerable<DepartmentViewModel>>(dDto);
             DepartmentListViewModel model = new DepartmentListViewModel {
                 Departments = departments,
@@ -145,23 +132,27 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         private DepartmentViewModel MapDTOWithViewModel(DepartmentDTO dDto) {
+            InitializeMapper();
+            DepartmentViewModel department = Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
+            return department;
+        }
+        private void InitializeMapper() {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<DepartmentDTO, DepartmentViewModel>();
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore())
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
                     .ForMember(e => e.Education, opt => opt.Ignore())
-                    .ForMember(e => e.Passport, opt => opt.Ignore());
+                    .ForMember(e => e.Passport, opt => opt.Ignore())
+                    .ForMember(e => e.Post, opt => opt.Ignore());
                 cfg.CreateMap<OrganizationDTO, OrganizationViewModel>()
                     .ForMember(o => o.Requisites, opt => opt.Ignore())
                     .ForMember(o => o.Bank, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, PostViewModel>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
             });
-            DepartmentViewModel department = Mapper.Map<DepartmentDTO, DepartmentViewModel>(dDto);
-            return department;
         }
 
         // Подробная информация об отделе
