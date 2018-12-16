@@ -45,10 +45,13 @@ namespace DiplomMSSQLApp.WEB.Models {
         public int? PostId { get; set; }
         public PostViewModel Post { get; set; }
 
+        [Display(Name = "Список отпусков")]
+        public virtual ICollection<AnnualLeaveViewModel> AnnualLeaves { get; set; }
         [Display(Name = "Список командировок")]
         public virtual ICollection<BaseBusinessTripViewModel> BusinessTrips { get; set; }
 
         public EmployeeViewModel() {
+            AnnualLeaves = new List<AnnualLeaveViewModel>();
             BusinessTrips = new List<BaseBusinessTripViewModel>();
         }
     }

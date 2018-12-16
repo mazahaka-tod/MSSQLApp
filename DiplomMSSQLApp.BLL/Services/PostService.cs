@@ -41,6 +41,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                     .ForMember(d => d.Organization, opt => opt.Ignore())
                     .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeDTO, Employee>()
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
@@ -109,6 +110,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                     .ForMember(d => d.Organization, opt => opt.Ignore())
                     .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
@@ -253,7 +255,7 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         // Удаление всех свободных должностей
         public override async Task DeleteAllAsync() {
-            IEnumerable<Post> posts = Database.Posts.Get(e => e.Employees.Count == 0);
+            IEnumerable<Post> posts = Database.Posts.Get(p => p.Employees.Count == 0);
             Database.Posts.RemoveSeries(posts);
             await Database.SaveAsync();
         }
@@ -301,6 +303,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                     NumberOfUnits = Convert.ToInt32(1 + Math.Round(new Random(i).NextDouble() * 100)),
                     Salary = Convert.ToInt32(50000 + Math.Round(new Random(i).NextDouble() * 100) * 400),
                     Premium = Convert.ToInt32(10000 + Math.Round(new Random(i).NextDouble() * 100) * 400),
+                    NumberOfDaysOfLeave = new Random().Next(28, 40),
                     DepartmentId = departmentIds[i % departmentIds.Length]
                 };
                 Database.Posts.Create(post);

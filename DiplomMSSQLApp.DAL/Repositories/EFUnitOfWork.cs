@@ -7,14 +7,24 @@ using System.Threading.Tasks;
 namespace DiplomMSSQLApp.DAL.Repositories {
     public class EFUnitOfWork : IUnitOfWork {
         private HRContext db;
+        private IGenericRepository<AnnualLeave>     _annualLeaveRepository;
         private IGenericRepository<BusinessTrip>    _businessTripRepository;
         private IGenericRepository<Department>      _departmentRepository;
         private IGenericRepository<Employee>        _employeeRepository;
+        private IGenericRepository<LeaveSchedule>   _leaveScheduleRepository;
         private IGenericRepository<Organization>    _organizationRepository;
         private IGenericRepository<Post>            _postRepository;
 
         public EFUnitOfWork(string connectionString) {
             db = new HRContext(connectionString);
+        }
+
+        public IGenericRepository<AnnualLeave> AnnualLeaves {
+            get {
+                if (_annualLeaveRepository == null)
+                    _annualLeaveRepository = new EFAnnualLeaveRepository(db);
+                return _annualLeaveRepository;
+            }
         }
 
         public IGenericRepository<BusinessTrip> BusinessTrips {
@@ -38,6 +48,14 @@ namespace DiplomMSSQLApp.DAL.Repositories {
                 if (_employeeRepository == null)
                     _employeeRepository = new EFEmployeeRepository(db);
                 return _employeeRepository;
+            }
+        }
+
+        public IGenericRepository<LeaveSchedule> LeaveSchedules {
+            get {
+                if (_leaveScheduleRepository == null)
+                    _leaveScheduleRepository = new EFLeaveScheduleRepository(db);
+                return _leaveScheduleRepository;
             }
         }
 

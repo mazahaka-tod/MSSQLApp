@@ -24,8 +24,10 @@ namespace DiplomMSSQLApp.WEB.Models.Identity {
 
     public class LoginModel {
         [Required(ErrorMessage = "Требуется ввести имя")]
+        [Display(Name = "Имя")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Требуется ввести пароль")]
+        [Display(Name = "Пароль")]
         public string Password { get; set; }
     }
 

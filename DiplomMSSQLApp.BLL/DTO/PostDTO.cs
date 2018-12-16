@@ -10,10 +10,12 @@ namespace DiplomMSSQLApp.BLL.DTO {
         public double TotalSalary {
             get { return (Salary.Value + Premium.Value) * NumberOfUnits.Value; }
         }
+        public int NumberOfDaysOfLeave { get; set; }
+
         public int? DepartmentId { get; set; }
         public DepartmentDTO Department { get; set; }
-        public virtual ICollection<EmployeeDTO> Employees { get; set; }
 
+        public virtual ICollection<EmployeeDTO> Employees { get; set; }
         public PostDTO() {
             Employees = new List<EmployeeDTO>();
         }

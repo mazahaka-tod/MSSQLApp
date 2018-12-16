@@ -5,6 +5,7 @@ using DiplomMSSQLApp.BLL.Infrastructure;
 using DiplomMSSQLApp.BLL.Interfaces;
 using DiplomMSSQLApp.BLL.Services;
 using DiplomMSSQLApp.WEB.Models;
+using DiplomMSSQLApp.WEB.Util;
 using NLog;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,7 @@ using System.Web.Mvc;
 namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
+    [Internationalization]
     public class EmployeeController : Controller {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private IService<EmployeeDTO> _employeeService;
@@ -32,19 +34,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 filter = System.Web.Helpers.Json.Decode<EmployeeFilter>(filterAsJsonString);
             IEnumerable<EmployeeDTO> eDto = (_employeeService as EmployeeService).Get(filter);      // Filter
             eDto = _employeeService.GetPage(eDto, page);     // Paging
-            Mapper.Initialize(cfg => {
-                cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
-                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
-                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                    .ForMember(d => d.Posts, opt => opt.Ignore());
-                cfg.CreateMap<PostDTO, PostViewModel>()
-                    .ForMember(p => p.Employees, opt => opt.Ignore());
-
-                cfg.CreateMap<BLL.DTO.Birth, Models.Birth>();
-                cfg.CreateMap<BLL.DTO.Passport, Models.Passport>();
-                cfg.CreateMap<BLL.DTO.Contacts, Models.Contacts>();
-                cfg.CreateMap<BLL.DTO.Education, Models.Education>();
-            });
+            InitializeMapper();
             IEnumerable<EmployeeViewModel> employees = Mapper.Map<IEnumerable<EmployeeDTO>, IEnumerable<EmployeeViewModel>>(eDto);
             EmployeeListViewModel model = new EmployeeListViewModel {
                 Employees = employees,
@@ -58,8 +48,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                         e.Id,
                         e.LastName,
                         e.FirstName,
-                        ContactsEmail = e.Contacts.Email,
-                        ContactsMobilePhone = e.Contacts.MobilePhone,
+                        ContactsEmail = e.Contacts.Email ?? "",
+                        ContactsMobilePhone = e.Contacts.MobilePhone ?? "",
                         HireDate = e.HireDate.ToString("dd MMMM yyyy"),
                         PostSalary = e.Post.Salary,
                         PostPremium = e.Post.Premium,
@@ -110,21 +100,23 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return new SelectList(items, "Value", "Text");
         }
 
-        private EmployeeDTO MapViewModelWithDTO(EmployeeViewModel e) {
+        private EmployeeDTO MapViewModelWithDTO(EmployeeViewModel employee) {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>();
-                cfg.CreateMap<BaseBusinessTripViewModel, BaseBusinessTripDTO>();
-                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
-                   .ForMember(d => d.Posts, opt => opt.Ignore());
+                cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
                 cfg.CreateMap<PostViewModel, PostDTO>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
-
+                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
+                   .ForMember(d => d.Manager, opt => opt.Ignore())
+                   .ForMember(d => d.Organization, opt => opt.Ignore())
+                   .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<Models.Birth, BLL.DTO.Birth>();
                 cfg.CreateMap<Models.Passport, BLL.DTO.Passport>();
                 cfg.CreateMap<Models.Contacts, BLL.DTO.Contacts>();
                 cfg.CreateMap<Models.Education, BLL.DTO.Education>();
             });
-            EmployeeDTO eDto = Mapper.Map<EmployeeViewModel, EmployeeDTO>(e);
+            EmployeeDTO eDto = Mapper.Map<EmployeeViewModel, EmployeeDTO>(employee);
             return eDto;
         }
 
@@ -161,21 +153,29 @@ namespace DiplomMSSQLApp.WEB.Controllers {
         }
 
         private EmployeeViewModel MapDTOWithViewModel(EmployeeDTO eDto) {
+            InitializeMapper();
+            EmployeeViewModel employee = Mapper.Map<EmployeeDTO, EmployeeViewModel>(eDto);
+            return employee;
+        }
+
+        private void InitializeMapper() {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>();
+                cfg.CreateMap<AnnualLeaveDTO, AnnualLeaveViewModel>()
+                    .ForMember(al => al.Employee, opt => opt.Ignore())
+                    .ForMember(al => al.LeaveSchedule, opt => opt.Ignore());
                 cfg.CreateMap<BaseBusinessTripDTO, BaseBusinessTripViewModel>();
-                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
-                   .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<PostDTO, PostViewModel>()
-                   .ForMember(p => p.Employees, opt => opt.Ignore());
-
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
+                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
+                    .ForMember(d => d.Manager, opt => opt.Ignore())
+                    .ForMember(d => d.Organization, opt => opt.Ignore())
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<BLL.DTO.Birth, Models.Birth>();
                 cfg.CreateMap<BLL.DTO.Passport, Models.Passport>();
                 cfg.CreateMap<BLL.DTO.Contacts, Models.Contacts>();
                 cfg.CreateMap<BLL.DTO.Education, Models.Education>();
             });
-            EmployeeViewModel e = Mapper.Map<EmployeeDTO, EmployeeViewModel>(eDto);
-            return e;
         }
 
         // Подробная информация о сотруднике

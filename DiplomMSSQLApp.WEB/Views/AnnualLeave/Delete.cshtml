@@ -1,0 +1,96 @@
+﻿@model DiplomMSSQLApp.WEB.Models.AnnualLeaveViewModel
+
+@{
+    ViewBag.Title = "Удаление отпуска";
+}
+
+<h2>Удаление отпуска</h2>
+<hr />
+
+<h3>Вы уверены, что хотите удалить отпуск?</h3>
+
+<div>
+    <div>
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Employee.LastName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Employee.LastName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Employee.FirstName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Employee.FirstName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Employee.Patronymic)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Employee.Patronymic)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Employee.Post.Title)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Employee.Post.Title)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Employee.Post.Department.DepartmentName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Employee.Post.Department.DepartmentName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Employee.Post.NumberOfDaysOfLeave)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Employee.Post.NumberOfDaysOfLeave)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ScheduledDate)
+            </dt>
+            <dd>
+                @Model.ScheduledDate.ToString("dd MMMM yyyy")
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ScheduledNumberOfDays)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.ScheduledNumberOfDays)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ActualDate)
+            </dt>
+            <dd>
+                @(Model.ActualDate.HasValue ? Model.ActualDate.Value.ToString("dd MMMM yyyy") : "")
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ActualNumberOfDays)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.ActualNumberOfDays)
+            </dd>
+        </dl>
+    </div>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Удалить" class="btn btn-primary" />
+            @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    }
+</div>

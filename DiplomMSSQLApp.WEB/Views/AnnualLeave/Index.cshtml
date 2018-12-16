@@ -1,0 +1,549 @@
+﻿@using DiplomMSSQLApp.WEB.Helpers
+@model DiplomMSSQLApp.WEB.Models.AnnualLeaveListViewModel
+
+@{
+    ViewBag.Title = "Список отпусков";
+}
+
+<h2>Список отпусков</h2>
+<hr />
+
+<div>
+    <div id="filterToggle" class="btn btn-default">
+        Поиск по фильтру <i>(Показать)</i>
+    </div>
+    <div id="filter" style="display:none;">
+        @using (Ajax.BeginForm("Index", null, new AjaxOptions { OnSuccess = "processData", Url = Url.Action("Index") }, new { id = "filterform" })) {
+            <table>
+                <tr>
+                    <td width="500px">
+                        <dl class="dl-horizontal">
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.Name, "ФИО сотрудника", new { style = "margin-top: 18px" })
+                            </dt>
+                            <dd>
+                                <span id="alName">
+                                    @Html.TextBoxFor(m => m.Filter.Name[0], null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "100" })
+                                    <span style="color:red;"></span>
+                                </span>
+                                <div>
+                                    <a id="addName">Добавить поле</a>
+                                    <a id="removeName" style="display:none;">Удалить поле</a>
+                                </div>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.PostTitle, "Должность сотрудника", new { style = "margin-top: 10px" })
+                            </dt>
+                            <dd>
+                                <span id="alPostTitle">
+                                    @Html.TextBoxFor(m => m.Filter.PostTitle[0], null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "100" })
+                                    <span style="color:red;"></span>
+                                </span>
+                                <div>
+                                    <a id="addPostTitle">Добавить поле</a>
+                                    <a id="removePostTitle" style="display:none;">Удалить поле</a>
+                                </div>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.DepartmentName, "Название отдела", new { style = "margin-top: 18px" })
+                            </dt>
+                            <dd>
+                                <span id="alDepartmentName">
+                                    @Html.TextBoxFor(m => m.Filter.DepartmentName[0], null, new { @class = "form-control", style = "margin-top: 12px", maxlength = "100" })
+                                    <span style="color:red;"></span>
+                                </span>
+                                <div>
+                                    <a id="addDepartmentName">Добавить поле</a>
+                                    <a id="removeDepartmentName" style="display:none;">Удалить поле</a>
+                                </div>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.ScheduledDate, "Запланированная дата отпуска", new { style = "margin-top: 10px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.ScheduledDate, null, new { @class = "form-control", style = "margin-top: 12px", type = "date" })
+                                <span style="color:red;"></span>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.ActualDate, "Фактическая дата отпуска", new { style = "margin-top: 12px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.ActualDate, null, new { @class = "form-control", style = "margin-top: 12px", type = "date" })
+                                <span style="color:red;"></span>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.MinNumberOfDaysOfLeave, "Общее количество дней отпуска на год от ", new { style = "margin-top: 12px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.MinNumberOfDaysOfLeave, null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "1", max = "1000" })
+                                <span style="color:red;"></span>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.MaxNumberOfDaysOfLeave, " до ", new { style = "margin-top: 12px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.MaxNumberOfDaysOfLeave, null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "1", max = "1000" })
+                                <span style="color:red;"></span>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.MinScheduledNumberOfDays, "Запланированное количество дней отпуска от ", new { style = "margin-top: 12px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.MinScheduledNumberOfDays, null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "1", max = "1000" })
+                                <span style="color:red;"></span>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.MaxScheduledNumberOfDays, " до ", new { style = "margin-top: 12px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.MaxScheduledNumberOfDays, null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "1", max = "1000" })
+                                <span style="color:red;"></span>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.MinActualNumberOfDays, "Фактическое количество дней отпуска от ", new { style = "margin-top: 12px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.MinActualNumberOfDays, null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "1", max = "1000" })
+                                <span style="color:red;"></span>
+                            </dd>
+
+                            <dt>
+                                @Html.LabelFor(m => m.Filter.MaxActualNumberOfDays, " до ", new { style = "margin-top: 12px" })
+                            </dt>
+                            <dd>
+                                @Html.TextBoxFor(m => m.Filter.MaxActualNumberOfDays, null, new { @class = "form-control", style = "margin-top: 12px", type = "number", min = "1", max = "1000" })
+                                <span style="color:red;"></span>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td valign="top">
+                        <dl class="dl-horizontal">
+                            <dt>
+                                @Html.Label("Sort", "Сортировка")
+                            </dt>
+                            <dd>
+                                @Html.DropDownListFor(m => m.Filter.SortField, new SelectList(new[] {
+                                    new { label = "По ФИО сотрудника", value = "Name" },
+                                    new { label = "По должности сотрудника", value = "PostTitle" },
+                                    new { label = "По названию отдела", value = "DepartmentName" },
+                                    new { label = "По запланированной дате отпуска", value = "ScheduledDate" },
+                                    new { label = "По фактической дате отпуска", value = "ActualDate" },
+                                    new { label = "По общему количеству дней отпуска на год", value = "NumberOfDaysOfLeave" },
+                                    new { label = "По запланированному количеству дней отпуска", value = "ScheduledNumberOfDays" },
+                                    new { label = "По фактическому количеству дней отпуска", value = "ActualNumberOfDays" } }, "value", "label"),
+                                    new { @class = "form-control", style = "margin-bottom: 12px" })
+                                @Html.DropDownListFor(m => m.Filter.SortOrder, new SelectList(new[] {
+                                    new { label = "По возрастанию", value = "Asc" },
+                                    new { label = "По убыванию", value = "Desc" } }, "value", "label"),
+                                    new { @class = "form-control", style = "margin-bottom: 12px" })
+                            </dd>
+
+                            <dt>
+                                @Html.Label("Columns", "Показывать столбцы")
+                            </dt>
+                            <dd>
+                                <input type="checkbox" id="Filter_Columns0" name="Filter.Columns" value="0" />
+                                @Html.Label("Columns0", "Название отдела")
+                                <br />
+                                <input type="checkbox" id="Filter_Columns1" name="Filter.Columns" value="1" />
+                                @Html.Label("Columns1", "Должность сотрудника")
+                                <br />
+                                <input type="checkbox" id="Filter_Columns2" name="Filter.Columns" value="2" />
+                                @Html.Label("Columns2", "ФИО сотрудника")
+                                <br />
+                                <input type="checkbox" id="Filter_Columns3" name="Filter.Columns" value="3" />
+                                @Html.Label("Columns3", "Общее количество дней отпуска на год")
+                                <br />
+                                <input type="checkbox" id="Filter_Columns4" name="Filter.Columns" value="4" />
+                                @Html.Label("Columns4", "Запланированная дата отпуска")
+                                <br />
+                                <input type="checkbox" id="Filter_Columns5" name="Filter.Columns" value="5" />
+                                @Html.Label("Columns5", "Запланированное количество дней отпуска")
+                                <br />
+                                <input type="checkbox" id="Filter_Columns6" name="Filter.Columns" value="6" />
+                                @Html.Label("Columns6", "Фактическая дата отпуска")
+                                <br />
+                                <input type="checkbox" id="Filter_Columns7" name="Filter.Columns" value="7" />
+                                @Html.Label("Columns7", "Фактическое количество дней отпуска")
+                            </dd>
+
+                            <dt>
+                                @Html.Label("AntiFilter", "Несоответствующие фильтру")
+                            </dt>
+                            <dd>
+                                @Html.CheckBoxFor(m => m.Filter.IsAntiFilter, new { style = "margin-bottom: 12px" })
+                                @Html.LabelFor(m => m.Filter.IsAntiFilter, "Отрицание фильтра")
+                            </dd>
+
+                            <dt>
+                            </dt>
+                            <dd>
+                                <input type="submit" value="Найти" class="btn btn-primary" />
+                                @Html.ActionLink("Сброс", null, null, new { id = "reset", @class = "btn btn-default" })
+                            </dd>
+                        </dl>
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>
+</div>
+
+<hr />
+
+<p>
+    @Html.ActionLink("Добавить отпуск", "Create", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Удалить все отпуска", "DeleteAll", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Экспортировать данные в JSON файл", "ExportJson", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Добавить 100 отпусков (для тестирования)", "TestCreate", null, new { @class = "btn btn-default" })
+</p>
+
+
+@if (Model.AnnualLeaves.Count() > 0) {
+    <table class="table table-striped table-hover">
+        <thead id="tableHeader">
+            <tr>
+                @if (Model.Filter.Columns.Contains("0")) {
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnnualLeaves.ElementAt(0).Employee.Post.Department.DepartmentName)
+                    </th>
+                }
+                @if (Model.Filter.Columns.Contains("1")) {
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnnualLeaves.ElementAt(0).Employee.Post.Title)
+                    </th>
+                }
+                @if (Model.Filter.Columns.Contains("2")) {
+                    <th>
+                        ФИО сотрудника
+                    </th>
+                }
+                @if (Model.Filter.Columns.Contains("3")) {
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnnualLeaves.ElementAt(0).Employee.Post.NumberOfDaysOfLeave)
+                    </th>
+                }
+                @if (Model.Filter.Columns.Contains("4")) {
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnnualLeaves.ElementAt(0).ScheduledDate)
+                    </th>
+                }
+                @if (Model.Filter.Columns.Contains("5")) {
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnnualLeaves.ElementAt(0).ScheduledNumberOfDays)
+                    </th>
+                }
+                @if (Model.Filter.Columns.Contains("6")) {
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnnualLeaves.ElementAt(0).ActualDate)
+                    </th>
+                }
+                @if (Model.Filter.Columns.Contains("7")) {
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnnualLeaves.ElementAt(0).ActualNumberOfDays)
+                    </th>
+                }
+                <th width="150px"></th>
+            </tr>
+        </thead>
+
+        <tbody id="tableBody">
+            @foreach (var item in Model.AnnualLeaves) {
+                <tr>
+                    @if (Model.Filter.Columns.Contains("0")) {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Employee.Post.Department.DepartmentName)
+                        </td>
+                    }
+                    @if (Model.Filter.Columns.Contains("1")) {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Employee.Post.Title)
+                        </td>
+                    }
+                    @if (Model.Filter.Columns.Contains("2")) {
+                        <td>
+                            @(item.Employee.LastName + " " + item.Employee.FirstName + " " + item.Employee.Patronymic ?? "")
+                        </td>
+                    }
+                    @if (Model.Filter.Columns.Contains("3")) {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Employee.Post.NumberOfDaysOfLeave)
+                        </td>
+                    }
+                    @if (Model.Filter.Columns.Contains("4")) {
+                        <td>
+                            @item.ScheduledDate.ToString("dd MMMM yyyy")
+                        </td>
+                    }
+                    @if (Model.Filter.Columns.Contains("5")) {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ScheduledNumberOfDays)
+                        </td>
+                    }
+                    @if (Model.Filter.Columns.Contains("6")) {
+                        <td>
+                            @(item.ActualDate.HasValue ? item.ActualDate.Value.ToString("dd MMMM yyyy") : "")
+                        </td>
+                    }
+                    @if (Model.Filter.Columns.Contains("7")) {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ActualNumberOfDays)
+                        </td>
+                    }
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<p>
+    @Html.Label("Count", "Количество отпусков: " + Model.PageInfo.TotalItems)
+</p>
+
+<div id="contentPager" class="btn-group">
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { filterAsJsonString = Json.Encode(Model.Filter), page = x }))
+</div>
+
+@section scripts {
+    <script>
+        function updateHrefAttr(target, numPage, data) {
+            var attr_href = '/AnnualLeave?filterAsJsonString=' + JSON.stringify(data.Filter) + '&page=' + numPage;
+            target.attr({
+                'data-ajax-url': attr_href,
+                'href': attr_href
+            });
+        }
+
+        function processData(data) {
+            // Обновляем заголовок таблицы
+            var target = $('#tableHeader');
+            target.empty();
+            $('#tableHeader').append('<tr>');
+            target = $('#tableHeader tr');
+            if (data.Filter.Columns.indexOf('0') != -1) target.append('<th>Название отдела</th>');
+            if (data.Filter.Columns.indexOf('1') != -1) target.append('<th>Название должности</th>');
+            if (data.Filter.Columns.indexOf('2') != -1) target.append('<th>ФИО сотрудника</th>');
+            if (data.Filter.Columns.indexOf('3') != -1) target.append('<th>Количество дней отпуска</th>');
+            if (data.Filter.Columns.indexOf('4') != -1) target.append('<th>Запланированная дата отпуска</th>');
+            if (data.Filter.Columns.indexOf('5') != -1) target.append('<th>Запланированное количество дней отпуска</th>');
+            if (data.Filter.Columns.indexOf('6') != -1) target.append('<th>Фактическая дата отпуска</th>');
+            if (data.Filter.Columns.indexOf('7') != -1) target.append('<th>Фактическое количество дней отпуска</th>');
+            target.append('<th width="150px"></th>');
+
+            // Заполняем таблицу
+            target = $('#tableBody');
+            target.empty();
+            for (var i = 0; i < data.AnnualLeaves.length; i++) {
+                $('#tableBody').append('<tr>');
+                target = $('#tableBody tr:last');
+                var annualLeave = data.AnnualLeaves[i];
+                if (data.Filter.Columns.indexOf('0') != -1) target.append('<td>' + annualLeave.DepartmentName + '</td>');
+                if (data.Filter.Columns.indexOf('1') != -1) target.append('<td>' + annualLeave.PostTitle + '</td>');
+                if (data.Filter.Columns.indexOf('2') != -1) target.append('<td>' + annualLeave.EmployeeName + '</td>');
+                if (data.Filter.Columns.indexOf('3') != -1) target.append('<td>' + annualLeave.NumberOfDaysOfLeave + '</td>');
+                if (data.Filter.Columns.indexOf('4') != -1) target.append('<td>' + annualLeave.ScheduledDate + '</td>');
+                if (data.Filter.Columns.indexOf('5') != -1) target.append('<td>' + annualLeave.ScheduledNumberOfDays + '</td>');
+                if (data.Filter.Columns.indexOf('6') != -1) target.append('<td>' + annualLeave.ActualDate + '</td>');
+                if (data.Filter.Columns.indexOf('7') != -1) target.append('<td>' + annualLeave.ActualNumberOfDays + '</td>');
+                target.append('<td><a href="/AnnualLeave/Edit/' + annualLeave.Id + '">Edit</a> | '
+                    + '<a href="/AnnualLeave/Details/' + annualLeave.Id + '">Details</a> | '
+                    + '<a href="/AnnualLeave/Delete/' + annualLeave.Id + '">Delete</a></td>');
+            }
+
+            // Обновляем кнопки навигации
+            // Кнопка '<<'
+            target = $('#firstpagebutton');
+            updateHrefAttr(target, 1, data);
+
+            // Кнопка '<'
+            var numPage = data.PageInfo.PageNumber > 3 ? data.PageInfo.PageNumber - 3 : 1;
+            target = $('#leftbutton');
+            updateHrefAttr(target, numPage, data);
+
+            // Кнопка '>'
+            numPage = data.PageInfo.PageNumber < data.PageInfo.TotalPages - 3 ? data.PageInfo.PageNumber + 3 : data.PageInfo.TotalPages;
+            target = $('#rightbutton');
+            updateHrefAttr(target, numPage, data);
+
+            // Кнопка '>>'
+            numPage = data.PageInfo.TotalPages;
+            target = $('#lastpagebutton');
+            updateHrefAttr(target, numPage, data);
+
+            // Кнопки с цифрами
+            $('a.centerbuttons').remove();
+            var minPage = data.PageInfo.PageNumber > 1 ? data.PageInfo.PageNumber - 1 : 1;
+            var maxPage = data.PageInfo.PageNumber < data.PageInfo.TotalPages - 1 ? data.PageInfo.PageNumber + 1 : data.PageInfo.TotalPages;
+            for (numPage = minPage; numPage <= maxPage; numPage++) {
+                target = $('#leftbutton').clone().insertBefore('#rightbutton');
+                updateHrefAttr(target, numPage, data);
+                target.text(numPage);
+                // если текущая страница, то выделяем ее
+                if (numPage == data.PageInfo.PageNumber)
+                    target.addClass('centerbuttons btn btn-primary selected');
+                else
+                    target.addClass('centerbuttons btn btn-default');
+            }
+
+            // Обновляем метку 'Количество отпусков: '
+            $('label[for="Count"]').text('Количество отпусков: ' + data.PageInfo.TotalItems);
+        }
+    </script>
+
+    <script>
+    $(document).ready(function () {
+        // Добавляет на форму фильтра текстовое поле 'ФИО сотрудника', 'Должность сотрудника' или 'Название отдела'
+        $('#addName, #addPostTitle, #addDepartmentName').on('click', function (event) {
+            event.preventDefault();
+            var id = $(this).attr("id").substr(3);
+            var inputCount = $('#al' + id + ' input').length;
+            if (inputCount < 5) {
+                // Добавляем элемент input
+                $('input:first', '#al' + id).clone().attr({
+                    style: 'margin-top:6px;',
+                    id: 'Filter_' + id + '_' + inputCount + '_',
+                    name: 'Filter.' + id + '[' + inputCount + ']'
+                }).val('').appendTo('#al' + id);
+                // Добавляем элемент span
+                $('span:first', '#al' + id).clone().appendTo('#al' + id);
+            }
+            if (inputCount === 1)
+                $('#remove' + id).css('display', 'block');
+            if (inputCount === 4)
+                $('#add' + id).css('display', 'none');
+        });
+
+        // Удаляет на форме фильтра текстовое поле 'ФИО сотрудника', 'Должность сотрудника' или 'Название отдела'
+        $('#removeName, #removePostTitle, #removeDepartmentName').on('click', function (event) {
+            event.preventDefault();
+            var id = $(this).attr("id").substr(6);
+            var inputCount = $('#al' + id + ' input').length;
+            if (inputCount > 1)
+                $('#al' + id + ' span:last, #al' + id + ' input:last').remove();
+            if (inputCount === 2)
+                $('#remove' + id).css('display', 'none');
+            if (inputCount === 5)
+                $('#add' + id).css('display', 'block');
+        });
+
+        // Устанавливает checkbox на форме фильтра
+        var columns = ('@String.Concat(Model.Filter.Columns)').split('');
+        $('input[name="Filter.Columns"]').val(columns);
+
+        // Устанавливает значения в полях фильтра 'ФИО сотрудника'
+        @if (Model.Filter.Name != null) {
+            string[] names = Model.Filter.Name.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            if (names.Length > 0) {
+                @:$('#Filter_Name_0_').val('@names[0]');
+                for (int i = 1; i < names.Length; i++) {
+                    @:$('input:first', '#alName').clone().attr({ style: 'margin-top:6px;', id: 'Filter_Name_' + @i + '_', name: 'Filter.Name[' + @i + ']' }).val('@names[i]').appendTo('#alName');
+                    @:$('span:first', '#alName').clone().appendTo('#alName');
+                }
+                if (names.Length == 5) {
+                    @:$('#addName').css('display', 'none');
+                }
+                if (names.Length > 1) {
+                    @:$('#removeName').css('display', 'block');
+                }
+            }
+        }
+
+        // Устанавливает значения в полях фильтра 'Должность сотрудника'
+        @if (Model.Filter.PostTitle != null) {
+            string[] titles = Model.Filter.PostTitle.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            if (titles.Length > 0) {
+                @:$('#Filter_PostTitle_0_').val('@titles[0]');
+                for (int i = 1; i < titles.Length; i++) {
+                    @:$('input:first', '#alPostTitle').clone().attr({ style: 'margin-top:6px;', id: 'Filter_PostTitle_' + @i + '_', name: 'Filter.PostTitle[' + @i + ']' }).val('@titles[i]').appendTo('#alPostTitle');
+                    @:$('span:first', '#alPostTitle').clone().appendTo('#alPostTitle');
+                }
+                if (titles.Length == 5) {
+                    @:$('#addPostTitle').css('display', 'none');
+                }
+                if (titles.Length > 1) {
+                    @:$('#removePostTitle').css('display', 'block');
+                }
+            }
+        }
+
+        // Устанавливает значения в полях фильтра 'Название отдела'
+        @if (Model.Filter.DepartmentName != null) {
+            string[] departmentNames = Model.Filter.DepartmentName.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            if (departmentNames.Length > 0) {
+                @:$('#Filter_DepartmentName_0_').val('@departmentNames[0]');
+                for (int i = 1; i < departmentNames.Length; i++) {
+                    @:$('input:first', '#alDepartmentName').clone().attr({ style: 'margin-top:6px;', id: 'Filter_DepartmentName_' + @i + '_', name: 'Filter.DepartmentName[' + @i + ']' }).val('@departmentNames[i]').appendTo('#alDepartmentName');
+                    @:$('span:first', '#alDepartmentName').clone().appendTo('#alDepartmentName');
+                }
+                if (departmentNames.Length == 5) {
+                    @:$('#addDepartmentName').css('display', 'none');
+                }
+                if (departmentNames.Length > 1) {
+                    @:$('#removeDepartmentName').css('display', 'block');
+                }
+            }
+        }
+
+        // Ограничивает количество символов в текстовых полях фильтра
+        $('#filterform').on('input', 'input[type="text"]', function (event) {
+            $this = $(this);
+            if ($this.val().length >= $this.attr('maxlength')) {
+                $this.next('span').text('Слишком длинное значение');
+                setTimeout(function () {
+                    $this.next('span').text('');
+                }, 2000);
+            }
+        });
+
+        // Запрещает ввод цифр в поле фильтра 'ФИО сотрудника', 'Должность сотрудника' или 'Название отдела'
+        $('#alName, #alPostTitle, #alDepartmentName').on('keypress', 'input', function (event) {
+            var $this = $(this);
+            if (event.charCode > 47 && event.charCode < 58) {
+                $this.next('span').text('Цифры недопустимы');
+                setTimeout(function () {
+                    $this.next('span').text('');
+                }, 2000);
+                return false;
+            }
+        });
+
+        // Показывает или скрывает блок с фильтром
+        $('#filterToggle').on('click', function (event) {
+            var $this = $(this);
+            $('#filter').slideToggle('slow', function () {
+                $this.html('Поиск по фильтру <i>(' + ($(this).is(':hidden') ? 'Показать' : 'Скрыть') + ')</i>');
+            });
+        });
+
+        // Сбрасывает параметры фильтра в дефолт
+        $('#reset').on('click', function (event) {
+            event.preventDefault();
+            // Сбрасывает input[checkbox] на форме фильтра
+            $('input[type="checkbox"]', '#filterform').prop('checked', false);
+            $('input[name="Filter.Columns"]', '#filterform').prop('checked', true);
+            // Сбрасывает input[text,number,date] на форме фильтра
+            $(':nth-child(n+3)', '#alName, #alPostTitle, #alDepartmentName').remove();
+            $('input[type="text"], input[type="number"], input[type="date"]', '#filterform').val('');
+            // Сбрасывает select на форме фильтра
+            $('option:first', '#filterform select').prop('selected', true);
+            // Сбрасывает отображение ссылок
+            $('#addName, #addPostTitle, #addDepartmentName').css('display', 'block');
+            $('#removeName, #removePostTitle, #removeDepartmentName').css('display', 'none');
+        });
+    })
+    </script>
+}

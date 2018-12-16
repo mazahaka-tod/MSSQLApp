@@ -76,13 +76,18 @@ namespace DiplomMSSQLApp.BLL.Services {
 
         private Employee MapDTOAndDomainModel(EmployeeDTO eDto) {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<EmployeeDTO, Employee>();
-                cfg.CreateMap<BaseBusinessTripDTO, BusinessTrip>();
-                cfg.CreateMap<DepartmentDTO, Department>()
-                   .ForMember(d => d.Posts, opt => opt.Ignore());
+                cfg.CreateMap<EmployeeDTO, Employee>()
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
+                    .ForMember(e => e.BusinessTrips, opt => opt.Ignore());
+                //cfg.CreateMap<AnnualLeave, AnnualLeaveDTO>()
+                //    .ForMember(al => al.Employee, opt => opt.Ignore())
+                //    .ForMember(al => al.LeaveSchedule, opt => opt.Ignore());
+                //cfg.CreateMap<BaseBusinessTripDTO, BusinessTrip>();
                 cfg.CreateMap<PostDTO, Post>()
                    .ForMember(p => p.Employees, opt => opt.Ignore());
-
+                cfg.CreateMap<DepartmentDTO, Department>()
+                   .ForMember(d => d.Organization, opt => opt.Ignore())
+                   .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<DTO.Birth, DAL.Entities.Birth>();
                 cfg.CreateMap<DTO.Passport, DAL.Entities.Passport>();
                 cfg.CreateMap<DTO.Contacts, DAL.Entities.Contacts>();
@@ -114,12 +119,16 @@ namespace DiplomMSSQLApp.BLL.Services {
         private void InitializeMapper() {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<Employee, EmployeeDTO>();
+                cfg.CreateMap<AnnualLeave, AnnualLeaveDTO>()
+                    .ForMember(al => al.Employee, opt => opt.Ignore())
+                    .ForMember(al => al.LeaveSchedule, opt => opt.Ignore());
                 cfg.CreateMap<BusinessTrip, BaseBusinessTripDTO>();
-                cfg.CreateMap<Department, DepartmentDTO>()
-                    .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<Post, PostDTO>()
                     .ForMember(p => p.Employees, opt => opt.Ignore());
-
+                cfg.CreateMap<Department, DepartmentDTO>()
+                    .ForMember(d => d.Manager, opt => opt.Ignore())
+                    .ForMember(d => d.Organization, opt => opt.Ignore())
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
                 cfg.CreateMap<DAL.Entities.Birth, DTO.Birth>();
                 cfg.CreateMap<DAL.Entities.Passport, DTO.Passport>();
                 cfg.CreateMap<DAL.Entities.Contacts, DTO.Contacts>();
@@ -236,12 +245,14 @@ namespace DiplomMSSQLApp.BLL.Services {
         public override async Task DeleteAsync(int id) {
             Employee employee = await Database.Employees.FindByIdAsync(id);
             if (employee == null) return;
+            Database.AnnualLeaves.RemoveSeries(employee.AnnualLeaves);
             Database.Employees.Remove(employee);
             await Database.SaveAsync();
         }
 
         // Удаление всех сотрудников
         public override async Task DeleteAllAsync() {
+            await Database.AnnualLeaves.RemoveAllAsync();
             await Database.Employees.RemoveAllAsync();
             await Database.SaveAsync();
         }

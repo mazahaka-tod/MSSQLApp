@@ -12,7 +12,6 @@
         <dt>
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Title)
         </dd>
@@ -20,7 +19,6 @@
         <dt>
             @Html.DisplayNameFor(model => model.NumberOfUnits)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.NumberOfUnits)
         </dd>
@@ -28,7 +26,6 @@
         <dt>
             @Html.DisplayNameFor(model => model.Salary)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Salary)
         </dd>
@@ -36,15 +33,20 @@
         <dt>
             @Html.DisplayNameFor(model => model.Premium)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Premium)
         </dd>
 
         <dt>
+            @Html.DisplayNameFor(model => model.NumberOfDaysOfLeave)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.NumberOfDaysOfLeave)
+        </dd>
+
+        <dt>
             @Html.DisplayNameFor(model => model.Department.DepartmentName)
         </dt>
-
         <dd>
             @Html.DisplayFor(model => model.Department.DepartmentName)
         </dd>
@@ -52,7 +54,6 @@
         <dt>
             @Html.DisplayNameFor(model => model.Employees)
         </dt>
-
         @if (Model.Employees != null) {
             foreach (var item in Model.Employees) {
                 <dd>

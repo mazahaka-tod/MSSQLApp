@@ -13,16 +13,20 @@ namespace DiplomMSSQLApp.BLL.DTO {
         public string Patronymic { get; set; }
         public Gender Gender { get; set; }
         public int Age { get; set; }
+
         public Birth Birth { get; set; }
         public Passport Passport { get; set; }
         public Contacts Contacts { get; set; }
         public Education Education { get; set; }
         public DateTime HireDate { get; set; }
+
         public int? PostId { get; set; }
         public PostDTO Post { get; set; }
-        public virtual ICollection<BaseBusinessTripDTO> BusinessTrips { get; set; }
 
+        public virtual ICollection<AnnualLeaveDTO> AnnualLeaves { get; set; }
+        public virtual ICollection<BaseBusinessTripDTO> BusinessTrips { get; set; }
         public EmployeeDTO() {
+            AnnualLeaves = new List<AnnualLeaveDTO>();
             BusinessTrips = new List<BaseBusinessTripDTO>();
         }
     }

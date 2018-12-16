@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Удаление всех графиков отпусков";
+}
+
+<h2>Удаление всех графиков отпусков</h2>
+<hr />
+
+<h4>Вы уверены, что хотите удалить все графики отпусков?</h4>
+<br />
+
+<div>
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Удалить" class="btn btn-primary" />
+            @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    }
+</div>

@@ -17,38 +17,42 @@ namespace DiplomMSSQLApp.WEB.Controllers {
     [HandleError]
     [Authorize]
     [Internationalization]
-    public class BusinessTripController : Controller {
+    public class AnnualLeaveController : Controller {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private IService<BusinessTripDTO> _businessTripService;
+        private IService<AnnualLeaveDTO> _annualLeaveService;
         private IService<EmployeeDTO> _employeeService;
 
-        public BusinessTripController(IService<BusinessTripDTO> bs, IService<EmployeeDTO> es) {
-            _businessTripService = bs;
+        public AnnualLeaveController(IService<AnnualLeaveDTO> al, IService<EmployeeDTO> es) {
+            _annualLeaveService = al;
             _employeeService = es;
         }
 
-        public ActionResult Index(BusinessTripFilter filter, string filterAsJsonString, int page = 1) {
+        public ActionResult Index(AnnualLeaveFilter filter, string filterAsJsonString, int page = 1) {
             if (filterAsJsonString != null)
-                filter = System.Web.Helpers.Json.Decode<BusinessTripFilter>(filterAsJsonString);
-            IEnumerable<BusinessTripDTO> btDto = (_businessTripService as BusinessTripService).Get(filter);  // Filter
-            btDto = _businessTripService.GetPage(btDto, page);     // Paging
-            Mapper.Initialize(cfg => cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>()
-                                        .ForMember(bt => bt.Employees, opt => opt.Ignore()));
-            IEnumerable<BusinessTripViewModel> businessTrips = Mapper.Map<IEnumerable<BusinessTripDTO>, IEnumerable<BusinessTripViewModel>>(btDto);
-            BusinessTripListViewModel model = new BusinessTripListViewModel {
-                BusinessTrips = businessTrips,
+                filter = System.Web.Helpers.Json.Decode<AnnualLeaveFilter>(filterAsJsonString);
+            IEnumerable<AnnualLeaveDTO> alDto = (_annualLeaveService as AnnualLeaveService).Get(filter);  // Filter
+            alDto = _annualLeaveService.GetPage(alDto, page);     // Paging
+            InitializeMapper();
+            IEnumerable<AnnualLeaveViewModel> annualLeaves = Mapper.Map<IEnumerable<AnnualLeaveDTO>, IEnumerable<AnnualLeaveViewModel>>(alDto);
+            AnnualLeaveListViewModel model = new AnnualLeaveListViewModel {
+                AnnualLeaves = annualLeaves,
                 Filter = filter,
-                PageInfo = _businessTripService.PageInfo
+                PageInfo = _annualLeaveService.PageInfo
             };
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest") {
                 _logger.Info("Executed async request");
                 var transformModel = new {
-                    BusinessTrips = model.BusinessTrips.Select(bt => new {
-                        bt.Id,
-                        Code = bt.Name,
-                        DateStart = bt.DateStart.ToString("dd MMMM yyyy"),
-                        DateEnd = bt.DateEnd.ToString("dd MMMM yyyy"),
-                        bt.Destination
+                    AnnualLeaves = model.AnnualLeaves.Select(al => new {
+                        al.Id,
+                        al.ScheduledNumberOfDays,
+                        al.ActualNumberOfDays,
+                        ScheduledDate = al.ScheduledDate.ToString("dd MMMM yyyy"),
+                        ActualDate = al.ActualDate.HasValue ? al.ActualDate.Value.ToString("dd MMMM yyyy") : "",
+                        EmployeeName = new System.Text.StringBuilder(al.Employee.LastName).Append(" ")
+                            .Append(al.Employee.FirstName).Append(" ").Append(al.Employee.Patronymic ?? "").ToString(),
+                        PostTitle = al.Employee.Post.Title,
+                        NumberOfDaysOfLeave = al.Employee.Post.NumberOfDaysOfLeave,
+                        DepartmentName = al.Employee.Post.Department.DepartmentName
                     }).ToArray(),
                     model.Filter,
                     model.PageInfo
@@ -59,7 +63,7 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View("Index", model);
         }
 
-        // Добавление новой командировки
+        // Добавление нового отпуска
         public async Task<ActionResult> Create() {
             int employeesCount = await _employeeService.CountAsync();
             if (employeesCount == 0) {
@@ -70,10 +74,10 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return View("Create");
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(BusinessTripViewModel bt) {
+        public async Task<ActionResult> Create(AnnualLeaveViewModel al) {
             try {
-                BusinessTripDTO btDto = MapViewModelWithDTO(bt);
-                await (_businessTripService as BusinessTripService).CreateAsync(btDto);
+                AnnualLeaveDTO alDto = MapViewModelWithDTO(al);
+                await (_annualLeaveService as AnnualLeaveService).CreateAsync(alDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
@@ -81,44 +85,52 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View("Create", bt);
+            return View("Create", al);
         }
 
         private async Task<SelectList> GetSelectListEmployeesAsync() {
             IEnumerable<EmployeeDTO> employees = await _employeeService.GetAllAsync();
             IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
                 Value = e.Id.ToString(),
-                Text = e.LastName + " " + e.FirstName + " " + e.Patronymic
+                Text = new System.Text.StringBuilder(e.LastName).Append(" ").Append(e.FirstName).Append(" ")
+                    .Append(e.Patronymic ?? "").Append(" [").Append(e.Post.Department.DepartmentName).Append("]").ToString()
             }).OrderBy(e => e.Text);
             return new SelectList(items, "Value", "Text");
         }
 
-        private BusinessTripDTO MapViewModelWithDTO(BusinessTripViewModel bt) {
+        private AnnualLeaveDTO MapViewModelWithDTO(AnnualLeaveViewModel al) {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTripViewModel, BusinessTripDTO>();
+                cfg.CreateMap<AnnualLeaveViewModel, AnnualLeaveDTO>();
+                cfg.CreateMap<LeaveScheduleViewModel, LeaveScheduleDTO>()
+                    .ForMember(ls => ls.AnnualLeaves, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeViewModel, EmployeeDTO>()
                     .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
                     .ForMember(e => e.Education, opt => opt.Ignore())
-                    .ForMember(e => e.Passport, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
+                    .ForMember(e => e.Passport, opt => opt.Ignore());
+                cfg.CreateMap<PostViewModel, PostDTO>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
+                cfg.CreateMap<DepartmentViewModel, DepartmentDTO>()
+                    .ForMember(d => d.Manager, opt => opt.Ignore())
+                    .ForMember(d => d.Organization, opt => opt.Ignore())
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
             });
-            BusinessTripDTO btDto = Mapper.Map<BusinessTripViewModel, BusinessTripDTO>(bt);
-            return btDto;
+            AnnualLeaveDTO alDto = Mapper.Map<AnnualLeaveViewModel, AnnualLeaveDTO>(al);
+            return alDto;
         }
 
-        // Обновление информации о командировке
+        // Обновление информации об отпуске
         public async Task<ActionResult> Edit(int? id) {
             ViewBag.Employees = await GetSelectListEmployeesAsync();
             return await GetViewAsync(id, "Edit");
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(BusinessTripViewModel bt) {
+        public async Task<ActionResult> Edit(AnnualLeaveViewModel al) {
             try {
-                BusinessTripDTO btDto = MapViewModelWithDTO(bt);
-                await (_businessTripService as BusinessTripService).EditAsync(btDto);
+                AnnualLeaveDTO alDto = MapViewModelWithDTO(al);
+                await (_annualLeaveService as AnnualLeaveService).EditAsync(alDto);
                 return RedirectToAction("Index");
             }
             catch (ValidationException ex) {
@@ -126,14 +138,14 @@ namespace DiplomMSSQLApp.WEB.Controllers {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
             ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return View("Edit", bt);
+            return View("Edit", al);
         }
 
         private async Task<ActionResult> GetViewAsync(int? id, string viewName) {
             try {
-                BusinessTripDTO btDto = await _businessTripService.FindByIdAsync(id);
-                BusinessTripViewModel bt = MapDTOWithViewModel(btDto);
-                return View(viewName, bt);
+                AnnualLeaveDTO alDto = await _annualLeaveService.FindByIdAsync(id);
+                AnnualLeaveViewModel al = MapDTOWithViewModel(alDto);
+                return View(viewName, al);
             }
             catch (ValidationException ex) {
                 _logger.Warn(ex.Message);
@@ -141,53 +153,64 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             }
         }
 
-        private BusinessTripViewModel MapDTOWithViewModel(BusinessTripDTO btDTO) {
+        private AnnualLeaveViewModel MapDTOWithViewModel(AnnualLeaveDTO alDto) {
+            InitializeMapper();
+            AnnualLeaveViewModel al = Mapper.Map<AnnualLeaveDTO, AnnualLeaveViewModel>(alDto);
+            return al;
+        }
+
+        private void InitializeMapper() {
             Mapper.Initialize(cfg => {
-                cfg.CreateMap<BusinessTripDTO, BusinessTripViewModel>();
+                cfg.CreateMap<AnnualLeaveDTO, AnnualLeaveViewModel>();
+                cfg.CreateMap<LeaveScheduleDTO, LeaveScheduleViewModel>()
+                    .ForMember(ls => ls.AnnualLeaves, opt => opt.Ignore());
                 cfg.CreateMap<EmployeeDTO, EmployeeViewModel>()
                     .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
                     .ForMember(e => e.Education, opt => opt.Ignore())
-                    .ForMember(e => e.Passport, opt => opt.Ignore())
-                    .ForMember(e => e.Post, opt => opt.Ignore());
+                    .ForMember(e => e.Passport, opt => opt.Ignore());
+                cfg.CreateMap<PostDTO, PostViewModel>()
+                    .ForMember(p => p.Employees, opt => opt.Ignore());
+                cfg.CreateMap<DepartmentDTO, DepartmentViewModel>()
+                    .ForMember(d => d.Manager, opt => opt.Ignore())
+                    .ForMember(d => d.Organization, opt => opt.Ignore())
+                    .ForMember(d => d.Posts, opt => opt.Ignore());
             });
-            BusinessTripViewModel bt = Mapper.Map<BusinessTripDTO, BusinessTripViewModel>(btDTO);
-            return bt;
         }
 
-        // Подробная информация о командировке
+        // Подробная информация об отпуске
         public async Task<ActionResult> Details(int? id) {
             return await GetViewAsync(id, "Details");
         }
 
-        // Удаление командировки
+        // Удаление отпуска
         public async Task<ActionResult> Delete(int? id) {
             return await GetViewAsync(id, "Delete");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("Delete")]
         public async Task<ActionResult> DeleteConfirmed(int id) {
-            await _businessTripService.DeleteAsync(id);
+            await _annualLeaveService.DeleteAsync(id);
             return RedirectToAction("Index");
         }
 
-        // Удаление всех командировок
+        // Удаление всех отпусков
         public ActionResult DeleteAll() {
             return View("DeleteAll");
         }
         [HttpPost, ValidateAntiForgeryToken, ActionName("DeleteAll")]
         public async Task<ActionResult> DeleteAllConfirmed() {
-            await _businessTripService.DeleteAllAsync();
+            await _annualLeaveService.DeleteAllAsync();
             return RedirectToAction("Index");
         }
 
-        // Запись информации о командировках в JSON-файл
+        // Запись информации об отпусках в JSON-файл
         public async Task<ActionResult> ExportJson() {
-            string fullPath = CreateDirectoryToFile("BusinessTrips.json");
+            string fullPath = CreateDirectoryToFile("AnnualLeaves.json");
             System.IO.File.Delete(fullPath);
-            await _businessTripService.ExportJsonAsync(fullPath);
-            return File(fullPath, "application/json", "BusinessTrips.json");
+            await _annualLeaveService.ExportJsonAsync(fullPath);
+            return File(fullPath, "application/json", "AnnualLeaves.json");
         }
 
         private string CreateDirectoryToFile(string filename) {
@@ -198,10 +221,10 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return fullPath;
         }
 
-        // Добавление командировок для тестирования
+        // Добавление отпусков для тестирования
         public async Task<ActionResult> TestCreate() {
             try {
-                await (_businessTripService as BusinessTripService).TestCreateAsync();
+                await (_annualLeaveService as AnnualLeaveService).TestCreateAsync();
             }
             catch (ValidationException ex) {
                 _logger.Warn("No employees");
@@ -210,15 +233,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             return RedirectToAction("Index");
         }
 
-        // Частичное представление добавляет выпадающий список сотрудников
-        public async Task<ActionResult> AddEmployeeAsync(int index) {
-            ViewBag.Index = index;
-            ViewBag.Employees = await GetSelectListEmployeesAsync();
-            return PartialView("AddEmployee");
-        }
-
         protected override void Dispose(bool disposing) {
-            _businessTripService.Dispose();
+            _annualLeaveService.Dispose();
             _employeeService.Dispose();
             base.Dispose(disposing);
         }

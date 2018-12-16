@@ -51,18 +51,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EF\HRContext.cs" />
+    <Compile Include="Entities\AnnualLeave.cs" />
     <Compile Include="Entities\BusinessTrip.cs" />
     <Compile Include="Entities\Department.cs" />
     <Compile Include="Entities\Employee.cs" />
+    <Compile Include="Entities\LeaveSchedule.cs" />
     <Compile Include="Entities\Organization.cs" />
     <Compile Include="Entities\Post.cs" />
     <Compile Include="Interfaces\IGenericRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\EFAnnualLeaveRepository.cs" />
     <Compile Include="Repositories\EFBusinessTripRepository.cs" />
     <Compile Include="Repositories\EFDepartmentRepository.cs" />
     <Compile Include="Repositories\EFEmployeeRepository.cs" />
     <Compile Include="Repositories\EFGenericRepository.cs" />
+    <Compile Include="Repositories\EFLeaveScheduleRepository.cs" />
     <Compile Include="Repositories\EFPostRepository.cs" />
     <Compile Include="Repositories\EFUnitOfWork.cs" />
   </ItemGroup>

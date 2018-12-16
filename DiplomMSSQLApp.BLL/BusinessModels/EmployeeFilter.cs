@@ -11,6 +11,7 @@
         public bool IsBonus { get; set; }
         public string PostTitle { get; set; }
         public string DepartmentName { get; set; }
+
         public bool IsAntiFilter { get; set; }
         public string SortField { get; set; }
         public string SortOrder { get; set; }

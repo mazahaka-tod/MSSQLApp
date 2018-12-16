@@ -1,0 +1,52 @@
+﻿@model DiplomMSSQLApp.WEB.Models.LeaveScheduleViewModel
+
+@{
+    ViewBag.Title = "Удаление графика отпусков";
+}
+
+<h2>Удаление графика отпусков</h2>
+<hr />
+
+<h3>Вы уверены, что хотите удалить график отпусков?</h3>
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Number)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Number)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Year)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Year)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfPreparation)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateOfPreparation)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfApproval)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateOfApproval)
+        </dd>
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Удалить" class="btn btn-primary" />
+            @Html.ActionLink("Отмена", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    }
+</div>

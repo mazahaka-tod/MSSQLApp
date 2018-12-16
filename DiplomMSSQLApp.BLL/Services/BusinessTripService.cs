@@ -49,6 +49,7 @@ namespace DiplomMSSQLApp.BLL.Services {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTripDTO, BusinessTrip>();
                 cfg.CreateMap<EmployeeDTO, Employee>()
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
@@ -96,6 +97,7 @@ namespace DiplomMSSQLApp.BLL.Services {
             Mapper.Initialize(cfg => {
                 cfg.CreateMap<BusinessTrip, BusinessTripDTO>();
                 cfg.CreateMap<Employee, EmployeeDTO>()
+                    .ForMember(e => e.AnnualLeaves, opt => opt.Ignore())
                     .ForMember(e => e.Birth, opt => opt.Ignore())
                     .ForMember(e => e.BusinessTrips, opt => opt.Ignore())
                     .ForMember(e => e.Contacts, opt => opt.Ignore())
@@ -245,7 +247,7 @@ namespace DiplomMSSQLApp.BLL.Services {
                     DateStart = new DateTime(2017, (new Random().Next(1000, 2000) + i) % 12 + 1, (new Random().Next(2000, 3000) + i) % 28 + 1),
                     DateEnd = new DateTime(2018, (new Random().Next(3000, 4000) + i) % 12 + 1, (new Random().Next(5000, 6000) + i) % 28 + 1),
                     Destination = destinations[(new Random().Next(7000, 8000) + i) % destinations.Length],
-                    Employees = new Employee[] { await Database.Employees.GetFirstAsync() }
+                    Employees = new Employee[] { await Database.Employees.FindByIdAsync(employeeIds[i % employeeIds.Length]) }
                 };
                 Database.BusinessTrips.Create(businessTrip);
             }

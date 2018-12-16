@@ -204,14 +204,31 @@
         <dd>
             @Html.DisplayFor(model => model.Education.EducationDocument)
         </dd>
+    </dl>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.BusinessTrips)
-        </dt>
+    <hr /><p><b><i>Список командировок</i></b></p>
+
+    <dl class="dl-horizontal">
+        <dt></dt>
         @if (Model.BusinessTrips != null) {
             foreach (var item in Model.BusinessTrips) {
                 <dd>
                     @item.Name
+                </dd>
+            }
+        }
+    </dl>
+
+    <hr /><p><b><i>Список отпусков</i></b></p>
+
+    <dl class="dl-horizontal">
+        <dt></dt>
+        @if (Model.AnnualLeaves != null) {
+            foreach (var item in Model.AnnualLeaves) {
+                <dd>
+                    @if (item.ActualDate.HasValue && item.ActualNumberOfDays.HasValue) {
+                        @:<i>с</i> @item.ActualDate.Value.ToString("dd MMMM yyyy") <i>по</i> @item.ActualDate.Value.AddDays(item.ActualNumberOfDays.Value).ToString("dd MMMM yyyy")
+                    }
                 </dd>
             }
         }

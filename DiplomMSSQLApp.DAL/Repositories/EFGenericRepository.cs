@@ -51,6 +51,11 @@ namespace DiplomMSSQLApp.DAL.Repositories {
             return await _dbSet.FirstOrDefaultAsync();
         }
 
+        // Получение первого элемента
+        public virtual async Task<TEntity> GetFirstAsync(Expression<Func<TEntity, bool>> predicate) {
+            return await _dbSet.FirstOrDefaultAsync(predicate);
+        }
+
         // Удаление элемента
         public void Remove(TEntity item) {
             _dbSet.Remove(item);
