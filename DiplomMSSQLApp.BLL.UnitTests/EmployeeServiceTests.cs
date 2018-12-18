@@ -267,6 +267,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         [Test]
         public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_RemoveMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.AnnualLeaves.RemoveSeries(It.IsAny<AnnualLeave[]>()));
+            mock.Setup(m => m.BusinessTrips.RemoveSeries(It.IsAny<BusinessTrip[]>()));
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
             EmployeeService es = GetNewService(mock.Object);
 
@@ -278,6 +280,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         [Test]
         public override async Task DeleteAsync_FindByIdAsyncMethodReturnsObject_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.AnnualLeaves.RemoveSeries(It.IsAny<AnnualLeave[]>()));
+            mock.Setup(m => m.BusinessTrips.RemoveSeries(It.IsAny<BusinessTrip[]>()));
             mock.Setup(m => m.Employees.FindByIdAsync(It.IsAny<int>())).ReturnsAsync(new Employee());
             EmployeeService es = GetNewService(mock.Object);
 
@@ -290,8 +294,36 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         /// // DeleteAllAsync method
         /// </summary>
         [Test]
-        public async Task DeleteAllAsync_Calls_RemoveAllAsyncMethodIsCalledOnce() {
+        public async Task DeleteAllAsync_Calls_AnnualLeavesRemoveAllAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.AnnualLeaves.RemoveAllAsync()).Returns(Task.CompletedTask);
+            mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
+            mock.Setup(m => m.Employees.RemoveAllAsync()).Returns(Task.CompletedTask);
+            EmployeeService es = GetNewService(mock.Object);
+
+            await es.DeleteAllAsync();
+
+            mock.Verify(m => m.AnnualLeaves.RemoveAllAsync(), Times.Once);
+        }
+
+        [Test]
+        public async Task DeleteAllAsync_Calls_BusinessTripsRemoveAllAsyncMethodIsCalledOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.AnnualLeaves.RemoveAllAsync()).Returns(Task.CompletedTask);
+            mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
+            mock.Setup(m => m.Employees.RemoveAllAsync()).Returns(Task.CompletedTask);
+            EmployeeService es = GetNewService(mock.Object);
+
+            await es.DeleteAllAsync();
+
+            mock.Verify(m => m.BusinessTrips.RemoveAllAsync(), Times.Once);
+        }
+
+        [Test]
+        public async Task DeleteAllAsync_Calls_EmployeesRemoveAllAsyncMethodIsCalledOnce() {
+            Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.AnnualLeaves.RemoveAllAsync()).Returns(Task.CompletedTask);
+            mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
             mock.Setup(m => m.Employees.RemoveAllAsync()).Returns(Task.CompletedTask);
             EmployeeService es = GetNewService(mock.Object);
 
@@ -303,6 +335,8 @@ namespace DiplomMSSQLApp.BLL.UnitTests {
         [Test]
         public override async Task DeleteAllAsync_Calls_SaveAsyncMethodIsCalledOnce() {
             Mock<IUnitOfWork> mock = new Mock<IUnitOfWork>();
+            mock.Setup(m => m.AnnualLeaves.RemoveAllAsync()).Returns(Task.CompletedTask);
+            mock.Setup(m => m.BusinessTrips.RemoveAllAsync()).Returns(Task.CompletedTask);
             mock.Setup(m => m.Employees.RemoveAllAsync()).Returns(Task.CompletedTask);
             EmployeeService es = GetNewService(mock.Object);
 

@@ -203,13 +203,13 @@ namespace DiplomMSSQLApp.BLL.Services {
                     }
                 }
 
-                // Фильтр по дате составления
+                // Фильтр по запланированной дате отпуска
                 if (!string.IsNullOrWhiteSpace(filter.ScheduledDate) && DateTime.TryParse(filter.ScheduledDate, out DateTime scheduledDate) && annualLeave.ScheduledDate != scheduledDate)
-                    return returnValue;             // Проверяемая запись не соответствует фильтру по дате составления
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по запланированной дате отпуска
 
-                // Фильтр по дате утверждения
+                // Фильтр по фактической дате отпуска
                 if (!string.IsNullOrWhiteSpace(filter.ActualDate) && DateTime.TryParse(filter.ActualDate, out DateTime actualDate) && annualLeave.ActualDate != actualDate)
-                    return returnValue;             // Проверяемая запись не соответствует фильтру по дате утверждения
+                    return returnValue;             // Проверяемая запись не соответствует фильтру по фактической дате отпуска
 
                 // Фильтры по общему количеству дней отпуска за год
                 if (filter.MinNumberOfDaysOfLeave.HasValue && annualLeave.Employee.Post.NumberOfDaysOfLeave < filter.MinNumberOfDaysOfLeave.Value)
