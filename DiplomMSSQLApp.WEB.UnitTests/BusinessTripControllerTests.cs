@@ -170,7 +170,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Create_Post method
         /// </summary>
         [Test]
-        public async Task Create_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Create_Post_ModelIsValid_RedirectToIndex() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
@@ -180,7 +180,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsNotValid_AsksForCreateView() {
+        public async Task Create_Post_ModelIsInvalid_AsksForCreateView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -192,7 +192,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
+        public async Task Create_Post_ModelIsInvalid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -209,7 +209,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_SetViewBagEmployees() {
+        public async Task Create_Post_ModelIsInvalid_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -229,7 +229,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Get method
         /// </summary>
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_AsksForEditView() {
+        public async Task Edit_Get_ModelIsValid_AsksForEditView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
@@ -240,7 +240,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_RetrievesBusinessTripFromModel() {
+        public async Task Edit_Get_ModelIsValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
                 Id = _id.Value,
@@ -257,7 +257,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Edit_Get_ModelIsInvalid_AsksForErrorView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -269,7 +269,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Edit_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -301,7 +301,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Post method
         /// </summary>
         [Test]
-        public async Task Edit_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Edit_Post_ModelIsValid_RedirectToIndex() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
@@ -311,7 +311,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_AsksForEditView() {
+        public async Task Edit_Post_ModelIsInvalid_AsksForEditView() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -323,7 +323,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_RetrievesBusinessTripFromModel() {
+        public async Task Edit_Post_ModelIsInvalid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -340,7 +340,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_SetViewBagEmployees() {
+        public async Task Edit_Post_ModelIsInvalid_SetViewBagEmployees() {
             Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
             bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
@@ -360,7 +360,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Details method
         /// </summary>
         [Test]
-        public async Task Details_ModelStateIsValid_AsksForDetailsView() {
+        public async Task Details_ModelIsValid_AsksForDetailsView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
@@ -370,7 +370,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsValid_RetrievesBusinessTripFromModel() {
+        public async Task Details_ModelIsValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
                 Id = _id.Value,
@@ -386,7 +386,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Details_ModelIsInvalid_AsksForErrorView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
@@ -397,7 +397,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Details_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
@@ -412,7 +412,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Delete_Get method
         /// </summary>
         [Test]
-        public async Task Delete_Get_ModelStateIsValid_AsksForDeleteView() {
+        public async Task Delete_Get_ModelIsValid_AsksForDeleteView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
 
@@ -422,7 +422,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsValid_RetrievesBusinessTripFromModel() {
+        public async Task Delete_Get_ModelIsValid_RetrievesBusinessTripFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
                 Id = _id.Value,
@@ -438,7 +438,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Delete_Get_ModelIsInvalid_AsksForErrorView() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
@@ -449,7 +449,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Delete_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);

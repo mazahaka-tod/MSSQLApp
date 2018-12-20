@@ -124,6 +124,7 @@
     <Compile Include="BusinessTripControllerTests.cs" />
     <Compile Include="DepartmentControllerTests.cs" />
     <Compile Include="EmployeeControllerTests.cs" />
+    <Compile Include="LeaveScheduleControllerTests.cs" />
     <Compile Include="OrganizationControllerTests.cs" />
     <Compile Include="PostControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

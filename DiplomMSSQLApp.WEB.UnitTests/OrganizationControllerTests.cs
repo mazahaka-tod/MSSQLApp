@@ -68,7 +68,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Get method
         /// </summary>
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_AsksForEditView() {
+        public async Task Edit_Get_ModelIsValid_AsksForEditView() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             OrganizationController controller = GetNewOrganizationController(mock.Object);
 
@@ -78,7 +78,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_RetrievesIdAndNameFromModel() {
+        public async Task Edit_Get_ModelIsValid_RetrievesIdAndNameFromModel() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new OrganizationDTO {
                 Id = _id.Value,
@@ -94,7 +94,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Edit_Get_ModelIsInvalid_AsksForErrorView() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             OrganizationController controller = GetNewOrganizationController(mock.Object);
@@ -105,7 +105,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Edit_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             OrganizationController controller = GetNewOrganizationController(mock.Object);
@@ -120,7 +120,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Post method
         /// </summary>
         [Test]
-        public async Task Edit_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Edit_Post_ModelIsValid_RedirectToIndex() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             OrganizationController controller = GetNewOrganizationController(mock.Object);
 
@@ -130,7 +130,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_AsksForEditView() {
+        public async Task Edit_Post_ModelIsInvalid_AsksForEditView() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             mock.Setup(m => m.EditAsync(It.IsAny<OrganizationDTO>())).Throws(new ValidationException("", ""));
             OrganizationController controller = GetNewOrganizationController(mock.Object);
@@ -141,7 +141,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_RetrievesIdAndNameFromModel() {
+        public async Task Edit_Post_ModelIsInvalid_RetrievesIdAndNameFromModel() {
             Mock<OrganizationService> mock = new Mock<OrganizationService>();
             mock.Setup(m => m.EditAsync(It.IsAny<OrganizationDTO>())).Throws(new ValidationException("", ""));
             OrganizationController controller = GetNewOrganizationController(mock.Object);

@@ -97,7 +97,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsNotValid_AsksForCreateView() {
+        public async Task Create_Post_ModelStateIsInvalid_AsksForCreateView() {
             Mock<RoleStore<AppRole>> roleStore = new Mock<RoleStore<AppRole>>();
             Mock<AppRoleManager> roleManager = new Mock<AppRoleManager>(roleStore.Object);
             RoleAdminController controller = GetNewRoleAdminController(null, roleManager.Object);
@@ -165,7 +165,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Edit_Post_ModelStateIsInvalid_AsksForErrorView() {
             RoleAdminController controller = GetNewRoleAdminController(null, null);
             controller.ModelState.AddModelError("", "Error");
 

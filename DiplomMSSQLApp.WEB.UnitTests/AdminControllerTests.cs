@@ -74,7 +74,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsNotValid_AsksForCreateView() {
+        public async Task Create_Post_ModelStateIsInvalid_AsksForCreateView() {
             Mock<IUserStore<AppUser>> userStore = new Mock<IUserStore<AppUser>>();
             Mock<AppUserManager> userManager = new Mock<AppUserManager>(userStore.Object);
             AdminController controller = GetNewAdminController(userManager.Object);

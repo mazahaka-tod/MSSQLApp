@@ -223,7 +223,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Create_Post method
         /// </summary>
         [Test]
-        public async Task Create_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Create_Post_ModelIsValid_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
@@ -233,7 +233,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_AsksForCreateView() {
+        public async Task Create_Post_ModelIsInvalid_AsksForCreateView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -246,7 +246,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_RetrievesEmployeeFromModel() {
+        public async Task Create_Post_ModelIsInvalid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -266,7 +266,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_SetViewBagPosts() {
+        public async Task Create_Post_ModelIsInvalid_SetViewBagPosts() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CreateAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -287,7 +287,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Get method
         /// </summary>
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_AsksForEditView() {
+        public async Task Edit_Get_ModelIsValid_AsksForEditView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<PostService> pmock = new Mock<PostService>();
@@ -299,7 +299,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_RetrievesEmployeeFromModel() {
+        public async Task Edit_Get_ModelIsValid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
@@ -319,7 +319,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsInvalid_AsksForErrorView() {
+        public async Task Edit_Get_ModelIsInvalid_AsksForErrorView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -332,7 +332,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsInvalid_RetrievesExceptionMessageFromModel() {
+        public async Task Edit_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -366,7 +366,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Post method
         /// </summary>
         [Test]
-        public async Task Edit_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Edit_Post_ModelIsValid_RedirectToIndex() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
@@ -376,7 +376,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsInvalid_AsksForEditView() {
+        public async Task Edit_Post_ModelIsInvalid_AsksForEditView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -389,7 +389,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsInvalid_RetrievesEmployeeFromModel() {
+        public async Task Edit_Post_ModelIsInvalid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -409,7 +409,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsInvalid_SetViewBagPosts() {
+        public async Task Edit_Post_ModelIsInvalid_SetViewBagPosts() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.EditAsync(It.IsAny<EmployeeDTO>())).Throws(new ValidationException("", ""));
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
@@ -430,7 +430,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Details method
         /// </summary>
         [Test]
-        public async Task Details_ModelStateIsValid_AsksForDetailsView() {
+        public async Task Details_ModelIsValid_AsksForDetailsView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
@@ -440,7 +440,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsValid_RetrievesEmployeeFromModel() {
+        public async Task Details_ModelIsValid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
@@ -458,7 +458,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Details_ModelIsInvalid_AsksForErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
@@ -469,7 +469,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Details_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
@@ -484,7 +484,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Delete_Get method
         /// </summary>
         [Test]
-        public async Task Delete_Get_ModelStateIsValid_AsksForDeleteView() {
+        public async Task Delete_Get_ModelIsValid_AsksForDeleteView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
 
@@ -494,7 +494,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsValid_RetrievesEmployeeFromModel() {
+        public async Task Delete_Get_ModelIsValid_RetrievesEmployeeFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new EmployeeDTO {
                 Id = _id.Value,
@@ -512,7 +512,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Delete_Get_ModelIsInvalid_AsksForErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);
@@ -523,7 +523,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Delete_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             EmployeeController controller = GetNewEmployeeController(mock.Object, null, null);

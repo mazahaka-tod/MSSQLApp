@@ -74,7 +74,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Login_Post_ModelStateIsNotValid_AsksForLoginView() {
+        public async Task Login_Post_ModelStateIsInvalid_AsksForLoginView() {
             AccountController controller = GetNewAccountController(null, null);
             controller.ModelState.AddModelError("", "Error");
 

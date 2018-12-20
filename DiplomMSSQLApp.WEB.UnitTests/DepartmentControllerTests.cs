@@ -178,7 +178,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Create_Post method
         /// </summary>
         [Test]
-        public async Task Create_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Create_Post_ModelIsValid_RedirectToIndex() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
 
@@ -188,7 +188,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_AsksForCreateView() {
+        public async Task Create_Post_ModelIsInvalid_AsksForCreateView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -201,7 +201,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_RetrievesDepartmentFromModel() {
+        public async Task Create_Post_ModelIsInvalid_RetrievesDepartmentFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -221,7 +221,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_SetViewBagOrganizations() {
+        public async Task Create_Post_ModelIsInvalid_SetViewBagOrganizations() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
             omock.Setup(m => m.GetAllAsync()).ReturnsAsync(new OrganizationDTO[] {
@@ -239,7 +239,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelStateIsInvalid_SetViewBagEmployees() {
+        public async Task Create_Post_ModelIsInvalid_SetViewBagEmployees() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
@@ -260,7 +260,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Get method
         /// </summary>
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_AsksForEditView() {
+        public async Task Edit_Get_ModelIsValid_AsksForEditView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -272,7 +272,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsValid_RetrievesDepartmentFromModel() {
+        public async Task Edit_Get_ModelIsValid_RetrievesDepartmentFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -292,7 +292,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Edit_Get_ModelIsInvalid_AsksForErrorView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -305,7 +305,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Edit_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -339,7 +339,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Edit_Post method
         /// </summary>
         [Test]
-        public async Task Edit_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task Edit_Post_ModelIsValid_RedirectToIndex() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
 
@@ -349,7 +349,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_AsksForEditView() {
+        public async Task Edit_Post_ModelIsInvalid_AsksForEditView() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -362,7 +362,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_RetrievesDepartmentFromModel() {
+        public async Task Edit_Post_ModelIsInvalid_RetrievesDepartmentFromModel() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<DepartmentService> dmock = new Mock<DepartmentService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
@@ -382,7 +382,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Post_ModelStateIsNotValid_SetViewBagEmployees() {
+        public async Task Edit_Post_ModelIsInvalid_SetViewBagEmployees() {
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             Mock<OrganizationService> omock = new Mock<OrganizationService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
@@ -403,7 +403,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Details method
         /// </summary>
         [Test]
-        public async Task Details_ModelStateIsValid_AsksForDetailsView() {
+        public async Task Details_ModelIsValid_AsksForDetailsView() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
 
@@ -413,7 +413,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsValid_RetrievesDepartmentFromModel() {
+        public async Task Details_ModelIsValid_RetrievesDepartmentFromModel() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new DepartmentDTO {
                 Id = _id.Value,
@@ -431,7 +431,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Details_ModelIsInvalid_AsksForErrorView() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
@@ -442,7 +442,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Details_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
@@ -457,7 +457,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // Delete_Get method
         /// </summary>
         [Test]
-        public async Task Delete_Get_ModelStateIsValid_AsksForDeleteView() {
+        public async Task Delete_Get_ModelIsValid_AsksForDeleteView() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
 
@@ -467,7 +467,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsValid_RetrievesDepartmentFromModel() {
+        public async Task Delete_Get_ModelIsValid_RetrievesDepartmentFromModel() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new DepartmentDTO {
                 Id = _id.Value,
@@ -485,7 +485,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsNotValid_AsksForErrorView() {
+        public async Task Delete_Get_ModelIsInvalid_AsksForErrorView() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
@@ -496,7 +496,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelStateIsNotValid_RetrievesExceptionMessageFromModel() {
+        public async Task Delete_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
@@ -511,7 +511,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // DeleteConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteConfirmed_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task DeleteConfirmed_Post_ModelIsValid_RedirectToIndex() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
 
@@ -521,7 +521,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task DeleteConfirmed_Post_ModelStateIsInvalid_AsksForErrorView() {
+        public async Task DeleteConfirmed_Post_ModelIsInvalid_AsksForErrorView() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new ValidationException("DeleteAsync method throws Exception", ""));
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
@@ -532,7 +532,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task DeleteConfirmed_Post_ModelStateIsInvalid_RetrievesExceptionMessageFromModel() {
+        public async Task DeleteConfirmed_Post_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             mock.Setup(m => m.DeleteAsync(It.IsAny<int>())).Throws(new ValidationException("DeleteAsync method throws Exception", ""));
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
@@ -560,7 +560,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// // DeleteAllConfirmed_Post method
         /// </summary>
         [Test]
-        public async Task DeleteAllConfirmed_Post_ModelStateIsValid_RedirectToIndex() {
+        public async Task DeleteAllConfirmed_Post_ModelIsValid_RedirectToIndex() {
             Mock<DepartmentService> mock = new Mock<DepartmentService>();
             DepartmentController controller = GetNewDepartmentController(null, mock.Object, null);
 
