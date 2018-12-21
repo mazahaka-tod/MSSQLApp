@@ -7,6 +7,7 @@ using DiplomMSSQLApp.WEB.Controllers;
 using DiplomMSSQLApp.WEB.Models;
 using Moq;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -16,13 +17,13 @@ using System.Web.Mvc;
 
 namespace DiplomMSSQLApp.WEB.UnitTests {
     [TestFixture]
-    public class BusinessTripControllerTests {
-        protected BusinessTripController GetNewBusinessTripController(IService<BusinessTripDTO> bs, IService<EmployeeDTO> es) {
-            return new BusinessTripController(bs, es);
+    public class AnnualLeaveControllerTests {
+        protected AnnualLeaveController GetNewAnnualLeaveController(IService<AnnualLeaveDTO> als, IService<EmployeeDTO> es) {
+            return new AnnualLeaveController(als, es);
         }
 
-        protected BusinessTripController GetNewBusinessTripControllerWithControllerContext(IService<BusinessTripDTO> bs, IService<EmployeeDTO> es, bool isXRequestedWith = false) {
-            return new BusinessTripController(bs, es) { ControllerContext = MockingControllerContext(isXRequestedWith) };
+        protected AnnualLeaveController GetNewAnnualLeaveControllerWithControllerContext(IService<AnnualLeaveDTO> als, IService<EmployeeDTO> es, bool isXRequestedWith = false) {
+            return new AnnualLeaveController(als, es) { ControllerContext = MockingControllerContext(isXRequestedWith) };
         }
 
         protected ControllerContext MockingControllerContext(bool isXRequestedWith) {
@@ -53,8 +54,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public void Index_SyncRequest_AsksForIndexView() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveControllerWithControllerContext(mock.Object, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
@@ -62,33 +63,31 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_SyncRequest_RetrievesBusinessTripsPropertyFromModel() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<BusinessTripDTO>>(), It.IsAny<int>())).Returns(new BusinessTripDTO[] {
-                new BusinessTripDTO {
-                    Id = 1,
-                    Name = "02.09.2018_026"
+        public void Index_SyncRequest_RetrievesAnnualLeavesPropertyFromModel() {
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<AnnualLeaveDTO>>(), It.IsAny<int>())).Returns(new AnnualLeaveDTO[] {
+                new AnnualLeaveDTO {
+                    Id = 7
                 }
             });
-            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveControllerWithControllerContext(mock.Object, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
-            BusinessTripListViewModel model = result.ViewData.Model as BusinessTripListViewModel;
-            Assert.AreEqual(1, model.BusinessTrips.Count());
-            Assert.AreEqual(1, model.BusinessTrips.FirstOrDefault().Id);
-            Assert.AreEqual("02.09.2018_026", model.BusinessTrips.FirstOrDefault().Name);
+            AnnualLeaveListViewModel model = result.ViewData.Model as AnnualLeaveListViewModel;
+            Assert.AreEqual(1, model.AnnualLeaves.Count());
+            Assert.AreEqual(7, model.AnnualLeaves.FirstOrDefault().Id);
         }
 
         [Test]
         public void Index_SyncRequest_RetrievesPageInfoPropertyFromModel() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
             mock.Setup(m => m.PageInfo).Returns(new PageInfo() { TotalItems = 9, PageSize = 3, PageNumber = 3 });
-            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveControllerWithControllerContext(mock.Object, null);
 
             ViewResult result = controller.Index(null, null) as ViewResult;
 
-            BusinessTripListViewModel model = result.ViewData.Model as BusinessTripListViewModel;
+            AnnualLeaveListViewModel model = result.ViewData.Model as AnnualLeaveListViewModel;
             Assert.AreEqual(9, model.PageInfo.TotalItems);
             Assert.AreEqual(3, model.PageInfo.PageSize);
             Assert.AreEqual(3, model.PageInfo.PageNumber);
@@ -96,29 +95,27 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public void Index_AsyncRequest_RetrievesBusinessTripsPropertyFromModel() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<BusinessTripDTO>>(), It.IsAny<int>())).Returns(new BusinessTripDTO[] {
-                new BusinessTripDTO {
-                    Id = 1,
-                    Name = "02.09.2018_026"
+        public void Index_AsyncRequest_RetrievesAnnualLeavesPropertyFromModel() {
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            mock.Setup(m => m.GetPage(It.IsAny<IEnumerable<AnnualLeaveDTO>>(), It.IsAny<int>())).Returns(new AnnualLeaveDTO[] {
+                new AnnualLeaveDTO {
+                    Id = 7,
+                    Employee = new EmployeeDTO { Post = new PostDTO { Department = new DepartmentDTO() } }
                 }
             });
-            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null, true);
+            AnnualLeaveController controller = GetNewAnnualLeaveControllerWithControllerContext(mock.Object, null, true);
 
             JsonResult result = controller.Index(null, null) as JsonResult;
-            object businessTrip = (result.Data.GetType().GetProperty("BusinessTrips").GetValue(result.Data) as object[])[0];
-            int id = (int)businessTrip.GetType().GetProperty("Id").GetValue(businessTrip);
-            string code = businessTrip.GetType().GetProperty("Code").GetValue(businessTrip).ToString();
+            object AnnualLeave = (result.Data.GetType().GetProperty("AnnualLeaves").GetValue(result.Data) as object[])[0];
+            int id = (int)AnnualLeave.GetType().GetProperty("Id").GetValue(AnnualLeave);
 
-            Assert.AreEqual(1, id);
-            Assert.AreEqual("02.09.2018_026", code);
+            Assert.AreEqual(7, id);
         }
 
         [Test]
         public void Index_AsyncRequest_JsonRequestBehaviorEqualsAllowGet() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null, true);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveControllerWithControllerContext(mock.Object, null, true);
 
             JsonResult result = controller.Index(null, null) as JsonResult;
 
@@ -132,7 +129,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         public async Task Create_Get_ExistsEmployees_AsksForCreateView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CountAsync()).ReturnsAsync(1);
-            BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(null, mock.Object);
 
             ViewResult result = (await controller.Create()) as ViewResult;
 
@@ -146,7 +143,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
             mock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
                 new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович", Post = new PostDTO { Department = new DepartmentDTO { DepartmentName = "IT" } } }
             });
-            BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(null, mock.Object);
 
             ViewResult result = (await controller.Create()) as ViewResult;
 
@@ -159,7 +156,7 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         public async Task Create_Get_NoEmployees_AsksForErrorView() {
             Mock<EmployeeService> mock = new Mock<EmployeeService>();
             mock.Setup(m => m.CountAsync()).ReturnsAsync(0);
-            BusinessTripController controller = GetNewBusinessTripController(null, mock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(null, mock.Object);
 
             ViewResult result = (await controller.Create()) as ViewResult;
 
@@ -171,8 +168,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task Create_Post_ModelIsValid_RedirectToIndex() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             RedirectToRouteResult result = (await controller.Create(null)) as RedirectToRouteResult;
 
@@ -181,10 +178,10 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
         [Test]
         public async Task Create_Post_ModelIsInvalid_AsksForCreateView() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.CreateAsync(It.IsAny<AnnualLeaveDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
             ViewResult result = (await controller.Create(null)) as ViewResult;
 
@@ -192,31 +189,29 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Create_Post_ModelIsInvalid_RetrievesBusinessTripFromModel() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
+        public async Task Create_Post_ModelIsInvalid_RetrievesAnnualLeaveFromModel() {
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.CreateAsync(It.IsAny<AnnualLeaveDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
-            ViewResult result = (await controller.Create(new BusinessTripViewModel {
-                Id = 2,
-                Name = "02.09.2018_026"
+            ViewResult result = (await controller.Create(new AnnualLeaveViewModel {
+                Id = 7
             })) as ViewResult;
 
-            BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
-            Assert.AreEqual(2, model.Id);
-            Assert.AreEqual("02.09.2018_026", model.Name);
+            AnnualLeaveViewModel model = result.ViewData.Model as AnnualLeaveViewModel;
+            Assert.AreEqual(7, model.Id);
         }
 
         [Test]
         public async Task Create_Post_ModelIsInvalid_SetViewBagEmployees() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.CreateAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.CreateAsync(It.IsAny<AnnualLeaveDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
                 new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович", Post = new PostDTO { Department = new DepartmentDTO { DepartmentName = "IT" } } }
             });
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
             ViewResult result = (await controller.Create(null)) as ViewResult;
 
@@ -230,9 +225,9 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task Edit_Get_ModelIsValid_AsksForEditView() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
             ViewResult result = (await controller.Edit(1)) as ViewResult;
 
@@ -240,28 +235,26 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Edit_Get_ModelIsValid_RetrievesBusinessTripFromModel() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
-                Id = _id.Value,
-                Name = "02.09.2018_026"
+        public async Task Edit_Get_ModelIsValid_RetrievesAnnualLeaveFromModel() {
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new AnnualLeaveDTO {
+                Id = _id.Value
             });
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
-            ViewResult result = (await controller.Edit(2)) as ViewResult;
+            ViewResult result = (await controller.Edit(7)) as ViewResult;
 
-            BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
-            Assert.AreEqual(2, model.Id);
-            Assert.AreEqual("02.09.2018_026", model.Name);
+            AnnualLeaveViewModel model = result.ViewData.Model as AnnualLeaveViewModel;
+            Assert.AreEqual(7, model.Id);
         }
 
         [Test]
         public async Task Edit_Get_ModelIsInvalid_AsksForErrorView() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
             ViewResult result = (await controller.Edit(1)) as ViewResult;
 
@@ -270,10 +263,10 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
         [Test]
         public async Task Edit_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
             ViewResult result = (await controller.Edit(1)) as ViewResult;
 
@@ -283,12 +276,12 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
         [Test]
         public async Task Edit_Get_SetViewBagEmployees() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
                 new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович", Post = new PostDTO { Department = new DepartmentDTO { DepartmentName = "IT" } } }
             });
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
             ViewResult result = (await controller.Edit(1)) as ViewResult;
 
@@ -302,54 +295,52 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task Edit_Post_ModelIsValid_RedirectToIndex() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
-            RedirectToRouteResult result = (await controller.Edit(new BusinessTripViewModel())) as RedirectToRouteResult;
+            RedirectToRouteResult result = (await controller.Edit(new AnnualLeaveViewModel())) as RedirectToRouteResult;
 
             Assert.AreEqual("Index", result.RouteValues["action"]);
         }
 
         [Test]
         public async Task Edit_Post_ModelIsInvalid_AsksForEditView() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.EditAsync(It.IsAny<AnnualLeaveDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
-            ViewResult result = (await controller.Edit(new BusinessTripViewModel())) as ViewResult;
+            ViewResult result = (await controller.Edit(new AnnualLeaveViewModel())) as ViewResult;
 
             Assert.AreEqual("Edit", result.ViewName);
         }
 
         [Test]
-        public async Task Edit_Post_ModelIsInvalid_RetrievesBusinessTripFromModel() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
+        public async Task Edit_Post_ModelIsInvalid_RetrievesAnnualLeaveFromModel() {
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.EditAsync(It.IsAny<AnnualLeaveDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
-            ViewResult result = (await controller.Edit(new BusinessTripViewModel {
-                Id = 2,
-                Name = "02.09.2018_026"
+            ViewResult result = (await controller.Edit(new AnnualLeaveViewModel {
+                Id = 7
             })) as ViewResult;
 
-            BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
-            Assert.AreEqual(2, model.Id);
-            Assert.AreEqual("02.09.2018_026", model.Name);
+            AnnualLeaveViewModel model = result.ViewData.Model as AnnualLeaveViewModel;
+            Assert.AreEqual(7, model.Id);
         }
 
         [Test]
         public async Task Edit_Post_ModelIsInvalid_SetViewBagEmployees() {
-            Mock<BusinessTripService> bmock = new Mock<BusinessTripService>();
-            bmock.Setup(m => m.EditAsync(It.IsAny<BusinessTripDTO>())).Throws(new ValidationException("", ""));
+            Mock<AnnualLeaveService> almock = new Mock<AnnualLeaveService>();
+            almock.Setup(m => m.EditAsync(It.IsAny<AnnualLeaveDTO>())).Throws(new ValidationException("", ""));
             Mock<EmployeeService> emock = new Mock<EmployeeService>();
             emock.Setup(m => m.GetAllAsync()).ReturnsAsync(new EmployeeDTO[] {
                 new EmployeeDTO() { Id = 2, LastName = "Петров", FirstName = "Петр", Patronymic = "Петрович", Post = new PostDTO { Department = new DepartmentDTO { DepartmentName = "IT" } } }
             });
-            BusinessTripController controller = GetNewBusinessTripController(bmock.Object, emock.Object);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(almock.Object, emock.Object);
 
-            ViewResult result = (await controller.Edit(new BusinessTripViewModel())) as ViewResult;
+            ViewResult result = (await controller.Edit(new AnnualLeaveViewModel())) as ViewResult;
 
             SelectListItem item = (result.ViewBag.Employees as SelectList).FirstOrDefault();
             Assert.AreEqual("Петров Петр Петрович [IT]", item.Text);
@@ -361,8 +352,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task Details_ModelIsValid_AsksForDetailsView() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             ViewResult result = (await controller.Details(1)) as ViewResult;
 
@@ -370,26 +361,24 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Details_ModelIsValid_RetrievesBusinessTripFromModel() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
-                Id = _id.Value,
-                Name = "02.09.2018_026",
+        public async Task Details_ModelIsValid_RetrievesAnnualLeaveFromModel() {
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new AnnualLeaveDTO {
+                Id = _id.Value
             });
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
-            ViewResult result = (await controller.Details(2)) as ViewResult;
+            ViewResult result = (await controller.Details(7)) as ViewResult;
 
-            BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
-            Assert.AreEqual(2, model.Id);
-            Assert.AreEqual("02.09.2018_026", model.Name);
+            AnnualLeaveViewModel model = result.ViewData.Model as AnnualLeaveViewModel;
+            Assert.AreEqual(7, model.Id);
         }
 
         [Test]
         public async Task Details_ModelIsInvalid_AsksForErrorView() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             ViewResult result = (await controller.Details(1)) as ViewResult;
 
@@ -398,9 +387,9 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
         [Test]
         public async Task Details_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             ViewResult result = (await controller.Details(1)) as ViewResult;
 
@@ -413,8 +402,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task Delete_Get_ModelIsValid_AsksForDeleteView() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             ViewResult result = (await controller.Delete(1)) as ViewResult;
 
@@ -422,26 +411,24 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         }
 
         [Test]
-        public async Task Delete_Get_ModelIsValid_RetrievesBusinessTripFromModel() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new BusinessTripDTO {
-                Id = _id.Value,
-                Name = "02.09.2018_026"
+        public async Task Delete_Get_ModelIsValid_RetrievesAnnualLeaveFromModel() {
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).ReturnsAsync((int? _id) => new AnnualLeaveDTO {
+                Id = _id.Value
             });
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
-            ViewResult result = (await controller.Delete(2)) as ViewResult;
+            ViewResult result = (await controller.Delete(7)) as ViewResult;
 
-            BusinessTripViewModel model = result.ViewData.Model as BusinessTripViewModel;
-            Assert.AreEqual(2, model.Id);
-            Assert.AreEqual("02.09.2018_026", model.Name);
+            AnnualLeaveViewModel model = result.ViewData.Model as AnnualLeaveViewModel;
+            Assert.AreEqual(7, model.Id);
         }
 
         [Test]
         public async Task Delete_Get_ModelIsInvalid_AsksForErrorView() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             ViewResult result = (await controller.Delete(1)) as ViewResult;
 
@@ -450,9 +437,9 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
 
         [Test]
         public async Task Delete_Get_ModelIsInvalid_RetrievesExceptionMessageFromModel() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
             mock.Setup(m => m.FindByIdAsync(It.IsAny<int?>())).Throws(new ValidationException("FindByIdAsync method throws Exception", ""));
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             ViewResult result = (await controller.Delete(1)) as ViewResult;
 
@@ -465,8 +452,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task DeleteConfirmed_Post_RedirectToIndex() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             RedirectToRouteResult result = (await controller.DeleteConfirmed(1)) as RedirectToRouteResult;
 
@@ -478,8 +465,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public void DeleteAll_Get_AsksForDeleteAllView() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             ViewResult result = controller.DeleteAll() as ViewResult;
 
@@ -491,8 +478,8 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task DeleteAllConfirmed_Post_RedirectToIndex() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripController(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveController(mock.Object, null);
 
             RedirectToRouteResult result = (await controller.DeleteAllConfirmed()) as RedirectToRouteResult;
 
@@ -504,14 +491,14 @@ namespace DiplomMSSQLApp.WEB.UnitTests {
         /// </summary>
         [Test]
         public async Task ExportJson_RedirectToIndex() {
-            Mock<BusinessTripService> mock = new Mock<BusinessTripService>();
-            BusinessTripController controller = GetNewBusinessTripControllerWithControllerContext(mock.Object, null);
+            Mock<AnnualLeaveService> mock = new Mock<AnnualLeaveService>();
+            AnnualLeaveController controller = GetNewAnnualLeaveControllerWithControllerContext(mock.Object, null);
 
             FilePathResult result = (await controller.ExportJson()) as FilePathResult;
 
             Assert.AreEqual("application/json", result.ContentType);
-            Assert.AreEqual("BusinessTrips.json", result.FileDownloadName);
-            Assert.AreEqual("./DiplomMSSQLApp.WEB/Results/BusinessTrips.json", result.FileName);
+            Assert.AreEqual("AnnualLeaves.json", result.FileDownloadName);
+            Assert.AreEqual("./DiplomMSSQLApp.WEB/Results/AnnualLeaves.json", result.FileName);
         }
     }
 }

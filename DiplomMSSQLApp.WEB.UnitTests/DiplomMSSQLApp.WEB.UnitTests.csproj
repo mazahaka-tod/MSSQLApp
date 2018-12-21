@@ -121,6 +121,7 @@
   <ItemGroup>
     <Compile Include="AccountControllerTests.cs" />
     <Compile Include="AdminControllerTests.cs" />
+    <Compile Include="AnnualLeaveControllerTests.cs" />
     <Compile Include="BusinessTripControllerTests.cs" />
     <Compile Include="DepartmentControllerTests.cs" />
     <Compile Include="EmployeeControllerTests.cs" />

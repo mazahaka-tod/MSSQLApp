@@ -88,7 +88,8 @@ namespace DiplomMSSQLApp.WEB.Controllers {
             IEnumerable<EmployeeDTO> employees = await _employeeService.GetAllAsync();
             IEnumerable<SelectListItem> items = employees.Select(e => new SelectListItem() {
                 Value = e.Id.ToString(),
-                Text = e.LastName + " " + e.FirstName + " " + e.Patronymic
+                Text = new System.Text.StringBuilder(e.LastName).Append(" ").Append(e.FirstName).Append(" ")
+                    .Append(e.Patronymic ?? "").Append(" [").Append(e.Post.Department.DepartmentName).Append("]").ToString()
             }).OrderBy(e => e.Text);
             return new SelectList(items, "Value", "Text");
         }
