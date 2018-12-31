@@ -52,7 +52,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DepartmentTests.cs" />
+    <Compile Include="EmployeeTests.cs" />
     <Compile Include="OrganizationTests.cs" />
+    <Compile Include="PostTests.cs" />
     <Compile Include="SeleniumTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

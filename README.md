@@ -42,7 +42,7 @@ The project is under active development.
 
 **Used Framework**: ASP.NET MVC 5.  
 **Used DBMS**: MS SQL Server.  
-**Used packages**: Entity Framework, AspNet.Identity, AutoMapper, Ninject, Bootstrap, jQuery, NLog, NUnit, Moq.  
+**Used packages**: Entity Framework, AspNet.Identity, AutoMapper, Ninject, Bootstrap, jQuery, NLog, NUnit, Moq, Selenium.WebDriver.  
 
 **P.S.**  
 **Login**: Admin  

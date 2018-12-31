@@ -10,25 +10,31 @@ namespace DiplomMSSQLApp.IntegrationTests {
 
         [Test]
         public void SignInAsAdmin() {
+            string actualTitle;
+
             ChromeDriver.Navigate().GoToUrl(GetAbsoluteUrl("/Organization/Index"));
+            actualTitle = ChromeDriver.Title;
             SignIn();
 
+            Assert.AreEqual("Вход", actualTitle);
             Assert.AreEqual("Информация об организации", ChromeDriver.Title);
         }
 
         [Test]
         public void EditPhoneOrganization() {
-            string phoneNumber = "+7 (922) " + new Random().Next(10000000, 99999999).ToString();
+            string actualTitle;
+            string expectedPhone = "+7 (922) " + new Random().Next(10000000, 99999999).ToString();
 
-            ChromeDriver.Navigate().GoToUrl(GetAbsoluteUrl("/Organization/Index"));
-            if (ChromeDriver.Title == "Вход") SignIn();
+            GoToUrl("/Organization/Index");
             ChromeDriver.FindElement(By.PartialLinkText("Изменить информацию")).Click();
+            actualTitle = ChromeDriver.Title;
             ChromeDriver.FindElement(By.Id("Phone")).Clear();
-            ChromeDriver.FindElement(By.Id("Phone")).SendKeys(phoneNumber);
+            ChromeDriver.FindElement(By.Id("Phone")).SendKeys(expectedPhone);
             ChromeDriver.FindElement(By.XPath("//input[@value='Сохранить']")).Click();
 
-            IWebElement element = ChromeDriver.FindElement(By.XPath("//dt[contains(.,'Телефон')]/following-sibling::dd"));
-            Assert.AreEqual(phoneNumber, element.Text);
+            Assert.AreEqual("Редактирование информации об организации", actualTitle);
+            string actualPhone = ChromeDriver.FindElement(By.XPath("//dt[contains(.,'Телефон')]/following-sibling::dd")).Text;
+            Assert.AreEqual(expectedPhone, actualPhone);
         }
 
         [Test]
@@ -36,8 +42,7 @@ namespace DiplomMSSQLApp.IntegrationTests {
             string fullPath = "./DiplomMSSQLApp.WEB/Results/Organizations.json";
             if (File.Exists(fullPath)) File.Delete(fullPath);
 
-            ChromeDriver.Navigate().GoToUrl(GetAbsoluteUrl("/Organization/Index"));
-            if (ChromeDriver.Title == "Вход") SignIn();
+            GoToUrl("/Organization/Index");
             ChromeDriver.FindElement(By.PartialLinkText("Экспортировать данные в JSON файл")).Click();
 
             Assert.IsTrue(File.Exists(fullPath));
