@@ -52,8 +52,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnnualLeaveTests.cs" />
+    <Compile Include="BusinessTripTests.cs" />
     <Compile Include="DepartmentTests.cs" />
     <Compile Include="EmployeeTests.cs" />
+    <Compile Include="LeaveScheduleTests.cs" />
     <Compile Include="OrganizationTests.cs" />
     <Compile Include="PostTests.cs" />
     <Compile Include="SeleniumTest.cs" />

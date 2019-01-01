@@ -117,7 +117,7 @@ namespace DiplomMSSQLApp.IntegrationTests {
             ChromeDriver.FindElement(By.XPath("//input[@value='Найти']")).Click();
             Thread.Sleep(500);
 
-            Assert.AreEqual(1, GetTextLabelForCount());
+            Assert.AreEqual(1, GetTextLabelForCount(2));
             string actualPostTitle = ChromeDriver.FindElement(By.XPath("//tbody[@id='tableBody']/tr[position()=last()]/td[3]")).Text;
             Assert.AreEqual(expectedPostTitle, actualPostTitle);
         }

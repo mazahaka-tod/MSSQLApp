@@ -57,12 +57,12 @@ namespace DiplomMSSQLApp.IntegrationTests {
 
         protected int GetNumberOfDepartments() {
             GoToUrl("/Department/Index");
-            return GetTextLabelForCount();
+            return GetTextLabelForCount(2);
         }
 
-        protected int GetTextLabelForCount() {
+        protected int GetTextLabelForCount(int index) {
             IWebElement label = ChromeDriver.FindElement(By.CssSelector("label[for='Count']"));
-            return int.Parse(label.Text.Split(new char[] { ' ' })[2]);
+            return int.Parse(label.Text.Split(new char[] { ' ' })[index]);
         }
 
         protected void AddDepartmentIfNumberOfDepartmentsIsZero() {
@@ -76,7 +76,7 @@ namespace DiplomMSSQLApp.IntegrationTests {
 
         protected int GetNumberOfPosts() {
             GoToUrl("/Post/Index");
-            return GetTextLabelForCount();
+            return GetTextLabelForCount(2);
         }
 
         protected void AddPostIfNumberOfPostsIsZero() {
@@ -94,7 +94,7 @@ namespace DiplomMSSQLApp.IntegrationTests {
 
         protected int GetNumberOfEmployees() {
             GoToUrl("/Employee/Index");
-            return GetTextLabelForCount();
+            return GetTextLabelForCount(2);
         }
 
         protected void AddEmployeeIfNumberOfEmployeesIsZero() {
@@ -121,6 +121,76 @@ namespace DiplomMSSQLApp.IntegrationTests {
             GoToUrl("/Post/Index");
             ChromeDriver.FindElement(By.PartialLinkText("Удалить все должности")).Click();
             ChromeDriver.FindElement(By.XPath("//input[@value='Удалить']")).Click();
+        }
+
+        protected int GetNumberOfBusinessTrips() {
+            GoToUrl("/BusinessTrip/Index");
+            return GetTextLabelForCount(2);
+        }
+
+        protected void AddBusinessTripIfNumberOfBusinessTripsIsZero() {
+            if (GetNumberOfBusinessTrips() > 0) return;
+            AddEmployeeIfNumberOfEmployeesIsZero();
+            GoToUrl("/BusinessTrip/Index");
+            ChromeDriver.FindElement(By.PartialLinkText("Добавить командировку")).Click();
+            ChromeDriver.FindElement(By.Id("Name")).SendKeys("100000");
+            ChromeDriver.FindElement(By.Id("DateStart")).SendKeys("12122018");
+            ChromeDriver.FindElement(By.Id("DateEnd")).SendKeys("16122018");
+            ChromeDriver.FindElement(By.Id("Destination")).SendKeys("Москва");
+            ChromeDriver.FindElement(By.Id("Purpose")).SendKeys("Семинар");
+            ChromeDriver.FindElement(By.XPath("//input[@value='Добавить']")).Click();
+        }
+
+        protected void RemoveAllBusinessTrips() {
+            GoToUrl("/BusinessTrip/Index");
+            ChromeDriver.FindElement(By.PartialLinkText("Удалить все командировки")).Click();
+            ChromeDriver.FindElement(By.XPath("//input[@value='Удалить']")).Click();
+        }
+
+        protected int GetNumberOfAnnualLeaves() {
+            GoToUrl("/AnnualLeave/Index");
+            return GetTextLabelForCount(2);
+        }
+
+        protected void AddAnnualLeaveIfNumberOfAnnualLeavesIsZero() {
+            if (GetNumberOfAnnualLeaves() > 0) return;
+            AddLeaveScheduleFor2018();
+            AddEmployeeIfNumberOfEmployeesIsZero();
+            GoToUrl("/AnnualLeave/Index");
+            ChromeDriver.FindElement(By.PartialLinkText("Добавить отпуск")).Click();
+            ChromeDriver.FindElement(By.Id("ScheduledDate")).SendKeys("12122018");
+            ChromeDriver.FindElement(By.Id("ScheduledNumberOfDays")).SendKeys("28");
+            ChromeDriver.FindElement(By.XPath("//input[@value='Добавить']")).Click();
+        }
+
+        protected void RemoveAllAnnualLeaves() {
+            GoToUrl("/AnnualLeave/Index");
+            ChromeDriver.FindElement(By.PartialLinkText("Удалить все отпуска")).Click();
+            ChromeDriver.FindElement(By.XPath("//input[@value='Удалить']")).Click();
+        }
+
+        protected int GetNumberOfLeaveSchedules() {
+            GoToUrl("/LeaveSchedule/Index");
+            return GetTextLabelForCount(3);
+        }
+
+        protected void AddLeaveScheduleIfNumberOfLeaveSchedulesIsZero() {
+            if (GetNumberOfLeaveSchedules() > 0) return;
+            GoToUrl("/LeaveSchedule/Index");
+            ChromeDriver.FindElement(By.PartialLinkText("Добавить график отпусков")).Click();
+            ChromeDriver.FindElement(By.Id("Number")).SendKeys("1");
+            ChromeDriver.FindElement(By.Id("Year")).SendKeys("2019");
+            ChromeDriver.FindElement(By.Id("DateOfPreparation")).SendKeys("12122018");
+            ChromeDriver.FindElement(By.XPath("//input[@value='Добавить']")).Click();
+        }
+
+        protected void AddLeaveScheduleFor2018() {
+            GoToUrl("/LeaveSchedule/Index");
+            ChromeDriver.FindElement(By.PartialLinkText("Добавить график отпусков")).Click();
+            ChromeDriver.FindElement(By.Id("Number")).SendKeys("1");
+            ChromeDriver.FindElement(By.Id("Year")).SendKeys("2018");
+            ChromeDriver.FindElement(By.Id("DateOfPreparation")).SendKeys("12122017");
+            ChromeDriver.FindElement(By.XPath("//input[@value='Добавить']")).Click();
         }
     }
 }
